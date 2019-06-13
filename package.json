@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -32,7 +32,6 @@
     "@types/react": "^16.8.19",
     "@types/react-dom": "^16.8.4",
     "awesome-typescript-loader": "^5.2.1",
-    "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
     "react": "^16.8.6",
@@ -54,10 +53,13 @@
     "react-dom": "^16.8.6"
   },
   "dependencies": {
-    "draft-js": "^0.10.5"
+    "draft-js": "^0.10.5",
+    "classnames": "^2.2.6"
   },
   "files": [
     "examples",
+    "dist",
+    "src",
     "*.js",
     "*.json",
     "*.ts",
