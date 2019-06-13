@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -17,7 +17,7 @@
     "url": "https://github.com/niuware/mui-rte/issues"
   },
   "homepage": "https://github.com/niuware/mui-rte#readme",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "serve-example": "cross-env EXAMPLE=basic webpack-dev-server --mode development",
     "build": "cross-env NODE_ENV=production rollup -c"
@@ -60,7 +60,7 @@
     "src",
     "examples",
     "dist",
-    "./*.js",
-    "./*.json"
+    "*.js",
+    "*.json"
   ]
 }

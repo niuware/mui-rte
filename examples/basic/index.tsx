@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import MUIRichTextEditor from '../../src'
+import MUIRichTextEditor from '../../'
 
 const save = (data: string) => {
     console.log(data)
