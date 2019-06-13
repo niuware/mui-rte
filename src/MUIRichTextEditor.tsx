@@ -57,7 +57,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     value?: any
-    label: string,
+    label?: string,
     readOnly?: boolean
     inheritFontSize?: boolean
     error?: boolean
@@ -284,7 +284,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                     })}
                     onClick={this.handleFocus}
                 >
-                    {this.props.label}
+                    {this.props.label || ""}
                 </div>
             )
             className = classes.hidePlaceholder

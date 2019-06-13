@@ -6,7 +6,6 @@ const content = '{"blocks":[{"key":"7po5","text":"My Title","type":"header-two",
 
 ReactDOM.render(
     <MUIRichTextEditor 
-        label="" 
         value={content} 
         readOnly={true} 
     />,
