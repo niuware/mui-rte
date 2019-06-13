@@ -1,0 +1,59 @@
+{
+  "name": "mui-rte",
+  "version": "1.0.0",
+  "description": "Material-UI Rich Text Editor and Viewer",
+  "keywords": [
+    "material-ui",
+    "rich text editor",
+    "rte",
+    "react",
+    "text editor"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/niuware/mui-rte.git"
+  },
+  "bugs": {
+    "url": "https://github.com/niuware/mui-rte/issues"
+  },
+  "homepage": "https://github.com/niuware/mui-rte#readme",
+  "main": "./dist/index.js",
+  "scripts": {
+    "serve-example": "cross-env EXAMPLE=basic webpack-dev-server --mode development",
+    "build": "cross-env NODE_ENV=production rollup -c"
+  },
+  "author": "Erik Lopez",
+  "license": "MIT",
+  "devDependencies": {
+    "@material-ui/core": "^4.0.2",
+    "@material-ui/icons": "^4.0.1",
+    "@types/classnames": "^2.2.8",
+    "@types/draft-js": "^0.10.32",
+    "@types/react": "^16.8.19",
+    "@types/react-dom": "^16.8.4",
+    "awesome-typescript-loader": "^5.2.1",
+    "classnames": "^2.2.6",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.16.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "rollup": "^1.15.2",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-uglify": "^6.0.2",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.5.1",
+    "webpack": "^4.34.0",
+    "webpack-cli": "^3.3.4",
+    "webpack-dev-server": "^3.7.1"
+  },
+  "peerDependencies": {
+    "@material-ui/core": "^4.0.2",
+    "@material-ui/icons": "^4.0.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "dependencies": {
+    "draft-js": "^0.10.5"
+  }
+}
