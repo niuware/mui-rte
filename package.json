@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -57,10 +57,10 @@
     "draft-js": "^0.10.5"
   },
   "files": [
-    "src",
     "examples",
-    "dist",
     "*.js",
-    "*.json"
+    "*.json",
+    "*.ts",
+    "*.tsx"
   ]
 }
