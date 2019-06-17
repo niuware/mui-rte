@@ -4,10 +4,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 const styles = ({ spacing, palette }: Theme) => createStyles({
     root: {
         backgroundColor: palette.grey[200],
-        paddingTop: spacing(1),
-        paddingBottom: spacing(1),
-        paddingLeft: spacing(2),
-        paddingRight: spacing(2)
+        padding: spacing(1, 2)
     }
 })
 

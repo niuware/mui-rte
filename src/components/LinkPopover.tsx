@@ -5,10 +5,7 @@ import CheckIcon from '@material-ui/icons/Check'
 
 const styles = ({spacing}: Theme) => createStyles({
     linkPopover: {
-        paddingRight: spacing(2),
-        paddingLeft: spacing(2),
-        paddingTop: spacing(1),
-        paddingBottom: spacing(1)
+        padding: spacing(1, 2)
     },
     linkTextField: {
         width: "96%"
