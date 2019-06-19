@@ -1,15 +1,17 @@
 # mui-rte
 The Material-UI Rich Text Editor and Viewer
 
-![mui-rte](http://niuware.github.io/public/assets/mui-rte/editor-w-controls.png)
+<img src="http://niuware.github.io/public/assets/mui-rte/editor-w-controls.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui 4` based on `draft-js` and written in Typescript.
+**mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript.
 
 ## Installation
 
 ```
 npm install mui-rte --save
 ```
+
+If you haven't install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
 
 ## Usage
 

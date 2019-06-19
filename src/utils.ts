@@ -24,4 +24,19 @@ const getSelectionInfo = (editorState: EditorState): {
     }
 }
 
-export { getSelectionInfo }
+/**
+ * Spacing compatible for material-ui v3.2.x ~ v.4.x.x
+ */
+const getCompatibleSpacing = (spacing: any, 
+    top: number, 
+    right: number, 
+    bottom: number, 
+    left: number) => {
+    if (typeof spacing === "function") {
+        return spacing(top, right, bottom, left)
+    }
+    const unit = (spacing as any).unit
+    return `${top * unit}px ${right * unit}px ${bottom * unit}px ${left * unit}px`
+}
+
+export { getSelectionInfo, getCompatibleSpacing }

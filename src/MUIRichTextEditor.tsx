@@ -14,11 +14,11 @@ import Link from './components/Link'
 import LinkPopover from './components/LinkPopover'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
-import { getSelectionInfo } from './utils'
+import { getSelectionInfo, getCompatibleSpacing } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
-        marginTop: spacing(1),
+        margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize
     },
@@ -26,10 +26,10 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         fontSize: "inherit"
     },
     editor: {
-        marginTop: spacing(1),
+        margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
         cursor: "text",
         width: "100%",
-        paddingBottom: spacing(1)
+        padding: getCompatibleSpacing(spacing, 0, 0, 1, 0)
     },
     editorReadOnly: {
         borderBottom: "none"
@@ -44,7 +44,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         color: palette.grey[600]
     },
     linkPopover: {
-        padding: spacing(2)
+        padding: getCompatibleSpacing(spacing, 2, 2, 2, 2)
     },
     linkTextField: {
         width: "100%"

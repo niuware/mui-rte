@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import { Popover, TextField, Grid, Button } from '@material-ui/core'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import CheckIcon from '@material-ui/icons/Check'
+import { getCompatibleSpacing } from '../utils'
 
 const styles = ({spacing}: Theme) => createStyles({
     linkPopover: {
-        padding: spacing(1, 2)
+        padding: getCompatibleSpacing(spacing, 1, 2, 1, 2)
     },
     linkTextField: {
         width: "96%"
