@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -19,7 +19,8 @@
   "homepage": "https://github.com/niuware/mui-rte#readme",
   "main": "dist/index.js",
   "scripts": {
-    "watch": "cross-env EXAMPLE=basic webpack-dev-server --mode development",
+    "serve": "cross-env EXAMPLE=basic webpack-dev-server --mode development",
+    "watch": "cross-env NODE_ENV=development rollup -c -w",
     "build": "cross-env NODE_ENV=production rollup -c"
   },
   "author": "Erik Lopez",

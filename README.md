@@ -13,7 +13,7 @@ npm install mui-rte --save
 
 If you haven't install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
 
-# Demo
+## Demo
 
 [![Edit mui-rte basic](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/mui-rte-basic-ypfdo?fontsize=14)
 
@@ -53,6 +53,11 @@ ReactDOM.render(
 |inheritFontSize|boolean|optional|Inherit font size from parent. Useful for read only mode|
 |error|boolean|optional|Renders the editor with an error style|
 |onSave|(data:string) => void|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object|
+|controls|string[]|optional|List of controls to show. Current available values are: "title", "bold", "italic", "underline", "link", "numberList", "bulletList", "quote", "code", "clear", "save"|
+
+## Examples
+
+Check the `examples` diretory for more.
 
 ## Future plans
 

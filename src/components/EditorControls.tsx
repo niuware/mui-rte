@@ -16,8 +16,11 @@ type KeyString = {
     [key: string]: React.ReactNode | EditorState
 }
 
+export type TEditorControl = "title" | "bold" | "italic" | "underline" | "link" | "numberList" | "bulletList" | "quote" | "code" | "clear" | "save"
+
 type TStyleType = {
     id?: string
+    name: TEditorControl
     label: string
     style: string
     icon: JSX.Element
@@ -27,60 +30,69 @@ type TStyleType = {
 }
 
 const STYLE_TYPES: TStyleType[] = [
-    { 
-        label: 'H2', 
-        style: 'header-two', 
-        icon: <TitleIcon />, 
-        type: "block" 
-    },
-    { 
-        label: 'Bold', 
-        style: 'BOLD', 
-        icon: <FormatBoldIcon />, 
-        type: "inline" 
-    },
-    { 
-        label: 'Italic', 
-        style: 'ITALIC', 
-        icon: <FormatItalicIcon />, 
-        type: "inline" 
-    },
-    { 
-        label: 'Underline', 
-        style: 'UNDERLINE', 
-        icon: <FormatUnderlinedIcon />, 
-        type: "inline"
-    },
-    { 
-        label: 'Link', 
-        style: 'LINK', 
-        icon: <InsertLinkIcon />, 
-        type: "decorator", 
-        clickFnName: "onPromptLink", 
-        id: "mui-rte-link-control" 
-    },
-    { 
-        label: 'OL', 
-        style: 'ordered-list-item', 
-        icon: <FormatListNumberedIcon />, 
-        type: "block" 
-    },
-    { 
-        label: 'UL', 
-        style: 'unordered-list-item', 
-        icon: <FormatListBulletedIcon />, 
-        type: "block" 
-    },
-    { 
-        label: 'Blockquote', 
-        style: 'blockquote', 
-        icon: <FormatQuoteIcon />, 
+    {
+        label: 'H2',
+        name: "title",
+        style: 'header-two',
+        icon: <TitleIcon />,
         type: "block"
     },
-    { 
-        label: 'Code Block', 
-        style: 'code-block', 
-        icon: <CodeIcon />, 
+    {
+        label: 'Bold',
+        name: "bold",
+        style: 'BOLD',
+        icon: <FormatBoldIcon />,
+        type: "inline"
+    },
+    {
+        label: 'Italic',
+        name: "italic",
+        style: 'ITALIC',
+        icon: <FormatItalicIcon />,
+        type: "inline"
+    },
+    {
+        label: 'Underline',
+        name: "underline",
+        style: 'UNDERLINE',
+        icon: <FormatUnderlinedIcon />,
+        type: "inline"
+    },
+    {
+        label: 'Link',
+        name: "link",
+        style: 'LINK',
+        icon: <InsertLinkIcon />,
+        type: "decorator",
+        clickFnName: "onPromptLink",
+        id: "mui-rte-link-control"
+    },
+    {
+        label: 'OL',
+        name: "bulletList",
+        style: 'ordered-list-item',
+        icon: <FormatListNumberedIcon />,
+        type: "block"
+    },
+    {
+        label: 'UL',
+        name: "numberList",
+        style: 'unordered-list-item',
+        icon: <FormatListBulletedIcon />,
+        type: "block"
+    },
+    {
+        label: 'Blockquote',
+        name: "quote",
+        style: 'blockquote',
+        icon: <FormatQuoteIcon />,
+        type: "block"
+    },
+    {
+        label: 'Code Block',
+        name: "code",
+        style: 'code-block',
+        icon: <CodeIcon />,
         type: "block"
     }
 ]
@@ -88,6 +100,7 @@ const STYLE_TYPES: TStyleType[] = [
 interface IBlockStyleControlsProps extends KeyString {
     children?: React.ReactNode
     editorState: EditorState
+    controls?: Array<TEditorControl>
     onToggleInline: (inlineStyle: any) => void
     onToggleBlock: (blockType: any) => void
     onPromptLink: () => void
@@ -95,9 +108,15 @@ interface IBlockStyleControlsProps extends KeyString {
 
 const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
     const selectionInfo = getSelectionInfo(props.editorState)
+    let filteredControls = STYLE_TYPES
+    if (props.controls) {
+        filteredControls = STYLE_TYPES.filter(style => {
+            return props.controls!.includes(style.name)
+        })
+    }
     return (
         <div>
-            {STYLE_TYPES.map(style => {
+            {filteredControls.map(style => {
                 let active = false
                 let action = null
                 if (style.type === "inline") {

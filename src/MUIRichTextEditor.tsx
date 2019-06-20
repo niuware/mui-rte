@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap
 } from 'draft-js'
-import EditorControls from './components/EditorControls'
+import EditorControls, { TEditorControl } from './components/EditorControls'
 import EditorButton from './components/EditorButton'
 import Link from './components/Link'
 import LinkPopover from './components/LinkPopover'
@@ -61,7 +61,9 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     readOnly?: boolean
     inheritFontSize?: boolean
     error?: boolean
+    controls?: Array<TEditorControl>
     onSave?: (data: string) => void
+    ref?: any
 }
 
 type IMUIRichTextEditorState = {
@@ -141,7 +143,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         })
     }
 
-    handleSave = () => {
+    save = () => {
         if (this.props.onSave) {
             this.props.onSave(JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent())))
         }
@@ -271,7 +273,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
     }
 
     render() {
-        const { classes } = this.props
+        const { classes, controls } = this.props
         const contentState = this.state.editorState.getCurrentContent()
         let className = ""
         let placeholder = null
@@ -300,19 +302,24 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                         onToggleBlock={this.toggleBlockType}
                         onToggleInline={this.toggleInlineStyle}
                         onPromptLink={this.promptForLink}
+                        controls={controls}
                     >
-                        <EditorButton
-                            key="clear"
-                            label="Format Clear"
-                            onClick={this.handleClearFormat}
-                            icon={<FormatClearIcon />}
-                        />
-                        <EditorButton
-                            key="save"
-                            label="Save"
-                            onClick={this.handleSave}
-                            icon={<SaveIcon />}
-                        />
+                        {this.props.controls === undefined || this.props.controls.includes("clear") ?
+                            <EditorButton
+                                key="clear"
+                                label="Format Clear"
+                                onClick={this.handleClearFormat}
+                                icon={<FormatClearIcon />}
+                            />
+                        : null }
+                        {this.props.controls === undefined || this.props.controls.includes("save") ?
+                            <EditorButton
+                                key="save"
+                                label="Save"
+                                onClick={this.save}
+                                icon={<SaveIcon />}
+                            />
+                        : null }
                     </EditorControls>
                     : null}
                 {placeholder}
