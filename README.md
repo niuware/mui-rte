@@ -13,6 +13,10 @@ npm install mui-rte --save
 
 If you haven't install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
 
+# Demo
+
+[![Edit mui-rte basic](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/mui-rte-basic-ypfdo?fontsize=14)
+
 ## Usage
 
 ```js
