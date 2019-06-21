@@ -35,7 +35,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         borderBottom: "none"
     },
     error: {
-        borderBottom: "1px solid red"
+        borderBottom: "2px solid red"
     },
     hidePlaceholder: {
         display: "none"
