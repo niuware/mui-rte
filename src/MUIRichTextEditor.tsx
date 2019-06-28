@@ -2,25 +2,28 @@ import * as React from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
-import SaveIcon from '@material-ui/icons/Save'
-import FormatClearIcon from '@material-ui/icons/FormatClear'
 import {
-    Editor, EditorState, convertFromRaw, RichUtils,
-    CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap
+    Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
+    CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand, 
+    DraftHandleValue,
+    ContentBlock
 } from 'draft-js'
 import EditorControls, { TEditorControl } from './components/EditorControls'
-import EditorButton from './components/EditorButton'
 import Link from './components/Link'
-import LinkPopover from './components/LinkPopover'
+import Image from './components/Image'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
+import UrlPopover from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
         margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
         fontFamily: typography.body1.fontFamily,
-        fontSize: typography.body1.fontSize
+        fontSize: typography.body1.fontSize,
+        '& figure': {
+            margin: 0
+        }
     },
     inheritFontSize: {
         fontSize: "inherit"
@@ -70,6 +73,7 @@ type IMUIRichTextEditorState = {
     editorState: EditorState
     focused: boolean
     anchorLinkPopover?: HTMLElement
+    anchorMediaPopover?: HTMLElement
     urlValue?: string
     urlKey?: string
 }
@@ -92,7 +96,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             {
                 strategy: this.findLinkEntities,
                 component: Link,
-            },
+            }
         ])
         let editorState = EditorState.createEmpty(decorator)
         if (this.props.value) {
@@ -141,6 +145,15 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         this.setState({
             anchorLinkPopover: undefined
         })
+    }
+
+    handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
+        const newState = RichUtils.handleKeyCommand(editorState, command)
+        if (newState) {
+            this.handleChange(newState)
+            return "handled"
+        }
+        return "not-handled"
     }
 
     save = () => {
@@ -204,7 +217,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
     removeLink = () => {
         const { editorState } = this.state
         const selection = editorState.getSelection()
-        this.updateStateForLink(RichUtils.toggleLink(editorState, selection, null))
+        this.updateStateForPopover(RichUtils.toggleLink(editorState, selection, null))
     }
 
     confirmLink = (url?: string) => {
@@ -245,13 +258,74 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 newEditorState.getSelection(),
                 entityKey)
         }
-        this.updateStateForLink(replaceEditorState)
+        this.updateStateForPopover(replaceEditorState)
     }
 
-    updateStateForLink = (editorState: EditorState) => {
+    promptForMedia = () => {
+        const { editorState } = this.state
+        let url = ''
+        let urlKey = undefined
+        const selectionInfo = getSelectionInfo(editorState)
+        const contentState = editorState.getCurrentContent()
+        const linkKey = selectionInfo.linkKey
+
+        if (linkKey) {
+            const linkInstance = contentState.getEntity(linkKey)
+            url = linkInstance.getData().url
+            urlKey = linkKey
+        }
+
+        this.setState({
+            urlValue: url,
+            urlKey: urlKey,
+            anchorMediaPopover: document.getElementById("mui-rte-image-control")!
+        }, () => {
+            setTimeout(() => document.getElementById("mui-rte-media-popover")!.focus(), 0)
+        })
+    }
+
+    confirmMedia = (url?: string) => {
+        const { editorState, urlKey } = this.state
+        if (!url) {
+            this.setState({
+                anchorMediaPopover: undefined
+            })
+            return
+        }
+
+        const contentState = editorState.getCurrentContent()
+        let replaceEditorState = null
+
+        if (urlKey) {
+            contentState.replaceEntityData(urlKey, {
+                url: url
+            })
+            const newEditorState = EditorState.push(editorState, contentState, "apply-entity")
+            replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
+        }
+        else {
+            const contentStateWithEntity = contentState.createEntity(
+                'IMAGE',
+                'IMMUTABLE', 
+                {
+                    url: url
+                }
+            )
+            const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+            const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity})
+            const newEditorState = AtomicBlockUtils.insertAtomicBlock(
+                newEditorStateRaw,
+                entityKey, ' ')
+            replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
+        }
+        this.updateStateForPopover(replaceEditorState)
+    }
+
+    updateStateForPopover = (editorState: EditorState) => {
         this.setState({
             editorState: editorState,
             anchorLinkPopover: undefined,
+            anchorMediaPopover: undefined,
             urlValue: undefined,
             urlKey: undefined
         }, () => {
@@ -270,6 +344,25 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             },
             callback
         )
+    }
+
+    blockRenderer = (contentBlock: ContentBlock) => {
+        const blockType = contentBlock.getType()
+        if (blockType === 'atomic') {
+            const contentState = this.state.editorState.getCurrentContent()
+            const entity = contentBlock.getEntityAt(0)
+            if (!entity) {
+                return null
+            }
+            const type = contentState.getEntity(entity).getType()
+            if (type === 'IMAGE') {
+                return {
+                    component: Image,
+                    editable: false
+                }
+            }
+            return null
+        }
     }
 
     render() {
@@ -302,25 +395,11 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                         onToggleBlock={this.toggleBlockType}
                         onToggleInline={this.toggleInlineStyle}
                         onPromptLink={this.promptForLink}
+                        onPromptMedia={this.promptForMedia}
+                        onClear={this.handleClearFormat}
+                        onSave={this.save}
                         controls={controls}
-                    >
-                        {this.props.controls === undefined || this.props.controls.includes("clear") ?
-                            <EditorButton
-                                key="clear"
-                                label="Format Clear"
-                                onClick={this.handleClearFormat}
-                                icon={<FormatClearIcon />}
-                            />
-                        : null }
-                        {this.props.controls === undefined || this.props.controls.includes("save") ?
-                            <EditorButton
-                                key="save"
-                                label="Save"
-                                onClick={this.save}
-                                icon={<SaveIcon />}
-                            />
-                        : null }
-                    </EditorControls>
+                    />
                     : null}
                 {placeholder}
                 <div className={classNames(className, classes.editor, {
@@ -329,17 +408,28 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 })} onClick={this.handleFocus} onBlur={this.handleBlur}>
                     <Editor
                         blockRenderMap={this.extendedBlockRenderMap}
+                        blockRendererFn={this.blockRenderer}
                         editorState={this.state.editorState}
                         onChange={this.handleChange}
                         readOnly={this.props.readOnly}
+                        handleKeyCommand={this.handleKeyCommand}
                         ref="editor"
                     />
                 </div>
                 {this.state.anchorLinkPopover ?
-                    <LinkPopover
+                    <UrlPopover
+                        id="mui-rte-link-popover"
                         url={this.state.urlValue}
                         anchor={this.state.anchorLinkPopover}
                         onConfirm={this.confirmLink}
+                    />
+                    : null}
+                {this.state.anchorMediaPopover ?
+                    <UrlPopover
+                        id="mui-rte-media-popover"
+                        url={this.state.urlValue}
+                        anchor={this.state.anchorMediaPopover}
+                        onConfirm={this.confirmMedia}
                     />
                     : null}
             </div>

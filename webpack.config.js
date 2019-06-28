@@ -48,6 +48,7 @@ module.exports = {
         hot: true,
         contentBase: path.join(__dirname, "examples"),
         port: 9000,
-        watchContentBase: true
+        watchContentBase: true,
+        host: "0.0.0.0"
     }
 };

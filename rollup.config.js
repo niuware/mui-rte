@@ -10,11 +10,12 @@ export default {
             include: ['node_modules/**'],
             extensions: ['.js', '.ts']
         }),
-        uglify()
+        process.env.NODE_ENV === "production" && uglify()
     ],
     output: {
         file: 'dist/index.js',
         format: 'cjs',
         exports: 'named',
+        sourcemap: process.env.NODE_ENV === "development"
     }
 };

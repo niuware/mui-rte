@@ -13,24 +13,25 @@ const styles = ({spacing}: Theme) => createStyles({
     }
 })
 
-interface ILinkPopoverStateProps extends WithStyles<typeof styles> {
+interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
+    id: string
     url?: string
     anchor?: HTMLElement
     onConfirm: (url?: string) => void
 }
 
-type TLinkPopoverState = {
+type TUrlPopoverState = {
     urlError: boolean
     urlValue?: string
 }
 
-const LinkPopover: React.FC<ILinkPopoverStateProps> = (props) => {
+const UrlPopover: React.FC<IUrlPopoverStateProps> = (props) => {
 
-    const [state, setState] = useState<TLinkPopoverState>({
+    const [state, setState] = useState<TUrlPopoverState>({
         urlError: false,
         urlValue: props.url
     })
-    const {classes} = props
+    const {classes, id} = props
     
     return (
         <Popover
@@ -49,7 +50,7 @@ const LinkPopover: React.FC<ILinkPopoverStateProps> = (props) => {
                 <Grid container>
                     <Grid item xs={9}>
                         <TextField
-                            id="mui-rte-link-popover"
+                            id={id}
                             className={classes.linkTextField}
                             onChange={(event) => {setState({...state, urlValue: event.target.value})}}
                             placeholder="URL"
@@ -72,4 +73,4 @@ const LinkPopover: React.FC<ILinkPopoverStateProps> = (props) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(LinkPopover)
+export default withStyles(styles, { withTheme: true })(UrlPopover)
