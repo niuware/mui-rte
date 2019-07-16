@@ -9,7 +9,7 @@ module.exports = {
         __filename: false
     },
     entry: {
-        bundle: "./examples/" + process.env.EXAMPLE + "/index.tsx"
+        bundle: "./examples/main.tsx"
     },
     output: {
         filename: "bundle.js",

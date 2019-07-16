@@ -1,8 +1,7 @@
 import * as React from 'react'
-import * as ReactDOM from 'react-dom'
 import MUIRichTextEditor from '../../'
 
-class App extends React.Component {
+class RefSave extends React.Component {
     private ref: any
     constructor(props: any) {
         super(props)
@@ -39,4 +38,4 @@ class App extends React.Component {
     }
 }
 
-ReactDOM.render(<App />,document.getElementById("root"))
+export default RefSave
