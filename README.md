@@ -53,6 +53,7 @@ ReactDOM.render(
 |inheritFontSize|boolean|optional|Inherit font size from parent. Useful for read only mode|
 |error|boolean|optional|Renders the editor with an error style|
 |onSave|(data:string) => void|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object|
+|onChange|(state: EditorState)|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object
 |controls|string[]|optional|List of controls to show. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "link", "image", "numberList", "bulletList", "quote", "code", "clear", "save"|
 
 ## Examples

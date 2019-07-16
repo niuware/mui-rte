@@ -18,6 +18,8 @@ import { getSelectionInfo, getCompatibleSpacing } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
+    },
+    container: {
         margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
@@ -29,6 +31,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         fontSize: "inherit"
     },
     editor: {
+    },
+    editorContainer: {
         margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
         cursor: "text",
         width: "100%",
@@ -66,6 +70,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     error?: boolean
     controls?: Array<TEditorControl>
     onSave?: (data: string) => void
+    onChange?: (state: EditorState) => void
     ref?: any
 }
 
@@ -113,6 +118,9 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         this.setState({
             editorState: state
         })
+        if (this.props.onChange) {
+            this.props.onChange(this.state.editorState)
+        }
     }
 
     handleClearFormat = () => {
@@ -374,7 +382,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         if (!contentState.hasText() && !this.state.focused) {
             placeholder = (
                 <div
-                    className={classNames(classes.editor, classes.placeHolder, {
+                    className={classNames(classes.editorContainer, classes.placeHolder, {
                         [classes.error]: this.props.error
                     })}
                     onClick={this.handleFocus}
@@ -386,55 +394,59 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         }
 
         return (
-            <div className={classNames(this.props.classes.root, {
-                [classes.inheritFontSize]: this.props.inheritFontSize
-            })}>
-                {editable ?
-                    <EditorControls
-                        editorState={this.state.editorState}
-                        onToggleBlock={this.toggleBlockType}
-                        onToggleInline={this.toggleInlineStyle}
-                        onPromptLink={this.promptForLink}
-                        onPromptMedia={this.promptForMedia}
-                        onClear={this.handleClearFormat}
-                        onSave={this.save}
-                        controls={controls}
-                    />
-                    : null}
-                {placeholder}
-                <div className={classNames(className, classes.editor, {
-                    [classes.editorReadOnly]: !editable,
-                    [classes.error]: this.props.error
-                })} onClick={this.handleFocus} onBlur={this.handleBlur}>
-                    <Editor
-                        blockRenderMap={this.extendedBlockRenderMap}
-                        blockRendererFn={this.blockRenderer}
-                        editorState={this.state.editorState}
-                        onChange={this.handleChange}
-                        readOnly={this.props.readOnly}
-                        handleKeyCommand={this.handleKeyCommand}
-                        ref="editor"
-                    />
+            <div className={classes.root}>
+                <div className={classNames(classes.container, {
+                    [classes.inheritFontSize]: this.props.inheritFontSize
+                })}>
+                    {editable ?
+                        <EditorControls
+                            editorState={this.state.editorState}
+                            onToggleBlock={this.toggleBlockType}
+                            onToggleInline={this.toggleInlineStyle}
+                            onPromptLink={this.promptForLink}
+                            onPromptMedia={this.promptForMedia}
+                            onClear={this.handleClearFormat}
+                            onSave={this.save}
+                            controls={controls}
+                        />
+                        : null}
+                    {placeholder}
+                    <div className={classes.editor}>
+                        <div className={classNames(className, classes.editorContainer, {
+                            [classes.editorReadOnly]: !editable,
+                            [classes.error]: this.props.error
+                        })} onClick={this.handleFocus} onBlur={this.handleBlur}>
+                            <Editor
+                                blockRenderMap={this.extendedBlockRenderMap}
+                                blockRendererFn={this.blockRenderer}
+                                editorState={this.state.editorState}
+                                onChange={this.handleChange}
+                                readOnly={this.props.readOnly}
+                                handleKeyCommand={this.handleKeyCommand}
+                                ref="editor"
+                            />
+                        </div>
+                    </div>
+                    {this.state.anchorLinkPopover ?
+                        <UrlPopover
+                            id="mui-rte-link-popover"
+                            url={this.state.urlValue}
+                            anchor={this.state.anchorLinkPopover}
+                            onConfirm={this.confirmLink}
+                        />
+                        : null}
+                    {this.state.anchorMediaPopover ?
+                        <UrlPopover
+                            id="mui-rte-media-popover"
+                            url={this.state.urlValue}
+                            anchor={this.state.anchorMediaPopover}
+                            onConfirm={this.confirmMedia}
+                        />
+                        : null}
                 </div>
-                {this.state.anchorLinkPopover ?
-                    <UrlPopover
-                        id="mui-rte-link-popover"
-                        url={this.state.urlValue}
-                        anchor={this.state.anchorLinkPopover}
-                        onConfirm={this.confirmLink}
-                    />
-                    : null}
-                {this.state.anchorMediaPopover ?
-                    <UrlPopover
-                        id="mui-rte-media-popover"
-                        url={this.state.urlValue}
-                        anchor={this.state.anchorMediaPopover}
-                        onConfirm={this.confirmMedia}
-                    />
-                    : null}
             </div>
         )
     }
 }
 
-export default withStyles(styles, { withTheme: true })(MUIRichTextEditor)
+export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(MUIRichTextEditor)
