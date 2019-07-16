@@ -11,7 +11,7 @@ The Material-UI Rich Text Editor and Viewer
 npm install mui-rte --save
 ```
 
-If you haven't install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
+If you haven't, install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
 
 ## Demo
 
@@ -28,12 +28,12 @@ ReactDOM.render(
 )
 ```
 
-Or in read only mode, with no controls but text selection and component interaction (such as clickable links):
+Or in read only mode, with no rendered controls but text selection and component interaction available (such as clickable links):
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
 
-const data = getPreviousContentState()
+const data = getSavedContentStateFromDb()
 
 ReactDOM.render(
     <MUIRichTextEditor value="{data}" readOnly={true} />, 
@@ -53,18 +53,22 @@ ReactDOM.render(
 |inheritFontSize|boolean|optional|Inherit font size from parent. Useful for read only mode|
 |error|boolean|optional|Renders the editor with an error style|
 |onSave|(data:string) => void|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object|
-|onChange|(state: EditorState)|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object
+|onChange|(state: EditorState) => void|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object
 |controls|string[]|optional|List of controls to show. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "link", "image", "numberList", "bulletList", "quote", "code", "clear", "save"|
 
 ## Examples
 
-Check the `examples` directory for more.
+Check the `examples` directory for details. For development, you can run the examples as follows:
+
+```
+$ npm run serve
+```
 
 ## Future plans
 
 - Allow user defined components
 - Add custom inline effects (highlights, etc.) 
-- Add custom blocks such as image, or direct components from `material-ui` (Card, etc)
+- Add custom blocks such as `material-ui` components (Card, etc.)
 
 ## Suggestions and issues
 
