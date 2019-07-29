@@ -14,7 +14,10 @@ const EditorButton: React.FC<IEditorButtonProps> = (props: IEditorButtonProps) =
     return (
         <IconButton
             id={props.id}
-            onClick={() => props.onClick(props.style)}
+            onMouseDown={(e) => {
+                e.preventDefault()
+                props.onClick(props.style)
+            }}
             aria-label={props.label}
             color={props.active ? "primary" : "default"}
         >
