@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@types/classnames": "^2.2.8",
-    "@types/draft-js": "^0.10.32",
+    "@types/draft-js": "^0.10.34",
     "classnames": "^2.2.6",
     "draft-js": "^0.10.5",
     "immutable": "~3.7.4"
