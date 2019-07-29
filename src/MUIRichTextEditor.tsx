@@ -5,8 +5,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand, 
-    DraftHandleValue,
-    ContentBlock
+    DraftHandleValue, DraftStyleMap, ContentBlock
 } from 'draft-js'
 import EditorControls, { TEditorControl } from './components/EditorControls'
 import Link from './components/Link'
@@ -94,6 +93,14 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             wrapper: <CodeBlock />
         }
     })
+    private styleRenderMap: DraftStyleMap = {
+        'STRIKETROUGH': {
+            textDecoration: "line-through"
+        },
+        'HIGHLIGHT': {
+            backgroundColor: "yellow"
+        }
+    }
     private extendedBlockRenderMap: Immutable.Map<any, any>
     constructor(props: IMUIRichTextEditorProps) {
         super(props)
@@ -417,6 +424,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                             [classes.error]: this.props.error
                         })} onClick={this.handleFocus} onBlur={this.handleBlur}>
                             <Editor
+                                customStyleMap={this.styleRenderMap}
                                 blockRenderMap={this.extendedBlockRenderMap}
                                 blockRendererFn={this.blockRenderer}
                                 editorState={this.state.editorState}

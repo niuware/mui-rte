@@ -3,6 +3,8 @@ import { EditorState } from 'draft-js'
 import FormatBoldIcon from '@material-ui/icons/FormatBold'
 import FormatItalicIcon from '@material-ui/icons/FormatItalic'
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined'
+import StrikethroughIcon from '@material-ui/icons/StrikethroughS'
+import HighlightIcon from '@material-ui/icons/Highlight'
 import TitleIcon from '@material-ui/icons/Title'
 import InsertLinkIcon from '@material-ui/icons/InsertLink'
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
@@ -21,7 +23,8 @@ type KeyString = {
 
 export type TEditorControl = 
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" | 
-    "bulletList" | "quote" | "code" | "clear" | "save" | "image"
+    "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
+    "strikethrough" | "highlight"
 
 type TStyleType = {
     id?: string
@@ -61,6 +64,20 @@ const STYLE_TYPES: TStyleType[] = [
         name: "underline",
         style: 'UNDERLINE',
         icon: <FormatUnderlinedIcon />,
+        type: "inline"
+    },
+    {
+        label: 'Strikethrough',
+        name: "strikethrough",
+        style: 'STRIKETHROUGH',
+        icon: <StrikethroughIcon />,
+        type: "inline"
+    },
+    {
+        label: 'Highlight',
+        name: "highlight",
+        style: 'HIGHLIGHT',
+        icon: <HighlightIcon />,
         type: "inline"
     },
     {
