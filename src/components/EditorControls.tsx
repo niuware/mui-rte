@@ -14,6 +14,8 @@ import FormatQuoteIcon from '@material-ui/icons/FormatQuote'
 import CodeIcon from '@material-ui/icons/Code'
 import FormatClearIcon from '@material-ui/icons/FormatClear'
 import SaveIcon from '@material-ui/icons/Save'
+import UndoIcon from '@material-ui/icons/Undo'
+import RedoIcon from '@material-ui/icons/Redo'
 import EditorButton from './EditorButton'
 import { getSelectionInfo } from '../utils'
 
@@ -93,6 +95,22 @@ const STYLE_TYPES: TStyleType[] = [
         type: "inline"
     },
     {
+        label: 'Undo',
+        name: "undo",
+        style: "UNDO",
+        icon: <UndoIcon />,
+        type: "callback",
+        clickFnName: "onUndo"
+    },
+    {
+        label: 'Redo',
+        name: "redo",
+        style: "REDO",
+        icon: <RedoIcon />,
+        type: "callback",
+        clickFnName: "onRedo"
+    },
+    {
         label: 'Link',
         name: "link",
         style: 'LINK',
@@ -167,6 +185,8 @@ interface IBlockStyleControlsProps extends KeyString {
     onPromptMedia: () => void
     onClear: () => void
     onSave: () => void
+    onUndo: () => void
+    onRedo: () => void
     onCustomClick: (style: any) => void
 }
 
@@ -210,9 +230,9 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
                     active = style.style === selectionInfo.blockType
                     action = props.onToggleBlock
                 }
-                else { 
+                else {
                     active = style.style === selectionInfo.entityType
-                    action = props[style.clickFnName! as string]
+                    action = props[style.clickFnName!]
                 }
 
                 return (
