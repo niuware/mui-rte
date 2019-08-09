@@ -186,6 +186,37 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         return "not-handled"
     }
 
+
+    handleCustomClick = (style: any) => {
+        if (!this.props.customControls) {
+            return
+        }
+        for (let control of this.props.customControls) {
+            if (control.name.toUpperCase() === style) {
+                if (control.onClick) {
+                    control.onClick(this.state.editorState, control.name)
+                }
+                break
+            }
+        }
+    }
+
+    handleUndo = () => {
+        this.setState(prevState => {
+            return {
+                editorState: EditorState.undo(prevState.editorState)
+            }
+        })
+    }
+
+    handleRedo = () => {
+        this.setState(prevState => {
+            return {
+                editorState: EditorState.redo(prevState.editorState)
+            }
+        })
+    }
+
     save = () => {
         if (this.props.onSave) {
             this.props.onSave(JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent())))
@@ -359,7 +390,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             urlValue: undefined,
             urlKey: undefined
         }, () => {
-            setTimeout(() => this.handleFocus(), 0)
+            setTimeout(() => (this.refs.editor as any).blur(), 0)
+            setTimeout(() => this.handleFocus(), 1)
         })
     }
 
@@ -392,20 +424,6 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 }
             }
             return null
-        }
-    }
-
-    handleCustomClick = (style: any) => {
-        if (!this.props.customControls) {
-            return
-        }
-        for (let control of this.props.customControls) {
-            if (control.name.toUpperCase() === style) {
-                if (control.onClick) {
-                    control.onClick(this.state.editorState, control.name)
-                }
-                break
-            }
         }
     }
 
@@ -442,6 +460,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                             onPromptLink={this.promptForLink}
                             onPromptMedia={this.promptForMedia}
                             onClear={this.handleClearFormat}
+                            onUndo={this.handleUndo}
+                            onRedo={this.handleRedo}
                             onSave={this.save}
                             onCustomClick={this.handleCustomClick}
                             controls={controls}

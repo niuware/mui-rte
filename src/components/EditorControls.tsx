@@ -14,6 +14,8 @@ import FormatQuoteIcon from '@material-ui/icons/FormatQuote'
 import CodeIcon from '@material-ui/icons/Code'
 import FormatClearIcon from '@material-ui/icons/FormatClear'
 import SaveIcon from '@material-ui/icons/Save'
+import UndoIcon from '@material-ui/icons/Undo'
+import RedoIcon from '@material-ui/icons/Redo'
 import EditorButton from './EditorButton'
 import { getSelectionInfo } from '../utils'
 
@@ -21,8 +23,8 @@ type KeyString = {
     [key: string]: React.ReactNode | EditorState
 }
 
-export type TEditorControl = 
-    "title" | "bold" | "italic" | "underline" | "link" | "numberList" | 
+export type TEditorControl =
+    "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
     "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
     "strikethrough" | "highlight" | string
 
@@ -91,6 +93,22 @@ const STYLE_TYPES: TStyleType[] = [
         style: 'HIGHLIGHT',
         icon: <HighlightIcon />,
         type: "inline"
+    },
+    {
+        label: 'Undo',
+        name: "undo",
+        style: "UNDO",
+        icon: <UndoIcon />,
+        type: "callback",
+        clickFnName: "onUndo"
+    },
+    {
+        label: 'Redo',
+        name: "redo",
+        style: "REDO",
+        icon: <RedoIcon />,
+        type: "callback",
+        clickFnName: "onRedo"
     },
     {
         label: 'Link',
@@ -167,6 +185,8 @@ interface IBlockStyleControlsProps extends KeyString {
     onPromptMedia: () => void
     onClear: () => void
     onSave: () => void
+    onUndo: () => void
+    onRedo: () => void
     onCustomClick: (style: any) => void
 }
 
@@ -175,8 +195,8 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
     let filteredControls = STYLE_TYPES
     if (props.controls) {
         filteredControls = []
-
-        props.controls!.forEach(name => {
+        const controls = props.controls.filter((control, index) => props.controls!.indexOf(control) >= index)
+        controls.forEach(name => {
             let style = STYLE_TYPES.find(style => style.name === name)
             if (style) {
                 filteredControls.push(style)
@@ -210,9 +230,9 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
                     active = style.style === selectionInfo.blockType
                     action = props.onToggleBlock
                 }
-                else { 
+                else {
                     active = style.style === selectionInfo.entityType
-                    action = props[style.clickFnName! as string]
+                    action = props[style.clickFnName!]
                 }
 
                 return (
