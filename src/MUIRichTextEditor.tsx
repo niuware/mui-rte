@@ -7,7 +7,7 @@ import {
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand, 
     DraftHandleValue, DraftStyleMap, ContentBlock
 } from 'draft-js'
-import EditorControls, { TEditorControl } from './components/EditorControls'
+import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
 import Image from './components/Image'
 import Blockquote from './components/Blockquote'
@@ -70,6 +70,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     controls?: Array<TEditorControl>
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    customControls?: TCustomControl[],
     ref?: any
 }
 
@@ -114,11 +115,25 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         if (this.props.value) {
             editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.value)), decorator)
         }
+        let customBlockRenderMap: any = {}
+        if (this.props.customControls) {
+            this.props.customControls.forEach(control => {
+                if (control.type === "inline" && control.inlineStyle) {
+                    this.styleRenderMap[control.name.toUpperCase()] = control.inlineStyle
+                }
+                else if (control.type === "block" && control.blockWrapper) {
+                    customBlockRenderMap[control.name.toUpperCase()] = {
+                        element: "div",
+                        wrapper: control.blockWrapper
+                    }
+                }
+            })
+        }
         this.state = {
             editorState: editorState,
             focused: false
         }
-        this.extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(this.blockRenderMap)
+        this.extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(this.blockRenderMap, Immutable.Map(customBlockRenderMap))
     }
 
     handleChange = (state: EditorState) => {
@@ -380,8 +395,22 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         }
     }
 
+    handleCustomClick = (style: any) => {
+        if (!this.props.customControls) {
+            return
+        }
+        for (let control of this.props.customControls) {
+            if (control.name.toUpperCase() === style) {
+                if (control.onClick) {
+                    control.onClick(this.state.editorState, control.name)
+                }
+                break
+            }
+        }
+    }
+
     render() {
-        const { classes, controls } = this.props
+        const { classes, controls, customControls } = this.props
         const contentState = this.state.editorState.getCurrentContent()
         let className = ""
         let placeholder = null
@@ -414,7 +443,9 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                             onPromptMedia={this.promptForMedia}
                             onClear={this.handleClearFormat}
                             onSave={this.save}
+                            onCustomClick={this.handleCustomClick}
                             controls={controls}
+                            customControls={customControls}
                         />
                         : null}
                     {placeholder}

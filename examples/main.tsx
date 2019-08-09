@@ -5,6 +5,7 @@ import Theme from './theme'
 import Basic from './basic'
 import RefSave from './ref-save'
 import ReadOnly from './read-only'
+import CustomControls from './custom-controls'
 
 const App = () => {
 
@@ -22,6 +23,7 @@ const App = () => {
             <button onClick={() => setSample(<RefSave />)}>RefSave</button> 
             <button onClick={() => setSample(<ReadOnly />)}>Read Only</button> 
             <button onClick={() => setSample(<Events />)}>Events</button>
+            <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
             {sample}
         </div>
     )

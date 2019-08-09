@@ -24,15 +24,27 @@ type KeyString = {
 export type TEditorControl = 
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" | 
     "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
-    "strikethrough" | "highlight"
+    "strikethrough" | "highlight" | string
+
+export type TControlType = "inline" | "block" | "callback"
+
+export type TCustomControl = {
+    id?: string
+    name: string
+    icon: JSX.Element
+    type: TControlType
+    inlineStyle?: React.CSSProperties
+    blockWrapper?: React.ReactElement
+    onClick?: (editorState: EditorState, name: string) => void
+}
 
 type TStyleType = {
     id?: string
-    name: TEditorControl
+    name: TEditorControl | string
     label: string
     style: string
     icon: JSX.Element
-    type: "inline" | "block" | "callback"
+    type: TControlType
     active?: boolean
     clickFnName?: string
 }
@@ -148,12 +160,14 @@ interface IBlockStyleControlsProps extends KeyString {
     children?: React.ReactNode
     editorState: EditorState
     controls?: Array<TEditorControl>
+    customControls?: TCustomControl[]
     onToggleInline: (inlineStyle: any) => void
     onToggleBlock: (blockType: any) => void
     onPromptLink: () => void
     onPromptMedia: () => void
     onClear: () => void
     onSave: () => void
+    onCustomClick: (style: any) => void
 }
 
 const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
@@ -163,9 +177,23 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
         filteredControls = []
 
         props.controls!.forEach(name => {
-            const style = STYLE_TYPES.find(style => style.name === name)
+            let style = STYLE_TYPES.find(style => style.name === name)
             if (style) {
                 filteredControls.push(style)
+            }
+            else if (props.customControls) {
+                const customControl = props.customControls.find(style => style.name === name)
+                if (customControl) {
+                    filteredControls.push({
+                        id: customControl.id,
+                        name: customControl.name,
+                        label: customControl.name,
+                        style: customControl.name.toUpperCase(),
+                        icon: customControl.icon,
+                        type: customControl.type,
+                        clickFnName: "onCustomClick"
+                    })
+                }
             }
         })
     }
@@ -182,9 +210,9 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
                     active = style.style === selectionInfo.blockType
                     action = props.onToggleBlock
                 }
-                else {
+                else { 
                     active = style.style === selectionInfo.entityType
-                    action = props[style.clickFnName!]
+                    action = props[style.clickFnName! as string]
                 }
 
                 return (
