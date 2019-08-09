@@ -23,8 +23,8 @@ type KeyString = {
     [key: string]: React.ReactNode | EditorState
 }
 
-export type TEditorControl = 
-    "title" | "bold" | "italic" | "underline" | "link" | "numberList" | 
+export type TEditorControl =
+    "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
     "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
     "strikethrough" | "highlight" | string
 
@@ -195,8 +195,8 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
     let filteredControls = STYLE_TYPES
     if (props.controls) {
         filteredControls = []
-
-        props.controls!.forEach(name => {
+        const controls = props.controls.filter((control, index) => props.controls!.indexOf(control) >= index)
+        controls.forEach(name => {
             let style = STYLE_TYPES.find(style => style.name === name)
             if (style) {
                 filteredControls.push(style)
