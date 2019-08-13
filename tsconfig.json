@@ -6,6 +6,7 @@
         "strict": true,
         "sourceMap": true,
         "esModuleInterop": true,
+        "noImplicitReturns": true,
         "outDir": "dist",
         "baseUrl": ".",
         "jsx": "react",
