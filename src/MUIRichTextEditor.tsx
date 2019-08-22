@@ -141,7 +141,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             editorState: state
         })
         if (this.props.onChange) {
-            this.props.onChange(this.state.editorState)
+            this.props.onChange(state)
         }
     }
 
