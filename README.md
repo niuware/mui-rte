@@ -167,6 +167,7 @@ $ npm run serve
 
 - Add custom decorators
 - Add custom blocks such as `material-ui` components (Card, etc.)
+- Increase test coverage
 
 ## Suggestions and issues
 
