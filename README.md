@@ -75,7 +75,7 @@ This sample adds a block to the editor based on a `React Element` defined:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import InvertColorsIcon from '@material-ui/icons/TableChartIcon'
+import TableChartIcon from '@material-ui/icons/TableChart'
 
 const MyBlock = (props) => {
     return (
