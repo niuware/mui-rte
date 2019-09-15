@@ -108,7 +108,7 @@ This sample adds a control that will trigger a custom callback function:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import InvertColorsIcon from '@material-ui/icons/DoneIcon'
+import DoneIcon from '@material-ui/icons/Done'
 
 <MUIRichTextEditor 
     controls={["my-callback"]}
