@@ -75,7 +75,7 @@ This sample adds a block to the editor based on a `React Element` defined:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import InvertColorsIcon from '@material-ui/icons/TableChartIcon'
+import TableChartIcon from '@material-ui/icons/TableChart'
 
 const MyBlock = (props) => {
     return (
@@ -108,7 +108,7 @@ This sample adds a control that will trigger a custom callback function:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import InvertColorsIcon from '@material-ui/icons/DoneIcon'
+import DoneIcon from '@material-ui/icons/Done'
 
 <MUIRichTextEditor 
     controls={["my-callback"]}
@@ -154,6 +154,34 @@ Check the `examples` directory for more.
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using the custom inline style.|
 |blockWrapper|`React.Element`|optional|The custom React component used for rendering the custom block.|
 |onClick|`(editorState: EditorState, name: string) => void`|optional|The callback function triggered when the custom control is clicked.|
+
+## Styling the editor
+
+You can style the editor using the `Material-UI` theming feature. First create a theme with `createMuiTheme` and override classes such as `root`, `container`, `editor`, and `editorContainer`. Check the examples directory for more.
+
+```js
+const defaultTheme = createMuiTheme()
+
+Object.assign(defaultTheme, {
+    overrides: {
+        MUIRichTextEditor: {
+            root: {
+                marginTop: 20,
+                width: "80%"
+            },
+            editor: {
+                borderBottom: "1px solid gray" 
+            }
+        }
+    }
+})
+
+<MuiThemeProvider theme={defaultTheme}>
+    <MUIRichTextEditor 
+        label="Type something here..."
+    />
+</MuiThemeProvider>
+```
 
 ## Examples
 
