@@ -6,6 +6,7 @@ import Basic from './basic'
 import RefSave from './ref-save'
 import ReadOnly from './read-only'
 import CustomControls from './custom-controls'
+import Decorators from './decorator'
 
 const App = () => {
 
@@ -24,6 +25,7 @@ const App = () => {
             <button onClick={() => setSample(<ReadOnly />)}>Read Only</button> 
             <button onClick={() => setSample(<Events />)}>Events</button>
             <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
+            <button onClick={() => setSample(<Decorators />)}>Decorators</button>
             {sample}
         </div>
     )

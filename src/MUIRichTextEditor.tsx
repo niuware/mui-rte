@@ -5,7 +5,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand, 
-    DraftHandleValue, DraftStyleMap, ContentBlock
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator
 } from 'draft-js'
 import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
@@ -61,6 +61,11 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     }
 })
 
+export type TDecorator = {
+    component: React.FC
+    regex: RegExp
+}
+
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     value?: any
     label?: string,
@@ -71,6 +76,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     customControls?: TCustomControl[],
+    decorators?: TDecorator[],
     ref?: any
 }
 
@@ -105,16 +111,24 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
     private extendedBlockRenderMap: Immutable.Map<any, any>
     constructor(props: IMUIRichTextEditorProps) {
         super(props)
-        const decorator = new CompositeDecorator([
+        const decorators: DraftDecorator[] = [
             {
                 strategy: this.findLinkEntities,
                 component: Link,
             }
-        ])
-        let editorState = EditorState.createEmpty(decorator)
-        if (this.props.value) {
-            editorState = EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.value)), decorator)
+        ]
+        if (props.decorators) {
+            props.decorators.forEach(deco => decorators.push({
+                strategy: (contentBlock: any, callback: any, contentState: any) => {
+                    this.findDecoWithRegex(deco.regex, contentBlock, callback)
+                },
+                component: deco.component
+            }))
         }
+        const decorator = new CompositeDecorator(decorators)
+        const editorState = (this.props.value) 
+            ? EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.value)), decorator)
+            : EditorState.createEmpty(decorator)
         let customBlockRenderMap: any = {}
         if (this.props.customControls) {
             this.props.customControls.forEach(control => {
@@ -406,6 +420,15 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             },
             callback
         )
+    }
+
+    findDecoWithRegex(regex: RegExp, contentBlock: any, callback: any) {
+        const text = contentBlock.getText()
+        let matchArr, start
+        while ((matchArr = regex.exec(text)) !== null) {
+            start = matchArr.index
+            callback(start, start + matchArr[0].length)
+        }
     }
 
     blockRenderer = (contentBlock: ContentBlock) => {
