@@ -1,9 +1,9 @@
 # mui-rte
 The Material-UI Rich Text Editor and Viewer
 
-<img src="http://niuware.github.io/public/assets/mui-rte/editor-w-controls.png" width="600" />
+<img src="http://niuware.github.io/public/assets/mui-rte/editor-w-controls-1-2-0.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript.
+**mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript. It supports user defined block, style, callback and decorator definitions to enhance the editor to all needs.
 
 ## Installation
 
@@ -11,7 +11,7 @@ The Material-UI Rich Text Editor and Viewer
 npm install mui-rte --save
 ```
 
-If you haven't, install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
+Install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
 
 ## Demo
 
@@ -28,7 +28,7 @@ ReactDOM.render(
 )
 ```
 
-Or in read only mode, with no rendered controls but text selection and component interaction available (such as clickable links):
+Or in read only mode, where no controls are rendered but text selection and component interaction is available (clickable links, etc.):
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
@@ -125,7 +125,42 @@ import DoneIcon from '@material-ui/icons/Done'
 />
 ```
 
-Check the `examples` directory for more.
+## Custom Decorators
+
+From version 1.2.0 you can define custom decorators to apply styles and/or functionality based on a provided regular expression. 
+
+### Adding custom functionality with a decorator
+
+To add some functionality when a user inputs a `#hashtag` use the following example. In this case, everytime the user inputs a word starting with a `#` character it will be automatically converted into a styled link:
+
+```js
+import MUIRichTextEditor from 'mui-rte'
+
+const MyHashTagDecorator = (props) => {
+    const hashtagUrl = "http://myurl/" + props.decoratedText
+    return (
+        <a 
+            href={hashtagUrl}
+            style={{
+                color: "green"
+            }}
+        >
+            {props.children}
+        </a>
+    )
+}
+
+<MUIRichTextEditor 
+    label="Type something here..."
+    onSave={save}
+    decorators={[
+        {
+            component: MyHashTagDecorator,
+            regex: /\#[\w]+/g
+        }
+    ]}
+/>
+```
 
 ## API
 
@@ -142,7 +177,8 @@ Check the `examples` directory for more.
 |onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object
 |controls|`string[]`|optional|List of controls to show. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "image", "numberList", "bulletList", "quote", "code", "clear", "save"|
 |customControls|`TCustomControl[]`|optional|Defines an array of user custom inline styles, blocks and callbacks. See more information in 'Custom Controls' below.|
-
+|decorators|`TDecorator[]`|optional|Defines an array of user custom decorators. See more information in 'Custom Decorators'|   
+   
 `TCustomControl`
 
 |Property|Type||description|
@@ -152,8 +188,15 @@ Check the `examples` directory for more.
 |icon|`JSX.Element`|required|The `@material-ui/icons` icon for the control. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
 |type|`string`|required|Either "inline", "block" or "callback"|
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using the custom inline style.|
-|blockWrapper|`React.Element`|optional|The custom React component used for rendering the custom block.|
-|onClick|`(editorState: EditorState, name: string) => void`|optional|The callback function triggered when the custom control is clicked.|
+|blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering the custom block.|
+|onClick|`(editorState: EditorState, name: string) => void`|optional|The callback function triggered when the custom control is clicked.|   
+   
+`TDecorator`
+|Property|Type||description|
+|---|---|---|---|
+|component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
+|regex|`RegExp`|required|The regular expression to match a decorator.|
+
 
 ## Styling the editor
 
@@ -185,7 +228,7 @@ Object.assign(defaultTheme, {
 
 ## Examples
 
-Check the `examples` directory for details. For development, you can run the examples as follows:
+Check the `examples` directory for more details. For development, you can run the examples as follows:
 
 ```
 $ npm run serve
@@ -193,7 +236,6 @@ $ npm run serve
 
 ## Future plans
 
-- Add custom decorators
 - Add custom blocks such as `material-ui` components (Card, etc.)
 - Increase test coverage
 

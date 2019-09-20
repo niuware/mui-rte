@@ -21,7 +21,7 @@ const change = (state: EditorState) => {
 const Events = () => {
     return (
         <MUIRichTextEditor 
-            label="Type something here..."
+            label="Open the console to see the event callback as you type..."
             onSave={save}
             onChange={change}
         />
