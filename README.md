@@ -230,10 +230,11 @@ Object.assign(defaultTheme, {
 <br />
 
 `TDecorator`
+
 |Property|Type||description|
 |---|---|---|---|
 |component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
-|regex|`RegExp`|required|The regular expression to match a decorator.|
+|regex|`RegExp`|required|The regular expression to match a decorator.|    
 
 ## Examples
 
