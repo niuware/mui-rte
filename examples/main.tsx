@@ -7,6 +7,8 @@ import RefSave from './ref-save'
 import ReadOnly from './read-only'
 import CustomControls from './custom-controls'
 import Decorators from './decorator'
+import InlineToolbar from './inline-toolbar'
+import CustomInlineToolbar from './custom-inline-toolbar'
 
 const App = () => {
 
@@ -26,6 +28,8 @@ const App = () => {
             <button onClick={() => setSample(<Events />)}>Events</button>
             <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
             <button onClick={() => setSample(<Decorators />)}>Decorators</button>
+            <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
+            <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
             {sample}
         </div>
     )

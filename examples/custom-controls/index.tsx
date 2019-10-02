@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import MUIRichTextEditor from '../../'
 import InvertColorsIcon from '@material-ui/icons/InvertColors'
 import TableChartIcon from '@material-ui/icons/TableChart'
@@ -8,7 +8,7 @@ const save = (data: string) => {
     console.log(data)
 }
 
-const MyBlock: React.FC<any> = (props: any) => {
+const MyBlock = (props: any) => {
     return (
         <div style={{
             padding: 10,
