@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { EditorState } from 'draft-js'
 import FormatBoldIcon from '@material-ui/icons/FormatBold'
 import FormatItalicIcon from '@material-ui/icons/FormatItalic'
@@ -180,17 +180,19 @@ interface IBlockStyleControlsProps extends KeyString {
     controls?: Array<TEditorControl>
     customControls?: TCustomControl[]
     onToggleInline: (inlineStyle: any) => void
-    onToggleBlock: (blockType: any) => void
-    onPromptLink: () => void
-    onPromptMedia: () => void
+    onToggleBlock?: (blockType: any) => void
+    onPromptLink: (style: any, toolbarMode: boolean) => void
+    onPromptMedia?: (style: any, toolbarMode: boolean) => void
     onClear: () => void
     onSave: () => void
-    onUndo: () => void
-    onRedo: () => void
-    onCustomClick: (style: any) => void
+    onUndo?: () => void
+    onRedo?: () => void
+    onCustomClick?: (style: any) => void
+    toolbarMode?: boolean
+    className?: string
 }
 
-const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
+const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
     const selectionInfo = getSelectionInfo(props.editorState)
     let filteredControls = STYLE_TYPES
     if (props.controls) {
@@ -218,8 +220,12 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
         })
     }
     return (
-        <div>
+        <div className={props.className}>
             {filteredControls.map(style => {
+                if (props.toolbarMode && 
+                    (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {
+                    return null
+                }
                 let active = false
                 let action = null
                 if (style.type === "inline") {
@@ -244,6 +250,7 @@ const EditorControls: React.FC<IBlockStyleControlsProps> = (props: IBlockStyleCo
                         onClick={action}
                         style={style.style}
                         icon={style.icon}
+                        toolbarMode={props.toolbarMode}
                     />
                 )
             })}

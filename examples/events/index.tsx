@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { EditorState, convertToRaw } from 'draft-js'
 import MUIRichTextEditor from '../../'
 

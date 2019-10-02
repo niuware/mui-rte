@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { IconButton } from '@material-ui/core'
 
 interface IEditorButtonProps {
@@ -8,18 +8,22 @@ interface IEditorButtonProps {
     active?: boolean
     icon: JSX.Element
     onClick: any
+    toolbarMode?: boolean
 }
 
-const EditorButton: React.FC<IEditorButtonProps> = (props: IEditorButtonProps) => {
+const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButtonProps) => {
+    const size = !props.toolbarMode ? "medium" : "small"
+    const toolbarId = props.toolbarMode ? "-toolbar" : ""
     return (
         <IconButton
-            id={props.id}
+            id={props.id + toolbarId}
             onMouseDown={(e) => {
                 e.preventDefault()
-                props.onClick(props.style)
+                props.onClick(props.style, props.toolbarMode)
             }}
             aria-label={props.label}
             color={props.active ? "primary" : "default"}
+            size={size}
         >
             {props.icon}
         </IconButton>

@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { createMuiTheme, Theme, MuiThemeProvider } from '@material-ui/core/styles'
 import MUIRichTextEditor from '../../'
 
@@ -8,11 +8,20 @@ Object.assign(defaultTheme, {
     overrides: {
         MUIRichTextEditor: {
             root: {
-                marginTop: 20,
-                width: "80%"
+                backgroundColor: "#ebebeb",
             },
             editor: {
-                borderBottom: "1px solid gray" 
+                borderBottom: "1px solid gray",
+                backgroundColor: "#ebebeb",
+                padding: "0 20px"
+            },
+            toolbar: {
+                backgroundColor: "#ebebeb"
+            },
+            placeHolder: {
+                backgroundColor: "#ebebeb",
+                paddingLeft: "20px",
+                width: "inherit"
             }
         }
     }

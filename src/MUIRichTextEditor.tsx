@@ -2,10 +2,11 @@ import * as React from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
+import { Paper } from '@material-ui/core'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
-    CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand, 
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator
+    CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect
 } from 'draft-js'
 import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
@@ -58,6 +59,14 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     anchorLink: {
         textDecoration: "underline",
         color: palette.secondary.main
+    },
+    toolbar: {
+    },
+    inlineToolbar: {
+        maxWidth: "180px",
+        position: "absolute",
+        padding: "5px",
+        zIndex: 10
     }
 })
 
@@ -78,6 +87,9 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     customControls?: TCustomControl[],
     decorators?: TDecorator[],
     ref?: any
+    toolbar?: boolean
+    inlineToolbar?: boolean
+    inlineToolbarControls?: Array<TEditorControl>
 }
 
 type IMUIRichTextEditorState = {
@@ -87,6 +99,10 @@ type IMUIRichTextEditorState = {
     anchorMediaPopover?: HTMLElement
     urlValue?: string
     urlKey?: string
+    toolbarPosition?: { 
+        top: number
+        left: number
+    }
 }
 
 class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRichTextEditorState> {
@@ -126,7 +142,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             }))
         }
         const decorator = new CompositeDecorator(decorators)
-        const editorState = (this.props.value) 
+        const editorState = (this.props.value)
             ? EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.value)), decorator)
             : EditorState.createEmpty(decorator)
         let customBlockRenderMap: any = {}
@@ -148,6 +164,45 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             focused: false
         }
         this.extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(this.blockRenderMap, Immutable.Map(customBlockRenderMap))
+    }
+
+    componentDidMount() {
+        if (this.refs.editor) {
+            const editor: HTMLElement = (this.refs.editor as any).editor
+            editor.addEventListener("mouseup", this.handleSetToolbarPosition)
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.refs.editor) {
+            const editor: HTMLElement = (this.refs.editor as any).editor
+            editor.removeEventListener("mouseup", this.handleSetToolbarPosition)
+        }
+    }
+
+    handleSetToolbarPosition = () => {
+        setTimeout(() => {
+            const selection = this.state.editorState.getSelection()
+            if (selection.isCollapsed()) {
+                this.setState({
+                    toolbarPosition: undefined
+                })
+                return
+            }
+            const editor: HTMLElement = (this.refs.editor as any).editor
+            const selectionRect = getVisibleSelectionRect(window)
+            const editorRect = editor.getBoundingClientRect()
+            if (!selectionRect) {
+                return
+            }
+            const position = {
+                top: editor.offsetTop - 48 + (selectionRect.top - editorRect.top),
+                left: editor.offsetLeft + (selectionRect.left - editorRect.left)
+            }
+            this.setState({
+                toolbarPosition: position
+            })
+        }, 1)
     }
 
     handleChange = (state: EditorState) => {
@@ -183,6 +238,11 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         this.setState({
             focused: false
         })
+        if (!this.state.anchorLinkPopover) {
+            this.setState({
+                toolbarPosition: undefined
+            })
+        }
     }
 
     handleCloseAnchorLinkPopover = () => {
@@ -199,7 +259,6 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         }
         return "not-handled"
     }
-
 
     handleCustomClick = (style: any) => {
         if (!this.props.customControls) {
@@ -263,7 +322,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         )
     }
 
-    promptForLink = () => {
+    promptForLink = (style: string, toolbarMode: boolean) => {
         const { editorState } = this.state
         const selection = editorState.getSelection()
 
@@ -282,7 +341,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             this.setState({
                 urlValue: url,
                 urlKey: urlKey,
-                anchorLinkPopover: document.getElementById("mui-rte-link-control")!
+                anchorLinkPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")! 
+                                                : document.getElementById("mui-rte-link-control-toolbar")!
             }, () => {
                 setTimeout(() => document.getElementById("mui-rte-link-popover")!.focus(), 0)
             })
@@ -304,6 +364,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             }
             this.setState({
                 anchorLinkPopover: undefined
+            }, () => {
+                this.refocus()
             })
             return
         }
@@ -336,7 +398,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         this.updateStateForPopover(replaceEditorState)
     }
 
-    promptForMedia = () => {
+    promptForMedia = (style: string, toolbarMode: boolean) => {
         const { editorState } = this.state
         let url = ''
         let urlKey = undefined
@@ -349,11 +411,12 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             url = linkInstance.getData().url
             urlKey = linkKey
         }
-
+        console.log(document.getElementById("mui-rte-image-control-toolbar"))
         this.setState({
             urlValue: url,
             urlKey: urlKey,
-            anchorMediaPopover: document.getElementById("mui-rte-image-control")!
+            anchorMediaPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
+                                             : document.getElementById("mui-rte-image-control-toolbar")!
         }, () => {
             setTimeout(() => document.getElementById("mui-rte-media-popover")!.focus(), 0)
         })
@@ -364,6 +427,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         if (!url) {
             this.setState({
                 anchorMediaPopover: undefined
+            }, () => {
+                this.refocus()
             })
             return
         }
@@ -381,13 +446,13 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         else {
             const contentStateWithEntity = contentState.createEntity(
                 'IMAGE',
-                'IMMUTABLE', 
+                'IMMUTABLE',
                 {
                     url: url
                 }
             )
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-            const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity})
+            const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity })
             const newEditorState = AtomicBlockUtils.insertAtomicBlock(
                 newEditorStateRaw,
                 entityKey, ' ')
@@ -404,9 +469,13 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             urlValue: undefined,
             urlKey: undefined
         }, () => {
-            setTimeout(() => (this.refs.editor as any).blur(), 0)
-            setTimeout(() => this.handleFocus(), 1)
+            this.refocus()
         })
+    }
+
+    refocus = () => {
+        setTimeout(() => (this.refs.editor as any).blur(), 0)
+        setTimeout(() => this.handleFocus(), 1)
     }
 
     findLinkEntities(contentBlock: any, callback: any, contentState: any) {
@@ -451,6 +520,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
 
     render() {
         const { classes, controls, customControls } = this.props
+        const renderToolbar = this.props.toolbar === undefined || this.props.toolbar
+        const inlineToolbarControls = this.props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
         const contentState = this.state.editorState.getCurrentContent()
         let className = ""
         let placeholder = null
@@ -474,7 +545,28 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 <div className={classNames(classes.container, {
                     [classes.inheritFontSize]: this.props.inheritFontSize
                 })}>
-                    {editable ?
+                    {this.props.inlineToolbar && editable && this.state.toolbarPosition ?
+                        <Paper className={classes.inlineToolbar} style={{
+                            top: this.state.toolbarPosition.top,
+                            left: this.state.toolbarPosition.left
+                        }} onBlur={() => {
+                            this.setState({
+                                toolbarPosition: undefined
+                            })
+                        }}>
+                            <EditorControls
+                                editorState={this.state.editorState}
+                                onToggleInline={this.toggleInlineStyle}
+                                onPromptLink={this.promptForLink}
+                                onClear={this.handleClearFormat}
+                                onSave={this.save}
+                                controls={inlineToolbarControls}
+                                customControls={customControls}
+                                toolbarMode={true}
+                            />
+                        </Paper>
+                    : null}
+                    {editable && renderToolbar ?
                         <EditorControls
                             editorState={this.state.editorState}
                             onToggleBlock={this.toggleBlockType}
@@ -488,6 +580,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                             onCustomClick={this.handleCustomClick}
                             controls={controls}
                             customControls={customControls}
+                            className={classes.toolbar}
                         />
                         : null}
                     {placeholder}

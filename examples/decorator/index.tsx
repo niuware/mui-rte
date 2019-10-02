@@ -1,11 +1,11 @@
-import * as React from 'react'
+import React from 'react'
 import MUIRichTextEditor from '../../'
 
 const save = (data: string) => {
     console.log(data)
 }
 
-const MyHashTagDecorator: React.FC<any> = (props: any) => {
+const MyHashTagDecorator = (props: any) => {
     return (
         <span style={{
             color: "#3F51B5"
@@ -15,7 +15,7 @@ const MyHashTagDecorator: React.FC<any> = (props: any) => {
     )
 }
 
-const MyAtDecorator: React.FC<any> = (props: any) => {
+const MyAtDecorator = (props: any) => {
     const customUrl = "http://myulr/mention/" + props.decoratedText
     return (
         <a 
