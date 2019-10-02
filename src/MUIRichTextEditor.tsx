@@ -173,7 +173,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
 
     componentWillUnmount() {
         if (this.refs.editor) {
-            const editor: HTMLElement = (this.refs.editor as any).editorContainer
+            const editor: HTMLElement = (this.refs.editor as any).editor
             editor.removeEventListener("mouseup", this.handleSetToolbarPosition)
         }
     }
@@ -362,6 +362,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             }
             this.setState({
                 anchorLinkPopover: undefined
+            }, () => {
+                this.refocus()
             })
             return
         }
@@ -423,6 +425,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         if (!url) {
             this.setState({
                 anchorMediaPopover: undefined
+            }, () => {
+                this.refocus()
             })
             return
         }
@@ -463,9 +467,13 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             urlValue: undefined,
             urlKey: undefined
         }, () => {
-            setTimeout(() => (this.refs.editor as any).blur(), 0)
-            setTimeout(() => this.handleFocus(), 1)
+            this.refocus()
         })
+    }
+
+    refocus = () => {
+        setTimeout(() => (this.refs.editor as any).blur(), 0)
+        setTimeout(() => this.handleFocus(), 1)
     }
 
     findLinkEntities(contentBlock: any, callback: any, contentState: any) {
