@@ -189,6 +189,7 @@ interface IBlockStyleControlsProps extends KeyString {
     onRedo?: () => void
     onCustomClick?: (style: any) => void
     toolbarMode?: boolean
+    className?: string
 }
 
 const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
@@ -219,7 +220,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props: IBlo
         })
     }
     return (
-        <div>
+        <div className={props.className}>
             {filteredControls.map(style => {
                 if (props.toolbarMode && 
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {

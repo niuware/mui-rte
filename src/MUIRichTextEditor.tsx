@@ -60,6 +60,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         textDecoration: "underline",
         color: palette.secondary.main
     },
+    toolbar: {
+    },
     inlineToolbar: {
         maxWidth: "180px",
         position: "absolute",
@@ -578,6 +580,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                             onCustomClick={this.handleCustomClick}
                             controls={controls}
                             customControls={customControls}
+                            className={classes.toolbar}
                         />
                         : null}
                     {placeholder}
