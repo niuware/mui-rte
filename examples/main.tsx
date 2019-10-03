@@ -9,6 +9,7 @@ import CustomControls from './custom-controls'
 import Decorators from './decorator'
 import InlineToolbar from './inline-toolbar'
 import CustomInlineToolbar from './custom-inline-toolbar'
+import LoadHTML from './load-html'
 
 const App = () => {
 
@@ -30,6 +31,7 @@ const App = () => {
             <button onClick={() => setSample(<Decorators />)}>Decorators</button>
             <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
             <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
+            <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
             {sample}
         </div>
     )
