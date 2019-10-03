@@ -28,6 +28,26 @@ ReactDOM.render(
 )
 ```
 
+You can load default content as follows:
+
+```js
+import MUIRichTextEditor from 'mui-rte'
+
+const data = getContentStateAsStringFromSomewhere()
+
+ReactDOM.render(
+    <MUIRichTextEditor 
+        value={data}
+        label="Start typing..." 
+    />, 
+    document.getElementById("root")
+)
+```
+
+## Examples
+
+Check the [examples](https://github.com/niuware/mui-rte/tree/master/examples) directory for more. 
+
 ## Custom Controls
 
 You can define your custom inline styles, block styles and callback actions to the editor. Just select an icon from `@material-ui/icons` and define your rules.
@@ -235,10 +255,6 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
 |regex|`RegExp`|required|The regular expression to match a decorator.|    
-
-## Examples
-
-Check the [examples](https://github.com/niuware/mui-rte/tree/master/examples) directory for more details. 
 
 ## Development 
 
