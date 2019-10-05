@@ -1,5 +1,5 @@
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, mount } from 'enzyme'
 import { assert, expect } from 'chai'
 import { EditorState } from 'draft-js'
 import EditorControls, { TEditorControl } from '../src/components/EditorControls'
@@ -13,7 +13,7 @@ describe('<EditorControls />', () => {
     })
 
     it('should render all controls', () => {
-        const wrapper = shallow(
+        const wrapper = mount(
             <EditorControls
                 editorState={editorState}
                 onClear={() => {}}
@@ -42,7 +42,7 @@ describe('<EditorControls />', () => {
             "Code Block",
             "Underline"
         ]
-        const wrapper = shallow(
+        const wrapper = mount(
             <EditorControls
                 editorState={editorState}
                 controls={controls}
@@ -64,7 +64,7 @@ describe('<EditorControls />', () => {
     })
 
     it('should not render controls', () => {
-        const wrapper = shallow(
+        const wrapper = mount(
             <EditorControls
                 editorState={editorState}
                 controls={[]}

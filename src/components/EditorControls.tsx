@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useState, useEffect } from 'react'
 import { EditorState } from 'draft-js'
 import FormatBoldIcon from '@material-ui/icons/FormatBold'
 import FormatItalicIcon from '@material-ui/icons/FormatItalic'
@@ -175,7 +175,6 @@ const STYLE_TYPES: TStyleType[] = [
 ]
 
 interface IBlockStyleControlsProps extends KeyString {
-    children?: React.ReactNode
     editorState: EditorState
     controls?: Array<TEditorControl>
     customControls?: TCustomControl[]
@@ -192,14 +191,18 @@ interface IBlockStyleControlsProps extends KeyString {
     className?: string
 }
 
-const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props: IBlockStyleControlsProps) => {
+const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
+    const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
     const selectionInfo = getSelectionInfo(props.editorState)
-    let filteredControls = STYLE_TYPES
-    if (props.controls) {
-        filteredControls = []
+
+    useEffect(() => {
+        if (!props.controls) {
+            return
+        }
+        const filteredControls: TStyleType[] = []
         const controls = props.controls.filter((control, index) => props.controls!.indexOf(control) >= index)
         controls.forEach(name => {
-            let style = STYLE_TYPES.find(style => style.name === name)
+            const style = STYLE_TYPES.find(style => style.name === name)
             if (style) {
                 filteredControls.push(style)
             }
@@ -218,10 +221,12 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props: IBlo
                 }
             }
         })
-    }
+        setAvailableControls(filteredControls)
+    }, [props.controls, props.customControls])
+
     return (
         <div className={props.className}>
-            {filteredControls.map(style => {
+            {availableControls.map(style => {
                 if (props.toolbarMode && 
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {
                     return null

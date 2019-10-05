@@ -411,7 +411,6 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             url = linkInstance.getData().url
             urlKey = linkKey
         }
-        console.log(document.getElementById("mui-rte-image-control-toolbar"))
         this.setState({
             urlValue: url,
             urlKey: urlKey,
