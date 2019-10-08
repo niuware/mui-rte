@@ -341,6 +341,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             this.setState({
                 urlValue: url,
                 urlKey: urlKey,
+                toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
                 anchorLinkPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")! 
                                                 : document.getElementById("mui-rte-link-control-toolbar")!
             }, () => {
@@ -414,6 +415,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         this.setState({
             urlValue: url,
             urlKey: urlKey,
+            toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
             anchorMediaPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
                                              : document.getElementById("mui-rte-image-control-toolbar")!
         }, () => {
