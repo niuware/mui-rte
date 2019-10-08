@@ -266,7 +266,7 @@ $ npm run serve
 
 ## Future plans
 
-- Add custom blocks such as `material-ui` components (Card, etc.)
+- Code refactor
 - Increase test coverage
 
 ## Suggestions and issues

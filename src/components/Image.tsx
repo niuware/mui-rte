@@ -14,9 +14,14 @@ interface IImageProps extends WithStyles<typeof styles> {
 }
 
 const Image: React.FC<IImageProps> = (props: IImageProps) => {
-    const { url } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()
+    const { url, width, height } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()
     return (
-        <img src={url} className={props.classes.root} />
+        <img 
+            src={url} 
+            className={props.classes.root} 
+            width={width} 
+            height={height} 
+        />
     )
 }
 
