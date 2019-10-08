@@ -1,4 +1,5 @@
-import { EditorState, DraftBlockType } from "draft-js"
+import { EditorState, DraftBlockType } from 'draft-js'
+import Immutable from 'immutable'
 
 const getSelectionInfo = (editorState: EditorState): {
     inlineStyle: Immutable.OrderedSet<string>,

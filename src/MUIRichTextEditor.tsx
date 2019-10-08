@@ -99,6 +99,8 @@ type IMUIRichTextEditorState = {
     anchorMediaPopover?: HTMLElement
     urlValue?: string
     urlKey?: string
+    urlWidth?: number
+    urlHeight?: number
     toolbarPosition?: { 
         top: number
         left: number
@@ -341,6 +343,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             this.setState({
                 urlValue: url,
                 urlKey: urlKey,
+                toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
                 anchorLinkPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")! 
                                                 : document.getElementById("mui-rte-link-control-toolbar")!
             }, () => {
@@ -401,6 +404,8 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
     promptForMedia = (style: string, toolbarMode: boolean) => {
         const { editorState } = this.state
         let url = ''
+        let width = undefined
+        let height = undefined
         let urlKey = undefined
         const selectionInfo = getSelectionInfo(editorState)
         const contentState = editorState.getCurrentContent()
@@ -409,11 +414,16 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         if (linkKey) {
             const linkInstance = contentState.getEntity(linkKey)
             url = linkInstance.getData().url
+            width = linkInstance.getData().width
+            height = linkInstance.getData().height
             urlKey = linkKey
         }
         this.setState({
             urlValue: url,
             urlKey: urlKey,
+            urlWidth: width,
+            urlHeight: height,
+            toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
             anchorMediaPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
                                              : document.getElementById("mui-rte-image-control-toolbar")!
         }, () => {
@@ -421,7 +431,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         })
     }
 
-    confirmMedia = (url?: string) => {
+    confirmMedia = (url?: string, width?: number, height?: number) => {
         const { editorState, urlKey } = this.state
         if (!url) {
             this.setState({
@@ -437,7 +447,9 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
 
         if (urlKey) {
             contentState.replaceEntityData(urlKey, {
-                url: url
+                url: url,
+                width: width,
+                height: height 
             })
             const newEditorState = EditorState.push(editorState, contentState, "apply-entity")
             replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
@@ -447,7 +459,9 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 'IMAGE',
                 'IMMUTABLE',
                 {
-                    url: url
+                    url: url,
+                    width: width,
+                    height: height 
                 }
             )
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
@@ -612,8 +626,11 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                         <UrlPopover
                             id="mui-rte-media-popover"
                             url={this.state.urlValue}
+                            width={this.state.urlWidth}
+                            height={this.state.urlHeight}
                             anchor={this.state.anchorMediaPopover}
                             onConfirm={this.confirmMedia}
+                            useSize={true}
                         />
                         : null}
                 </div>

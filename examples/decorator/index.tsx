@@ -18,10 +18,11 @@ const MyHashTagDecorator = (props: any) => {
 const MyAtDecorator = (props: any) => {
     const customUrl = "http://myulr/mention/" + props.decoratedText
     return (
-        <a 
-            href={customUrl}
+        <a
+            onClick={() => window.location.href = customUrl}
             style={{
-                color: "green"
+                color: "green",
+                cursor: "pointer"
             }}
         >
             {props.children}
