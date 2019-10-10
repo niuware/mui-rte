@@ -93,13 +93,13 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
 }
 
 type IMUIRichTextEditorState = {
-    anchorLinkPopover?: HTMLElement
-    anchorMediaPopover?: HTMLElement
+    anchorUrlPopover?: HTMLElement
     urlValue?: string
     urlKey?: string
     urlWidth?: number
     urlHeight?: number
     toolbarPosition?: TToolbarPosition
+    sizeProps?: boolean
 }
 
 type TStateOffset = {
@@ -220,10 +220,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }, [state.toolbarPosition])
 
     useEffect(() => {
-        if (state.anchorLinkPopover === undefined) {
+        if (state.anchorUrlPopover === undefined) {
             refocus()
         }
-    }, [state.anchorLinkPopover])
+    }, [state.anchorUrlPopover])
 
     const handleSetToolbarPosition = () => {
         setTimeout(() => {
@@ -274,7 +274,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handleBlur = () => {
         setFocus(false)
-        if (!state.anchorLinkPopover) {
+        if (!state.anchorUrlPopover) {
             setState({
                 ...state,
                 toolbarPosition: undefined
@@ -351,8 +351,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 urlValue: url,
                 urlKey: urlKey,
                 toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-                anchorLinkPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")!
-                    : document.getElementById("mui-rte-link-control-toolbar")!
+                anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")!
+                                                : document.getElementById("mui-rte-link-control-toolbar")!,
+                sizeProps: undefined
             })
         }
     }
@@ -374,14 +375,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             urlKey = linkKey
         }
         setState({
-            ...state,
             urlValue: url,
             urlKey: urlKey,
             urlWidth: width,
             urlHeight: height,
             toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-            anchorMediaPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
-                : document.getElementById("mui-rte-image-control-toolbar")!
+            anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
+                                            : document.getElementById("mui-rte-image-control-toolbar")!,
+            sizeProps: true
         })
     }
 
@@ -399,7 +400,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             }
             setState({
                 ...state,
-                anchorLinkPopover: undefined
+                anchorUrlPopover: undefined
             })
             return
         }
@@ -437,7 +438,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!url) {
             setState({
                 ...state,
-                anchorMediaPopover: undefined
+                anchorUrlPopover: undefined
             })
             return
         }
@@ -478,10 +479,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(editorState)
         setState({
             ...state,
-            anchorLinkPopover: undefined,
-            anchorMediaPopover: undefined,
+            anchorUrlPopover: undefined,
             urlValue: undefined,
-            urlKey: undefined
+            urlKey: undefined,
+            sizeProps: undefined,
+            urlWidth: undefined,
+            urlHeight: undefined,
         })
     }
 
@@ -628,21 +631,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         />
                     </div>
                 </div>
-                {state.anchorLinkPopover ?
-                    <UrlPopover
-                        url={state.urlValue}
-                        anchor={state.anchorLinkPopover}
-                        onConfirm={confirmLink}
-                    />
-                    : null}
-                {state.anchorMediaPopover ?
+                {state.anchorUrlPopover ?
                     <UrlPopover
                         url={state.urlValue}
                         width={state.urlWidth}
                         height={state.urlHeight}
-                        anchor={state.anchorMediaPopover}
-                        onConfirm={confirmMedia}
-                        useSize={true}
+                        anchor={state.anchorUrlPopover}
+                        onConfirm={state.sizeProps ? confirmMedia : confirmLink}
+                        useSize={state.sizeProps}
                     />
                     : null}
             </div>
