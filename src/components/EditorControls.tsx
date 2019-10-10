@@ -193,7 +193,7 @@ interface IBlockStyleControlsProps extends KeyString {
 
 const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
     const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
-    const selectionInfo = getSelectionInfo(props.editorState)
+    const {editorState} = props
 
     useEffect(() => {
         if (!props.controls) {
@@ -234,15 +234,18 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                 let active = false
                 let action = null
                 if (style.type === "inline") {
-                    active = selectionInfo.inlineStyle.has(style.style)
+                    active = editorState.getCurrentInlineStyle().has(style.style)
                     action = props.onToggleInline
                 }
                 else if (style.type === "block") {
-                    active = style.style === selectionInfo.blockType
+                    const selection = editorState.getSelection()
+                    active = style.style === editorState.getCurrentContent().getBlockForKey(selection.getStartKey()).getType()
                     action = props.onToggleBlock
                 }
                 else {
-                    active = style.style === selectionInfo.entityType
+                    if (style.style === "IMAGE" || style.style === "LINK") {
+                        active = style.style === getSelectionInfo(editorState).entityType
+                    }
                     action = props[style.clickFnName!]
                 }
 
