@@ -10,6 +10,7 @@ import Decorators from './decorator'
 import InlineToolbar from './inline-toolbar'
 import CustomInlineToolbar from './custom-inline-toolbar'
 import LoadHTML from './load-html'
+import ResetValue from './reset-value'
 
 const App = () => {
 
@@ -32,6 +33,7 @@ const App = () => {
             <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
             <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
+            <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
             {sample}
         </div>
     )

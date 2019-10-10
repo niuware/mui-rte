@@ -208,7 +208,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const editor: HTMLElement = (editorRef.current as any).editor
             editor.removeEventListener("mouseup", handleSetToolbarPosition)
         }
-    }, [])
+    }, [props.value])
 
     useEffect(() => {
         editorStateRef.current = editorState

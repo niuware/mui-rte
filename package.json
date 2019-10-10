@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -74,7 +74,6 @@
     "immutable": "^3.8.2"
   },
   "files": [
-    "examples",
     "dist",
     "src",
     "*.js",
