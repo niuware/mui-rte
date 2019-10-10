@@ -266,7 +266,7 @@ $ npm run serve
 
 ## Future plans
 
-- Code refactor
+- Add new features
 - Increase test coverage
 
 ## Suggestions and issues

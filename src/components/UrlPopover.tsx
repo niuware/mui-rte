@@ -15,7 +15,6 @@ const styles = ({spacing}: Theme) => createStyles({
 })
 
 interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
-    id: string
     url?: string
     width?: number
     height?: number
@@ -32,14 +31,15 @@ type TUrlPopoverState = {
 }
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
-
     const [state, setState] = useState<TUrlPopoverState>({
         urlError: false,
         urlValue: props.url,
         width: props.width,
         height: props.height
     })
-    const {classes, id} = props
+    
+    const {classes} = props
+
     const onSizeChange = (data: any, prop: "width" | "height") => {
         if (data === "") {
             setState({...state, [prop]: undefined})
@@ -71,7 +71,6 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
                                 <TextField
-                                    id={id}
                                     className={classes.linkTextField}
                                     onChange={(event) => {setState({...state, urlValue: event.target.value})}}
                                     label="URL"

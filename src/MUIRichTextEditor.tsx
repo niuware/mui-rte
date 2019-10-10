@@ -1,4 +1,5 @@
-import * as React from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef, 
+    forwardRef, useImperativeHandle, RefForwardingComponent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -71,7 +72,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
 })
 
 export type TDecorator = {
-    component: React.FC
+    component: FunctionComponent
     regex: RegExp
 }
 
@@ -85,113 +86,164 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     customControls?: TCustomControl[],
-    decorators?: TDecorator[],
-    ref?: any
+    decorators?: TDecorator[]
     toolbar?: boolean
     inlineToolbar?: boolean
     inlineToolbarControls?: Array<TEditorControl>
 }
 
 type IMUIRichTextEditorState = {
-    editorState: EditorState
-    focused: boolean
-    anchorLinkPopover?: HTMLElement
-    anchorMediaPopover?: HTMLElement
+    anchorUrlPopover?: HTMLElement
     urlValue?: string
     urlKey?: string
     urlWidth?: number
     urlHeight?: number
-    toolbarPosition?: { 
-        top: number
-        left: number
+    toolbarPosition?: TToolbarPosition
+    sizeProps?: boolean
+}
+
+type TStateOffset = {
+    start: number,
+    end: number
+}
+
+type TToolbarPosition = {
+    top: number
+    left: number
+}
+
+type TCustomRenderers = {
+    style?: DraftStyleMap
+    block?: Immutable.Map<any, any>
+}
+
+const blockRenderMap = Immutable.Map({
+    'blockquote': {
+        element: "blockquote",
+        wrapper: <Blockquote />
+    },
+    'code-block': {
+        element: "pre",
+        wrapper: <CodeBlock />
+    }
+})
+const styleRenderMap: DraftStyleMap = {
+    'STRIKETROUGH': {
+        textDecoration: "line-through"
+    },
+    'HIGHLIGHT': {
+        backgroundColor: "yellow"
     }
 }
 
-class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRichTextEditorState> {
-    private blockRenderMap = Immutable.Map({
-        'blockquote': {
-            element: "blockquote",
-            wrapper: <Blockquote />
-        },
-        'code-block': {
-            element: "pre",
-            wrapper: <CodeBlock />
-        }
+const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
+    const { classes, controls, customControls } = props
+    const [state, setState] = useState<IMUIRichTextEditorState>({})
+    const [focus, setFocus] = useState(false)
+    const [editorState, setEditorState] = useState(EditorState.createEmpty())
+    const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
+        style: undefined,
+        block: undefined
     })
-    private styleRenderMap: DraftStyleMap = {
-        'STRIKETROUGH': {
-            textDecoration: "line-through"
-        },
-        'HIGHLIGHT': {
-            backgroundColor: "yellow"
+
+    const editorRef = useRef(null)
+    const selectionRef = useRef<TStateOffset>({
+        start: 0,
+        end: 0
+    })
+    const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
+    const editorStateRef = useRef<EditorState | null>(editorState)
+
+    /**
+     * Expose the save method 
+     */
+    useImperativeHandle(ref, () => ({
+        save: () => {
+            handleSave()
         }
-    }
-    private extendedBlockRenderMap: Immutable.Map<any, any>
-    constructor(props: IMUIRichTextEditorProps) {
-        super(props)
+    }))
+
+    useEffect(() => {
         const decorators: DraftDecorator[] = [
             {
-                strategy: this.findLinkEntities,
+                strategy: findLinkEntities,
                 component: Link,
             }
         ]
         if (props.decorators) {
             props.decorators.forEach(deco => decorators.push({
                 strategy: (contentBlock: any, callback: any, contentState: any) => {
-                    this.findDecoWithRegex(deco.regex, contentBlock, callback)
+                    findDecoWithRegex(deco.regex, contentBlock, callback)
                 },
                 component: deco.component
             }))
         }
         const decorator = new CompositeDecorator(decorators)
-        const editorState = (this.props.value)
-            ? EditorState.createWithContent(convertFromRaw(JSON.parse(this.props.value)), decorator)
+        const editorState = (props.value)
+            ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
             : EditorState.createEmpty(decorator)
-        let customBlockRenderMap: any = {}
-        if (this.props.customControls) {
-            this.props.customControls.forEach(control => {
+        const customBlockMap: any = {}
+        const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
+        if (props.customControls) {
+            props.customControls.forEach(control => {
                 if (control.type === "inline" && control.inlineStyle) {
-                    this.styleRenderMap[control.name.toUpperCase()] = control.inlineStyle
+                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
                 }
                 else if (control.type === "block" && control.blockWrapper) {
-                    customBlockRenderMap[control.name.toUpperCase()] = {
+                    customBlockMap[control.name.toUpperCase()] = {
                         element: "div",
                         wrapper: control.blockWrapper
                     }
                 }
             })
         }
-        this.state = {
-            editorState: editorState,
-            focused: false
+        setCustomRenderers({
+            style: customStyleMap,
+            block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
+        })
+        setEditorState(editorState)
+        const editor: HTMLElement = (editorRef.current as any).editor
+        editor.addEventListener("mouseup", handleSetToolbarPosition)
+        return () => {
+            const editor: HTMLElement = (editorRef.current as any).editor
+            editor.removeEventListener("mouseup", handleSetToolbarPosition)
         }
-        this.extendedBlockRenderMap = DefaultDraftBlockRenderMap.merge(this.blockRenderMap, Immutable.Map(customBlockRenderMap))
-    }
+    }, [])
 
-    componentDidMount() {
-        if (this.refs.editor) {
-            const editor: HTMLElement = (this.refs.editor as any).editor
-            editor.addEventListener("mouseup", this.handleSetToolbarPosition)
+    useEffect(() => {
+        editorStateRef.current = editorState
+    }, [editorState])
+
+
+    useEffect(() => {
+        toolbarPositionRef.current = state.toolbarPosition
+    }, [state.toolbarPosition])
+
+    useEffect(() => {
+        if (state.anchorUrlPopover === undefined) {
+            refocus()
         }
-    }
+    }, [state.anchorUrlPopover])
 
-    componentWillUnmount() {
-        if (this.refs.editor) {
-            const editor: HTMLElement = (this.refs.editor as any).editor
-            editor.removeEventListener("mouseup", this.handleSetToolbarPosition)
-        }
-    }
-
-    handleSetToolbarPosition = () => {
+    const handleSetToolbarPosition = () => {
         setTimeout(() => {
-            const selection = this.state.editorState.getSelection()
-            if (selection.isCollapsed()) {
-                this.setState({
-                    toolbarPosition: undefined
-                })
+            const selection = (editorStateRef.current as any).getSelection()
+            if (selection.isCollapsed() || (toolbarPositionRef !== undefined && 
+                selectionRef.current.start === selection.getStartOffset() &&
+                selectionRef.current.end === selection.getEndOffset())) {
+                    setState({
+                        ...state,
+                        toolbarPosition: undefined
+                    })
                 return
             }
-            const editor: HTMLElement = (this.refs.editor as any).editor
+
+            selectionRef.current = {
+                start: selection.getStartOffset(),
+                end: selection.getEndOffset()
+            }
+
+            const editor: HTMLElement = (editorRef.current as any).editor
             const selectionRect = getVisibleSelectionRect(window)
             const editorRect = editor.getBoundingClientRect()
             if (!selectionRect) {
@@ -201,23 +253,36 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 top: editor.offsetTop - 48 + (selectionRect.top - editorRect.top),
                 left: editor.offsetLeft + (selectionRect.left - editorRect.left)
             }
-            this.setState({
+            setState({
+                ...state,
                 toolbarPosition: position
             })
         }, 1)
     }
 
-    handleChange = (state: EditorState) => {
-        this.setState({
-            editorState: state
-        })
-        if (this.props.onChange) {
-            this.props.onChange(state)
+    const handleChange = (state: EditorState) => {
+        setEditorState(state)
+        if (props.onChange) {
+            props.onChange(state)
         }
     }
 
-    handleClearFormat = () => {
-        const { editorState } = this.state
+    const handleFocus = () => {
+        setFocus(true)
+        setTimeout(() => (editorRef.current as any).focus(), 0)
+    }
+
+    const handleBlur = () => {
+        setFocus(false)
+        if (!state.anchorUrlPopover) {
+            setState({
+                ...state,
+                toolbarPosition: undefined
+            })
+        }
+    }
+
+    const handleClearFormat = () => {
         const selectionInfo = getSelectionInfo(editorState)
         let newEditorState = editorState
         selectionInfo.inlineStyle.forEach((effect) => {
@@ -226,106 +291,47 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             }
         })
         newEditorState = RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType)
-        this.updateAndFocus(newEditorState)
+        setEditorState(newEditorState)
     }
 
-    handleFocus = () => {
-        (this.refs.editor as any).focus()
-        this.setState({
-            focused: true
-        })
-    }
-
-    handleBlur = () => {
-        this.setState({
-            focused: false
-        })
-        if (!this.state.anchorLinkPopover) {
-            this.setState({
-                toolbarPosition: undefined
-            })
+    const handleSave = () => {
+        if (props.onSave) {
+            props.onSave(JSON.stringify(convertToRaw(editorState.getCurrentContent())))
         }
     }
 
-    handleCloseAnchorLinkPopover = () => {
-        this.setState({
-            anchorLinkPopover: undefined
-        })
-    }
-
-    handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
+    const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
         const newState = RichUtils.handleKeyCommand(editorState, command)
         if (newState) {
-            this.handleChange(newState)
+            handleChange(newState)
             return "handled"
         }
         return "not-handled"
     }
 
-    handleCustomClick = (style: any) => {
-        if (!this.props.customControls) {
+    const handleCustomClick = (style: any) => {
+        if (!props.customControls) {
             return
         }
-        for (let control of this.props.customControls) {
+        for (let control of props.customControls) {
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
-                    control.onClick(this.state.editorState, control.name)
+                    control.onClick(editorState, control.name)
                 }
                 break
             }
         }
     }
 
-    handleUndo = () => {
-        this.setState(prevState => {
-            return {
-                editorState: EditorState.undo(prevState.editorState)
-            }
-        })
+    const handleUndo = () => {
+        setEditorState(EditorState.undo(editorState))
     }
 
-    handleRedo = () => {
-        this.setState(prevState => {
-            return {
-                editorState: EditorState.redo(prevState.editorState)
-            }
-        })
+    const handleRedo = () => {
+        setEditorState(EditorState.redo(editorState))
     }
 
-    save = () => {
-        if (this.props.onSave) {
-            this.props.onSave(JSON.stringify(convertToRaw(this.state.editorState.getCurrentContent())))
-        }
-    }
-
-    updateAndFocus = (state: EditorState) => {
-        this.setState({
-            editorState: state
-        }, () => {
-            setTimeout(() => this.handleFocus(), 0)
-        })
-    }
-
-    toggleBlockType = (blockType: any) => {
-        this.updateAndFocus(
-            RichUtils.toggleBlockType(
-                this.state.editorState,
-                blockType
-            )
-        )
-    }
-
-    toggleInlineStyle = (inlineStyle: any) => {
-        this.updateAndFocus(
-            RichUtils.toggleInlineStyle(
-                this.state.editorState,
-                inlineStyle
-            )
-        )
-    }
-
-    promptForLink = (style: string, toolbarMode: boolean) => {
-        const { editorState } = this.state
+    const handlePromptForLink = (style: string, toolbarMode: boolean) => {
         const selection = editorState.getSelection()
 
         if (!selection.isCollapsed()) {
@@ -340,35 +346,61 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 url = linkInstance.getData().url
                 urlKey = linkKey
             }
-            this.setState({
+            setState({
+                ...state,
                 urlValue: url,
                 urlKey: urlKey,
-                toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
-                anchorLinkPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")! 
-                                                : document.getElementById("mui-rte-link-control-toolbar")!
-            }, () => {
-                setTimeout(() => document.getElementById("mui-rte-link-popover")!.focus(), 0)
+                toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
+                anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")!
+                                                : document.getElementById("mui-rte-link-control-toolbar")!,
+                sizeProps: undefined
             })
         }
     }
 
-    removeLink = () => {
-        const { editorState } = this.state
-        const selection = editorState.getSelection()
-        this.updateStateForPopover(RichUtils.toggleLink(editorState, selection, null))
+    const handlePromptForMedia = (style: string, toolbarMode: boolean) => {
+        let url = ''
+        let width = undefined
+        let height = undefined
+        let urlKey = undefined
+        const selectionInfo = getSelectionInfo(editorState)
+        const contentState = editorState.getCurrentContent()
+        const linkKey = selectionInfo.linkKey
+
+        if (linkKey) {
+            const linkInstance = contentState.getEntity(linkKey)
+            url = linkInstance.getData().url
+            width = linkInstance.getData().width
+            height = linkInstance.getData().height
+            urlKey = linkKey
+        }
+        setState({
+            urlValue: url,
+            urlKey: urlKey,
+            urlWidth: width,
+            urlHeight: height,
+            toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
+            anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
+                                            : document.getElementById("mui-rte-image-control-toolbar")!,
+            sizeProps: true
+        })
     }
 
-    confirmLink = (url?: string) => {
-        const { editorState, urlKey } = this.state
+    const removeLink = () => {
+        const selection = editorState.getSelection()
+        updateStateForPopover(RichUtils.toggleLink(editorState, selection, null))
+    }
+
+    const confirmLink = (url?: string) => {
+        const { urlKey } = state
         if (!url) {
             if (urlKey) {
-                this.removeLink()
+                removeLink()
                 return
             }
-            this.setState({
-                anchorLinkPopover: undefined
-            }, () => {
-                this.refocus()
+            setState({
+                ...state,
+                anchorUrlPopover: undefined
             })
             return
         }
@@ -398,46 +430,15 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 newEditorState.getSelection(),
                 entityKey)
         }
-        this.updateStateForPopover(replaceEditorState)
+        updateStateForPopover(replaceEditorState)
     }
 
-    promptForMedia = (style: string, toolbarMode: boolean) => {
-        const { editorState } = this.state
-        let url = ''
-        let width = undefined
-        let height = undefined
-        let urlKey = undefined
-        const selectionInfo = getSelectionInfo(editorState)
-        const contentState = editorState.getCurrentContent()
-        const linkKey = selectionInfo.linkKey
-
-        if (linkKey) {
-            const linkInstance = contentState.getEntity(linkKey)
-            url = linkInstance.getData().url
-            width = linkInstance.getData().width
-            height = linkInstance.getData().height
-            urlKey = linkKey
-        }
-        this.setState({
-            urlValue: url,
-            urlKey: urlKey,
-            urlWidth: width,
-            urlHeight: height,
-            toolbarPosition: !toolbarMode ? undefined : this.state.toolbarPosition,
-            anchorMediaPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
-                                             : document.getElementById("mui-rte-image-control-toolbar")!
-        }, () => {
-            setTimeout(() => document.getElementById("mui-rte-media-popover")!.focus(), 0)
-        })
-    }
-
-    confirmMedia = (url?: string, width?: number, height?: number) => {
-        const { editorState, urlKey } = this.state
+    const confirmMedia = (url?: string, width?: number, height?: number) => {
+        const { urlKey } = state
         if (!url) {
-            this.setState({
-                anchorMediaPopover: undefined
-            }, () => {
-                this.refocus()
+            setState({
+                ...state,
+                anchorUrlPopover: undefined
             })
             return
         }
@@ -449,7 +450,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
             contentState.replaceEntityData(urlKey, {
                 url: url,
                 width: width,
-                height: height 
+                height: height
             })
             const newEditorState = EditorState.push(editorState, contentState, "apply-entity")
             replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
@@ -461,7 +462,7 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 {
                     url: url,
                     width: width,
-                    height: height 
+                    height: height
                 }
             )
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
@@ -471,52 +472,49 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
                 entityKey, ' ')
             replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
         }
-        this.updateStateForPopover(replaceEditorState)
+        updateStateForPopover(replaceEditorState)
     }
 
-    updateStateForPopover = (editorState: EditorState) => {
-        this.setState({
-            editorState: editorState,
-            anchorLinkPopover: undefined,
-            anchorMediaPopover: undefined,
+    const updateStateForPopover = (editorState: EditorState) => {
+        setEditorState(editorState)
+        setState({
+            ...state,
+            anchorUrlPopover: undefined,
             urlValue: undefined,
-            urlKey: undefined
-        }, () => {
-            this.refocus()
+            urlKey: undefined,
+            sizeProps: undefined,
+            urlWidth: undefined,
+            urlHeight: undefined,
         })
     }
 
-    refocus = () => {
-        setTimeout(() => (this.refs.editor as any).blur(), 0)
-        setTimeout(() => this.handleFocus(), 1)
+    const refocus = () => {
+        setTimeout(() => (editorRef.current as any).blur(), 0)
+        setTimeout(() => (editorRef.current as any).focus(), 1)
     }
 
-    findLinkEntities(contentBlock: any, callback: any, contentState: any) {
-        contentBlock.findEntityRanges(
-            (character: any) => {
-                const entityKey = character.getEntity()
-                return (
-                    entityKey !== null &&
-                    contentState.getEntity(entityKey).getType() === 'LINK'
-                )
-            },
-            callback
+    const toggleBlockType = (blockType: any) => {
+        setEditorState(
+            RichUtils.toggleBlockType(
+                editorState,
+                blockType
+            )
         )
     }
 
-    findDecoWithRegex(regex: RegExp, contentBlock: any, callback: any) {
-        const text = contentBlock.getText()
-        let matchArr, start
-        while ((matchArr = regex.exec(text)) !== null) {
-            start = matchArr.index
-            callback(start, start + matchArr[0].length)
-        }
+    const toggleInlineStyle = (inlineStyle: any) => {
+        setEditorState(
+            RichUtils.toggleInlineStyle(
+                editorState,
+                inlineStyle
+            )
+        )
     }
 
-    blockRenderer = (contentBlock: ContentBlock) => {
+    const blockRenderer = (contentBlock: ContentBlock) => {
         const blockType = contentBlock.getType()
         if (blockType === 'atomic') {
-            const contentState = this.state.editorState.getCurrentContent()
+            const contentState = editorState.getCurrentContent()
             const entity = contentBlock.getEntityAt(0)
             if (entity) {
                 const type = contentState.getEntity(entity).getType()
@@ -531,112 +529,121 @@ class MUIRichTextEditor extends React.Component<IMUIRichTextEditorProps, IMUIRic
         return null
     }
 
-    render() {
-        const { classes, controls, customControls } = this.props
-        const renderToolbar = this.props.toolbar === undefined || this.props.toolbar
-        const inlineToolbarControls = this.props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
-        const contentState = this.state.editorState.getCurrentContent()
-        let className = ""
-        let placeholder = null
-        const editable = this.props.readOnly === undefined || !this.props.readOnly
-        if (!contentState.hasText() && !this.state.focused) {
+    const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
+        contentBlock.findEntityRanges(
+            (character: any) => {
+                const entityKey = character.getEntity()
+                return (
+                    entityKey !== null &&
+                    contentState.getEntity(entityKey).getType() === 'LINK'
+                )
+            },
+            callback
+        )
+    }
+
+    const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
+        const text = contentBlock.getText()
+        let matchArr, start
+        while ((matchArr = regex.exec(text)) !== null) {
+            start = matchArr.index
+            callback(start, start + matchArr[0].length)
+        }
+    }
+
+    const renderToolbar = props.toolbar === undefined || props.toolbar
+    const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
+    const editable = props.readOnly === undefined || !props.readOnly
+
+    let className = ""
+    let placeholder: React.ReactElement | null = null
+    if (!focus) {
+        const contentState = editorState.getCurrentContent()
+        if (!contentState.hasText()) {
             placeholder = (
                 <div
                     className={classNames(classes.editorContainer, classes.placeHolder, {
-                        [classes.error]: this.props.error
+                        [classes.error]: props.error
                     })}
-                    onClick={this.handleFocus}
+                    onClick={handleFocus}
                 >
-                    {this.props.label || ""}
+                    {props.label || ""}
                 </div>
             )
             className = classes.hidePlaceholder
         }
-
-        return (
-            <div className={classes.root}>
-                <div className={classNames(classes.container, {
-                    [classes.inheritFontSize]: this.props.inheritFontSize
-                })}>
-                    {this.props.inlineToolbar && editable && this.state.toolbarPosition ?
-                        <Paper className={classes.inlineToolbar} style={{
-                            top: this.state.toolbarPosition.top,
-                            left: this.state.toolbarPosition.left
-                        }} onBlur={() => {
-                            this.setState({
-                                toolbarPosition: undefined
-                            })
-                        }}>
-                            <EditorControls
-                                editorState={this.state.editorState}
-                                onToggleInline={this.toggleInlineStyle}
-                                onPromptLink={this.promptForLink}
-                                onClear={this.handleClearFormat}
-                                onSave={this.save}
-                                controls={inlineToolbarControls}
-                                customControls={customControls}
-                                toolbarMode={true}
-                            />
-                        </Paper>
-                    : null}
-                    {editable && renderToolbar ?
-                        <EditorControls
-                            editorState={this.state.editorState}
-                            onToggleBlock={this.toggleBlockType}
-                            onToggleInline={this.toggleInlineStyle}
-                            onPromptLink={this.promptForLink}
-                            onPromptMedia={this.promptForMedia}
-                            onClear={this.handleClearFormat}
-                            onUndo={this.handleUndo}
-                            onRedo={this.handleRedo}
-                            onSave={this.save}
-                            onCustomClick={this.handleCustomClick}
-                            controls={controls}
-                            customControls={customControls}
-                            className={classes.toolbar}
-                        />
-                        : null}
-                    {placeholder}
-                    <div className={classes.editor}>
-                        <div className={classNames(className, classes.editorContainer, {
-                            [classes.editorReadOnly]: !editable,
-                            [classes.error]: this.props.error
-                        })} onClick={this.handleFocus} onBlur={this.handleBlur}>
-                            <Editor
-                                customStyleMap={this.styleRenderMap}
-                                blockRenderMap={this.extendedBlockRenderMap}
-                                blockRendererFn={this.blockRenderer}
-                                editorState={this.state.editorState}
-                                onChange={this.handleChange}
-                                readOnly={this.props.readOnly}
-                                handleKeyCommand={this.handleKeyCommand}
-                                ref="editor"
-                            />
-                        </div>
-                    </div>
-                    {this.state.anchorLinkPopover ?
-                        <UrlPopover
-                            id="mui-rte-link-popover"
-                            url={this.state.urlValue}
-                            anchor={this.state.anchorLinkPopover}
-                            onConfirm={this.confirmLink}
-                        />
-                        : null}
-                    {this.state.anchorMediaPopover ?
-                        <UrlPopover
-                            id="mui-rte-media-popover"
-                            url={this.state.urlValue}
-                            width={this.state.urlWidth}
-                            height={this.state.urlHeight}
-                            anchor={this.state.anchorMediaPopover}
-                            onConfirm={this.confirmMedia}
-                            useSize={true}
-                        />
-                        : null}
-                </div>
-            </div>
-        )
     }
+
+    return (
+        <div className={classes.root}>
+            <div className={classNames(classes.container, {
+                [classes.inheritFontSize]: props.inheritFontSize
+            })}>
+                {props.inlineToolbar && editable && state.toolbarPosition ?
+                    <Paper className={classes.inlineToolbar} style={{
+                        top: state.toolbarPosition.top,
+                        left: state.toolbarPosition.left
+                    }}>
+                        <EditorControls
+                            editorState={editorState}
+                            onToggleInline={toggleInlineStyle}
+                            onPromptLink={handlePromptForLink}
+                            onClear={handleClearFormat}
+                            onSave={handleSave}
+                            controls={inlineToolbarControls}
+                            customControls={customControls}
+                            toolbarMode={true}
+                        />
+                    </Paper>
+                    : null}
+                {editable && renderToolbar ?
+                    <EditorControls
+                        editorState={editorState}
+                        onToggleBlock={toggleBlockType}
+                        onToggleInline={toggleInlineStyle}
+                        onPromptLink={handlePromptForLink}
+                        onPromptMedia={handlePromptForMedia}
+                        onClear={handleClearFormat}
+                        onUndo={handleUndo}
+                        onRedo={handleRedo}
+                        onSave={handleSave}
+                        onCustomClick={handleCustomClick}
+                        controls={controls}
+                        customControls={customControls}
+                        className={classes.toolbar}
+                    />
+                    : null}
+                {placeholder}
+                <div className={classes.editor}>
+                    <div className={classNames(className, classes.editorContainer, {
+                        [classes.editorReadOnly]: !editable,
+                        [classes.error]: props.error
+                    })} onClick={handleFocus} onBlur={handleBlur}>
+                        <Editor
+                            customStyleMap={customRenderers.style}
+                            blockRenderMap={customRenderers.block}
+                            blockRendererFn={blockRenderer}
+                            editorState={editorState}
+                            onChange={handleChange}
+                            readOnly={props.readOnly}
+                            handleKeyCommand={handleKeyCommand}
+                            ref={editorRef}
+                        />
+                    </div>
+                </div>
+                {state.anchorUrlPopover ?
+                    <UrlPopover
+                        url={state.urlValue}
+                        width={state.urlWidth}
+                        height={state.urlHeight}
+                        anchor={state.anchorUrlPopover}
+                        onConfirm={state.sizeProps ? confirmMedia : confirmLink}
+                        useSize={state.sizeProps}
+                    />
+                    : null}
+            </div>
+        </div>
+    )
 }
 
-export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(MUIRichTextEditor)
+export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(forwardRef(MUIRichTextEditor))

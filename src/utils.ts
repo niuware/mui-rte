@@ -1,20 +1,26 @@
 import { EditorState, DraftBlockType } from 'draft-js'
 import Immutable from 'immutable'
 
-const getSelectionInfo = (editorState: EditorState): {
+export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
     blockType: DraftBlockType,
     entityType: string | null,
     linkKey: string
-} => {
+}
+
+/**
+ * Get the current selection details
+ */
+const getSelectionInfo = (editorState: EditorState): TSelectionInfo => {
     const selection = editorState.getSelection()
-    const startOffset = editorState.getSelection().getStartOffset()
-    const contentBlock = editorState.getCurrentContent().getBlockForKey(selection.getStartKey())
+    const startOffset = selection.getStartOffset()
+    const currentContent = editorState.getCurrentContent()
+    const contentBlock = currentContent.getBlockForKey(selection.getStartKey())
     const currentStyle = editorState.getCurrentInlineStyle()
     const linkKey = contentBlock.getEntityAt(startOffset)
     let entityType = null
     if (linkKey) {
-        const linkInstance = editorState.getCurrentContent().getEntity(linkKey)
+        const linkInstance = currentContent.getEntity(linkKey)
         entityType = linkInstance.getType()
     }
     return {
