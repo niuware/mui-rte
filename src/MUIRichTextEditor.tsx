@@ -219,12 +219,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
-    useEffect(() => {
-        if (state.anchorUrlPopover === undefined) {
-            refocus()
-        }
-    }, [state.anchorUrlPopover])
-
     const handleSetToolbarPosition = () => {
         setTimeout(() => {
             const selection = (editorStateRef.current as any).getSelection()
@@ -477,6 +471,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const updateStateForPopover = (editorState: EditorState) => {
         setEditorState(editorState)
+        refocus()
         setState({
             ...state,
             anchorUrlPopover: undefined,
