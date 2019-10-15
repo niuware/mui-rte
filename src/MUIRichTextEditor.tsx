@@ -7,7 +7,8 @@ import { Paper } from '@material-ui/core'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
+    SelectionState, Modifier, ContentState
 } from 'draft-js'
 import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
@@ -145,6 +146,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         style: undefined,
         block: undefined
     })
+    const [focusImageKey, setFocusImageKey] = useState("")
 
     const editorRef = useRef(null)
     const selectionRef = useRef<TStateOffset>({
@@ -202,11 +204,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
         setEditorState(editorState)
-        const editor: HTMLElement = (editorRef.current as any).editor
-        editor.addEventListener("mouseup", handleSetToolbarPosition)
+        toggleMouseUpListener(true)
         return () => {
-            const editor: HTMLElement = (editorRef.current as any).editor
-            editor.removeEventListener("mouseup", handleSetToolbarPosition)
+            toggleMouseUpListener()
         }
     }, [props.value])
 
@@ -219,12 +219,20 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
-    const handleSetToolbarPosition = () => {
+    const handleMouseUp = (event: any) => {
+        if (event.target.nodeName === "IMG"){
+            return
+        }
         setTimeout(() => {
-            const selection = (editorStateRef.current as any).getSelection()
+            const selection = editorStateRef.current!.getSelection()
             if (selection.isCollapsed() || (toolbarPositionRef !== undefined && 
                 selectionRef.current.start === selection.getStartOffset() &&
                 selectionRef.current.end === selection.getEndOffset())) {
+                    const selectionInfo = getSelectionInfo(editorStateRef.current!)
+                    if (selectionInfo.entityType === "IMAGE") {
+                        focusImage(selectionInfo.block)
+                        return
+                    }
                     setState({
                         ...state,
                         toolbarPosition: undefined
@@ -352,13 +360,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
-    const handlePromptForMedia = (style: string, toolbarMode: boolean) => {
+    const handlePromptForMedia = (style: string, toolbarMode: boolean, newState?: EditorState) => {
+        const lastState = newState || editorState
         let url = ''
         let width = undefined
         let height = undefined
         let urlKey = undefined
-        const selectionInfo = getSelectionInfo(editorState)
-        const contentState = editorState.getCurrentContent()
+        const selectionInfo = getSelectionInfo(lastState)
+        const contentState = lastState.getCurrentContent()
         const linkKey = selectionInfo.linkKey
 
         if (linkKey) {
@@ -378,6 +387,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                                             : document.getElementById("mui-rte-image-control-toolbar")!,
             sizeProps: true
         })
+    }
+
+    const toggleMouseUpListener = (addAfter = false) => {
+        const editor: HTMLElement = (editorRef.current as any).editor
+        if (!editor) {
+            return
+        }
+        editor.removeEventListener("mouseup", handleMouseUp)
+        if (addAfter) {
+            editor.addEventListener("mouseup", handleMouseUp)
+        }
     }
 
     const removeLink = () => {
@@ -427,9 +447,35 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         updateStateForPopover(replaceEditorState)
     }
 
+    const removeMedia = () => {
+        const blockKey = editorState.getSelection().getStartKey()
+        const contentState = editorState.getCurrentContent()
+        const mediaBlock = contentState.getBlockForKey(blockKey)
+        const removeBlockContentState = Modifier.removeRange(
+            contentState,
+            new SelectionState({
+                anchorKey: mediaBlock.getKey(),
+                anchorOffset: 0,
+                focusKey: mediaBlock.getKey(),
+                focusOffset: mediaBlock.getLength(),
+            }),
+            'backward'
+        )
+        const blockMap = removeBlockContentState.getBlockMap().delete(mediaBlock.getKey())
+        var withoutAtomic = removeBlockContentState.merge({
+            blockMap,
+            selectionAfter: contentState.getSelectionAfter()
+        })
+        const newEditorState = EditorState.push(editorState, withoutAtomic as ContentState, "remove-range")
+        setEditorState(newEditorState)
+    }
+
     const confirmMedia = (url?: string, width?: number, height?: number) => {
         const { urlKey } = state
         if (!url) {
+            if (urlKey) {
+                removeMedia()
+            }
             setState({
                 ...state,
                 anchorUrlPopover: undefined
@@ -466,6 +512,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 entityKey, ' ')
             replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
         }
+        setFocusImageKey("")
         updateStateForPopover(replaceEditorState)
     }
 
@@ -506,6 +553,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         )
     }
 
+    const focusImage = (block: ContentBlock) => {
+        const newSeletion = SelectionState.createEmpty(block.getKey())
+        const newEditorState = EditorState.forceSelection(editorStateRef.current!, newSeletion)
+        editorStateRef.current = newEditorState
+        setFocusImageKey(block.getKey())
+        setEditorState(newEditorState)
+        handlePromptForMedia("", false, newEditorState)
+    }
+
     const blockRenderer = (contentBlock: ContentBlock) => {
         const blockType = contentBlock.getType()
         if (blockType === 'atomic') {
@@ -516,7 +572,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 if (type === 'IMAGE') {
                     return {
                         component: Image,
-                        editable: false
+                        editable: false,
+                        props: {
+                            onClick: focusImage,
+                            readOnly: props.readOnly,
+                            focusKey: focusImageKey
+                        }
                     }
                 }
             }

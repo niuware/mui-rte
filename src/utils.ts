@@ -1,4 +1,4 @@
-import { EditorState, DraftBlockType } from 'draft-js'
+import { EditorState, DraftBlockType, ContentBlock } from 'draft-js'
 import Immutable from 'immutable'
 
 export type TSelectionInfo = {
@@ -6,6 +6,7 @@ export type TSelectionInfo = {
     blockType: DraftBlockType,
     entityType: string | null,
     linkKey: string
+    block: ContentBlock
 }
 
 /**
@@ -27,7 +28,8 @@ const getSelectionInfo = (editorState: EditorState): TSelectionInfo => {
         inlineStyle: currentStyle,
         blockType: contentBlock.getType(),
         entityType: entityType,
-        linkKey: linkKey
+        linkKey: linkKey,
+        block: contentBlock
     }
 }
 

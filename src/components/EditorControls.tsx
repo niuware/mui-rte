@@ -239,7 +239,10 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                 }
                 else if (style.type === "block") {
                     const selection = editorState.getSelection()
-                    active = style.style === editorState.getCurrentContent().getBlockForKey(selection.getStartKey()).getType()
+                    const block = editorState.getCurrentContent().getBlockForKey(selection.getStartKey())
+                    if (block) { 
+                        active = style.style === block.getType()
+                    }
                     action = props.onToggleBlock
                 }
                 else {
