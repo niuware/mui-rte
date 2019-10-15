@@ -2,15 +2,16 @@ import React, { FunctionComponent, useState } from 'react'
 import { Popover, TextField, Grid, Button } from '@material-ui/core'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import CheckIcon from '@material-ui/icons/Check'
+import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import { getCompatibleSpacing } from '../utils'
 
-const styles = ({spacing}: Theme) => createStyles({
+const styles = ({ spacing }: Theme) => createStyles({
     linkPopover: {
         padding: getCompatibleSpacing(spacing, 2, 2, 2, 2),
         maxWidth: 250
     },
     linkTextField: {
-        width: "96%"
+        width: "100%"
     }
 })
 
@@ -37,21 +38,21 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
         width: props.width,
         height: props.height
     })
-    
-    const {classes} = props
+
+    const { classes } = props
 
     const onSizeChange = (data: any, prop: "width" | "height") => {
         if (data === "") {
-            setState({...state, [prop]: undefined})
+            setState({ ...state, [prop]: undefined })
             return
         }
         const value = parseInt(data, 10)
         if (isNaN(value)) {
-            return 
+            return
         }
-        setState({...state, [prop]: value})
+        setState({ ...state, [prop]: value })
     }
-    
+
     return (
         <Popover
             open={props.anchor !== undefined}
@@ -66,58 +67,60 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
             }}
         >
             <div className={classes.linkPopover}>
-                <Grid container alignItems="flex-end" alignContent="center" direction="row" justify="flex-end">
-                    <Grid item xs={9}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    className={classes.linkTextField}
-                                    onChange={(event) => {setState({...state, urlValue: event.target.value})}}
-                                    label="URL"
-                                    defaultValue={props.url}
-                                    error={state!.urlError}
-                                    autoFocus={true}
-                                    InputLabelProps={{
-                                        shrink: true
-                                    }}
-                                />
-                            </Grid>
-                            {props.useSize ?
+                <Grid container spacing={1}>
+                    <Grid container item xs spacing={1}>
+                        <Grid item xs={12}>
+                            <TextField
+                                className={classes.linkTextField}
+                                onChange={(event) => { setState({ ...state, urlValue: event.target.value }) }}
+                                label="URL"
+                                defaultValue={props.url}
+                                error={state!.urlError}
+                                autoFocus={true}
+                                InputLabelProps={{
+                                    shrink: true
+                                }}
+                            />
+                        </Grid>
+                        {props.useSize ?
                             <>
-                            <Grid item xs={4}>
-                                <TextField
-                                    onChange={(event) => onSizeChange(event.target.value, "width")}
-                                    value={state.width || ""}
-                                    label="Width"
-                                    InputLabelProps={{
-                                        shrink: true
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <TextField
-                                    onChange={(event) => onSizeChange(event.target.value, "height")}
-                                    value={state.height || ""}
-                                    label="Height"
-                                    InputLabelProps={{
-                                        shrink: true
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs></Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        onChange={(event) => onSizeChange(event.target.value, "width")}
+                                        value={state.width || ""}
+                                        label="Width"
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <TextField
+                                        onChange={(event) => onSizeChange(event.target.value, "height")}
+                                        value={state.height || ""}
+                                        label="Height"
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs></Grid>
                             </>
-                        : null }
-                        </Grid>
+                            : null}
                     </Grid>
-                    <Grid item xs={3}>
-                        <Grid container item xs>
-                            <Button 
-                                onClick={() => {
-                                props.onConfirm(state.urlValue, state.width, state.height)
-                            }}>
-                                <CheckIcon />
-                            </Button>
-                        </Grid>
+                    <Grid container item xs={12} direction="row" justify="flex-end">
+                        {props.url ?
+                        <Button
+                            onClick={() => props.onConfirm("")}
+                        >
+                            <DeleteIcon />
+                        </Button>
+                        : null }
+                        <Button
+                            onClick={() => props.onConfirm(state.urlValue, state.width, state.height)}
+                        >
+                            <CheckIcon />
+                        </Button>
                     </Grid>
                 </Grid>
             </div>
