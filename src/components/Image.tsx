@@ -5,6 +5,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 
 const styles = ({ shadows }: Theme) => createStyles({
     root: {
+        margin: "5px 0 1px"
     },
     editable: {
         cursor: "pointer",

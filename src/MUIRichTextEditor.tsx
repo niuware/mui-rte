@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
-    SelectionState, Modifier, ContentState
+    SelectionState
 } from 'draft-js'
 import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
@@ -16,7 +16,7 @@ import Image from './components/Image'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -451,22 +451,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const blockKey = editorState.getSelection().getStartKey()
         const contentState = editorState.getCurrentContent()
         const mediaBlock = contentState.getBlockForKey(blockKey)
-        const removeBlockContentState = Modifier.removeRange(
-            contentState,
-            new SelectionState({
-                anchorKey: mediaBlock.getKey(),
-                anchorOffset: 0,
-                focusKey: mediaBlock.getKey(),
-                focusOffset: mediaBlock.getLength(),
-            }),
-            'backward'
-        )
-        const blockMap = removeBlockContentState.getBlockMap().delete(mediaBlock.getKey())
-        var withoutAtomic = removeBlockContentState.merge({
-            blockMap,
-            selectionAfter: contentState.getSelectionAfter()
-        })
-        const newEditorState = EditorState.push(editorState, withoutAtomic as ContentState, "remove-range")
+        const newContentState = removeBlockFromMap(editorState, mediaBlock)
+        const newEditorState = EditorState.push(editorState, newContentState, "remove-range")
         setEditorState(newEditorState)
     }
 
@@ -510,7 +496,21 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const newEditorState = AtomicBlockUtils.insertAtomicBlock(
                 newEditorStateRaw,
                 entityKey, ' ')
-            replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
+
+            const mediaBlock = newEditorState.getCurrentContent().getBlockMap().find(block => {
+                return block !== undefined && block.getEntityAt(0) === entityKey
+            })
+            const previousBlock = newEditorState.getCurrentContent().getBlockBefore(mediaBlock.getKey())
+
+            if (editorState.getCurrentContent().getPlainText() !== "" && previousBlock.getText() === "") {
+                const newContentState = removeBlockFromMap(newEditorState, previousBlock)
+                const updatedEditorState = EditorState.push(editorState, newContentState, "remove-range")
+
+                replaceEditorState = EditorState.forceSelection(updatedEditorState, updatedEditorState.getCurrentContent().getSelectionAfter())
+            }
+            else {
+                replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
+            }
         }
         setFocusImageKey("")
         updateStateForPopover(replaceEditorState)
