@@ -15,7 +15,7 @@ import Link from './components/Link'
 import Image from './components/Image'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
-import UrlPopover, { TAlignment } from './components/UrlPopover'
+import UrlPopover, { TAlignment, TUrlData } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
@@ -26,7 +26,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
         '& figure': {
-            margin: 0,
+            margin: 0
         }
     },
     inheritFontSize: {
@@ -95,13 +95,10 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
 
 type IMUIRichTextEditorState = {
     anchorUrlPopover?: HTMLElement
-    urlValue?: string
     urlKey?: string
-    urlWidth?: number
-    urlHeight?: number
-    urlAlignment?: TAlignment
+    urlData?: TUrlData
+    urlIsMedia?: boolean
     toolbarPosition?: TToolbarPosition
-    sizeProps?: boolean
 }
 
 type TStateOffset = {
@@ -341,56 +338,53 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const selectionInfo = getSelectionInfo(editorState)
             const contentState = editorState.getCurrentContent()
             const linkKey = selectionInfo.linkKey
-
-            let url = ''
+            let data = undefined
             let urlKey = undefined
             if (linkKey) {
                 const linkInstance = contentState.getEntity(linkKey)
-                url = linkInstance.getData().url
+                data = linkInstance.getData()
                 urlKey = linkKey
             }
             setState({
-                ...state,
-                urlValue: url,
+                urlData: data,
                 urlKey: urlKey,
                 toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
                 anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")!
                                                 : document.getElementById("mui-rte-link-control-toolbar")!,
-                sizeProps: undefined
+                urlIsMedia: undefined
             })
         }
     }
 
     const handlePromptForMedia = (style: string, toolbarMode: boolean, newState?: EditorState) => {
         const lastState = newState || editorState
-        let url = ''
-        let width = undefined
-        let height = undefined
         let urlKey = undefined
-        let alignment = undefined
+        let data = undefined
         const selectionInfo = getSelectionInfo(lastState)
         const contentState = lastState.getCurrentContent()
         const linkKey = selectionInfo.linkKey
 
         if (linkKey) {
             const linkInstance = contentState.getEntity(linkKey)
-            url = linkInstance.getData().url
-            width = linkInstance.getData().width
-            height = linkInstance.getData().height
-            alignment = linkInstance.getData().alignment
+            data = linkInstance.getData()
             urlKey = linkKey
         }
         setState({
-            urlValue: url,
             urlKey: urlKey,
-            urlWidth: width,
-            urlHeight: height,
-            urlAlignment: alignment,
+            urlData: data,
             toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
             anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
                                             : document.getElementById("mui-rte-image-control-toolbar")!,
-            sizeProps: true
+            urlIsMedia: true
         })
+    }
+
+    const handleConfirmPrompt = (isMedia?: boolean, ...args: any) => {
+        if (isMedia) {
+            confirmMedia(...args)
+            return
+        }
+        confirmLink(...args)
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -425,22 +419,16 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
         const contentState = editorState.getCurrentContent()
         let replaceEditorState = null
+        const data = {
+            url: url
+        }
 
         if (urlKey) {
-            contentState.replaceEntityData(urlKey, {
-                url: url
-            })
+            contentState.replaceEntityData(urlKey, data)
             replaceEditorState = EditorState.push(editorState, contentState, "apply-entity")
         }
         else {
-            const contentStateWithEntity = contentState.createEntity(
-                'LINK',
-                'MUTABLE',
-                {
-                    url: url
-                }
-            )
-
+            const contentStateWithEntity = contentState.createEntity('LINK', 'MUTABLE', data)
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
             const newEditorState = EditorState.set(editorState, { currentContent: contentStateWithEntity })
             replaceEditorState = RichUtils.toggleLink(
@@ -520,11 +508,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setState({
             ...state,
             anchorUrlPopover: undefined,
-            urlValue: undefined,
             urlKey: undefined,
-            sizeProps: undefined,
-            urlWidth: undefined,
-            urlHeight: undefined,
+            urlIsMedia: undefined,
+            urlData: undefined
         })
     }
 
@@ -687,13 +673,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 </div>
                 {state.anchorUrlPopover ?
                     <UrlPopover
-                        url={state.urlValue}
-                        width={state.urlWidth}
-                        height={state.urlHeight}
-                        alignment={state.urlAlignment}
+                        data={state.urlData}
                         anchor={state.anchorUrlPopover}
-                        onConfirm={state.sizeProps ? confirmMedia : confirmLink}
-                        useSize={state.sizeProps}
+                        onConfirm={handleConfirmPrompt}
+                        isMedia={state.urlIsMedia}
                     />
                     : null}
             </div>

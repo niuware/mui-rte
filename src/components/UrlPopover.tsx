@@ -21,43 +21,40 @@ const styles = ({ spacing }: Theme) => createStyles({
 
 export type TAlignment = "left" | "center" | "right"
 
-interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
+export type TUrlData = {
     url?: string
     width?: number
     height?: number
-    anchor?: HTMLElement
     alignment?: TAlignment
-    useSize?: boolean
-    onConfirm: (url?: string, ...args: any) => void
 }
 
-type TUrlPopoverState = {
-    url?: string
-    width?: number
-    height?: number
+interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
+    anchor?: HTMLElement
+    data?: TUrlData
+    isMedia?: boolean
+    onConfirm: (isMedia?: boolean, ...args: any) => void
 }
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
-    const [state, setState] = useState<TUrlPopoverState>({
-        url: props.url,
-        width: props.width,
-        height: props.height
+    const [data, setData] = useState<TUrlData>(props.data || {
+        url: undefined,
+        width: undefined,
+        height: undefined,
+        alignment: undefined
     })
-
-    const [alignment, setAlignment] = useState<TAlignment | undefined>(props.alignment)
 
     const { classes } = props
 
-    const onSizeChange = (data: any, prop: "width" | "height") => {
-        if (data === "") {
-            setState({ ...state, [prop]: undefined })
+    const onSizeChange = (value: any, prop: "width" | "height") => {
+        if (value === "") {
+            setData({ ...data, [prop]: undefined })
             return
         }
-        const value = parseInt(data, 10)
-        if (isNaN(value)) {
+        const intValue = parseInt(value, 10)
+        if (isNaN(intValue)) {
             return
         }
-        setState({ ...state, [prop]: value })
+        setData({ ...data, [prop]: intValue })
     }
 
     return (
@@ -79,37 +76,37 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                         <Grid item xs={12}>
                             <TextField
                                 className={classes.linkTextField}
-                                onChange={(event) => { setState({ ...state, url: event.target.value }) }}
+                                onChange={(event) => setData({...data, url: event.target.value})}
                                 label="URL"
-                                defaultValue={props.url}
+                                defaultValue={props.data && props.data.url}
                                 autoFocus={true}
                                 InputLabelProps={{
                                     shrink: true
                                 }}
                             />
                         </Grid>
-                        {props.useSize ?
+                        {props.isMedia ?
                             <>
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
                                         <Button 
-                                            color={alignment === "left" ? "primary" : "default"} 
+                                            color={data.alignment === "left" ? "primary" : "default"} 
                                             size="small" 
-                                            onClick={() => setAlignment("left")}
+                                            onClick={() => setData({...data, alignment: "left"})}
                                         >
                                             <FormatAlignLeft />
                                         </Button>
                                         <Button 
-                                            color={alignment === "center" ? "primary" : "default"} 
+                                            color={data.alignment === "center" ? "primary" : "default"} 
                                             size="small" 
-                                            onClick={() => setAlignment("center")}
+                                            onClick={() => setData({...data, alignment: "center"})}
                                         >
                                             <FormatAlignCenter />
                                         </Button>
                                         <Button 
-                                            color={alignment === "right" ? "primary" : "default"} 
+                                            color={data.alignment === "right" ? "primary" : "default"} 
                                             size="small" 
-                                            onClick={() => setAlignment("right")}>
+                                            onClick={() => setData({...data, alignment: "right"})}>
                                             <FormatAlignRight />
                                         </Button>
                                     </ButtonGroup>
@@ -117,7 +114,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 <Grid item xs={4}>
                                     <TextField
                                         onChange={(event) => onSizeChange(event.target.value, "width")}
-                                        value={state.width || ""}
+                                        value={data.width || ""}
                                         label="Width"
                                         InputLabelProps={{
                                             shrink: true
@@ -127,7 +124,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 <Grid item xs={4}>
                                     <TextField
                                         onChange={(event) => onSizeChange(event.target.value, "height")}
-                                        value={state.height || ""}
+                                        value={data.height || ""}
                                         label="Height"
                                         InputLabelProps={{
                                             shrink: true
@@ -139,15 +136,15 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                             : null}
                     </Grid>
                     <Grid container item xs={12} direction="row" justify="flex-end">
-                        {props.url ?
+                        {props.data && props.data.url ?
                         <Button
-                            onClick={() => props.onConfirm("")}
+                            onClick={() => props.onConfirm(props.isMedia, "")}
                         >
                             <DeleteIcon />
                         </Button>
                         : null }
                         <Button
-                            onClick={() => props.onConfirm(state.url, state.width, state.height, alignment)}
+                            onClick={() => props.onConfirm(props.isMedia, data.url, data.width, data.height, data.alignment)}
                         >
                             <CheckIcon />
                         </Button>
