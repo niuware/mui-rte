@@ -15,6 +15,15 @@ const styles = ({ shadows }: Theme) => createStyles({
     },
     focused: {
         boxShadow: shadows[3]
+    },
+    centered: {
+        textAlign: "center"
+    },
+    leftAligned: {
+        textAlign: "left"
+    },
+    rightAligned: {
+        textAlign: "right"
     }
 })
 
@@ -26,24 +35,31 @@ interface IImageProps extends WithStyles<typeof styles> {
 }
 
 const Image: FunctionComponent<IImageProps> = (props) => {
-    const { url, width, height } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()
+    const { url, width, height, alignment } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()
     const { onClick, readOnly, focusKey } = props.blockProps
+
     return (
-        <img 
-            src={url} 
-            className={classNames(props.classes.root, {
-                [props.classes.editable]: !readOnly,
-                [props.classes.focused]: !readOnly && focusKey === props.block.getKey()
-            })} 
-            width={width} 
-            height={height}
-            onClick={() => {
-                if (readOnly) {
-                    return
-                }
-                onClick(props.block)
-            }}
-        />
+        <div className={classNames({
+            [props.classes.centered]: alignment === "center",
+            [props.classes.leftAligned]: alignment === "left",
+            [props.classes.rightAligned]: alignment === "right"
+        })}>
+            <img 
+                src={url} 
+                className={classNames(props.classes.root, {
+                    [props.classes.editable]: !readOnly,
+                    [props.classes.focused]: !readOnly && focusKey === props.block.getKey()
+                })} 
+                width={width} 
+                height={height}
+                onClick={() => {
+                    if (readOnly) {
+                        return
+                    }
+                    onClick(props.block)
+                }}
+            />
+        </div>
     )
 }
 

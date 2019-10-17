@@ -15,7 +15,7 @@ import Link from './components/Link'
 import Image from './components/Image'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
-import UrlPopover from './components/UrlPopover'
+import UrlPopover, { TAlignment } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
@@ -26,7 +26,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
         '& figure': {
-            margin: 0
+            margin: 0,
         }
     },
     inheritFontSize: {
@@ -99,6 +99,7 @@ type IMUIRichTextEditorState = {
     urlKey?: string
     urlWidth?: number
     urlHeight?: number
+    urlAlignment?: TAlignment
     toolbarPosition?: TToolbarPosition
     sizeProps?: boolean
 }
@@ -366,6 +367,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         let width = undefined
         let height = undefined
         let urlKey = undefined
+        let alignment = undefined
         const selectionInfo = getSelectionInfo(lastState)
         const contentState = lastState.getCurrentContent()
         const linkKey = selectionInfo.linkKey
@@ -375,6 +377,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             url = linkInstance.getData().url
             width = linkInstance.getData().width
             height = linkInstance.getData().height
+            alignment = linkInstance.getData().alignment
             urlKey = linkKey
         }
         setState({
@@ -382,6 +385,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             urlKey: urlKey,
             urlWidth: width,
             urlHeight: height,
+            urlAlignment: alignment,
             toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
             anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
                                             : document.getElementById("mui-rte-image-control-toolbar")!,
@@ -456,7 +460,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(newEditorState)
     }
 
-    const confirmMedia = (url?: string, width?: number, height?: number) => {
+    const confirmMedia = (url?: string, width?: number, height?: number, alignment?: TAlignment) => {
         const { urlKey } = state
         if (!url) {
             if (urlKey) {
@@ -470,27 +474,21 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
 
         const contentState = editorState.getCurrentContent()
+        const data = {
+            url: url,
+            width: width,
+            height: height,
+            alignment: alignment
+        }
         let replaceEditorState = null
 
         if (urlKey) {
-            contentState.replaceEntityData(urlKey, {
-                url: url,
-                width: width,
-                height: height
-            })
+            contentState.replaceEntityData(urlKey, data)
             const newEditorState = EditorState.push(editorState, contentState, "apply-entity")
             replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
         }
         else {
-            const contentStateWithEntity = contentState.createEntity(
-                'IMAGE',
-                'IMMUTABLE',
-                {
-                    url: url,
-                    width: width,
-                    height: height
-                }
-            )
+            const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE',data)
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
             const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity })
             const newEditorState = AtomicBlockUtils.insertAtomicBlock(
@@ -692,6 +690,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         url={state.urlValue}
                         width={state.urlWidth}
                         height={state.urlHeight}
+                        alignment={state.urlAlignment}
                         anchor={state.anchorUrlPopover}
                         onConfirm={state.sizeProps ? confirmMedia : confirmLink}
                         useSize={state.sizeProps}
