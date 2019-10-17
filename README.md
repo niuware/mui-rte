@@ -256,11 +256,16 @@ Object.assign(defaultTheme, {
 |component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
 |regex|`RegExp`|required|The regular expression to match a decorator.|    
 
+## Changelog
+
+Check the [release notes](https://github.com/niuware/mui-rte/releases) for the changelog.
+
 ## Development 
 
 For development use:
 
 ```
+$ npm run watch
 $ npm run serve
 ```
 

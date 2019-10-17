@@ -1,4 +1,5 @@
-import { EditorState, DraftBlockType, ContentBlock } from 'draft-js'
+import { EditorState, DraftBlockType, ContentBlock, ContentState, 
+    Modifier, SelectionState } from 'draft-js'
 import Immutable from 'immutable'
 
 export type TSelectionInfo = {
@@ -48,4 +49,26 @@ const getCompatibleSpacing = (spacing: any,
     return `${top * unit}px ${right * unit}px ${bottom * unit}px ${left * unit}px`
 }
 
-export { getSelectionInfo, getCompatibleSpacing }
+/**
+ * Remove a block from the ContentState
+ */
+const removeBlockFromMap = (editorState: EditorState, block: ContentBlock): ContentState => {
+    const contentState = editorState.getCurrentContent()
+    const removeBlockContentState = Modifier.removeRange(
+        contentState,
+        new SelectionState({
+            anchorKey: block.getKey(),
+            anchorOffset: 0,
+            focusKey: block.getKey(),
+            focusOffset: block.getLength(),
+        }),
+        'backward'
+    )
+    const blockMap = removeBlockContentState.getBlockMap().delete(block.getKey())
+    return removeBlockContentState.merge({
+        blockMap,
+        selectionAfter: contentState.getSelectionAfter()
+    }) as ContentState
+}
+
+export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap }
