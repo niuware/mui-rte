@@ -468,38 +468,21 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             height: height,
             alignment: alignment
         }
-        let replaceEditorState = null
 
         if (urlKey) {
             contentState.replaceEntityData(urlKey, data)
             const newEditorState = EditorState.push(editorState, contentState, "apply-entity")
-            replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
+            updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         else {
             const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE',data)
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
             const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity })
-            const newEditorState = AtomicBlockUtils.insertAtomicBlock(
-                newEditorStateRaw,
-                entityKey, ' ')
+            const newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
 
-            const mediaBlock = newEditorState.getCurrentContent().getBlockMap().find(block => {
-                return block !== undefined && block.getEntityAt(0) === entityKey
-            })
-            const previousBlock = newEditorState.getCurrentContent().getBlockBefore(mediaBlock.getKey())
-
-            if (editorState.getCurrentContent().getPlainText() !== "" && previousBlock.getText() === "") {
-                const newContentState = removeBlockFromMap(newEditorState, previousBlock)
-                const updatedEditorState = EditorState.push(editorState, newContentState, "remove-range")
-
-                replaceEditorState = EditorState.forceSelection(updatedEditorState, updatedEditorState.getCurrentContent().getSelectionAfter())
-            }
-            else {
-                replaceEditorState = EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter())
-            }
+            updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         setFocusImageKey("")
-        updateStateForPopover(replaceEditorState)
     }
 
     const updateStateForPopover = (editorState: EditorState) => {
