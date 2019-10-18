@@ -19,10 +19,6 @@ import RedoIcon from '@material-ui/icons/Redo'
 import EditorButton from './EditorButton'
 import { getSelectionInfo } from '../utils'
 
-type KeyString = {
-    [key: string]: React.ReactNode | EditorState
-}
-
 export type TEditorControl =
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
     "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
@@ -174,19 +170,11 @@ const STYLE_TYPES: TStyleType[] = [
     }
 ]
 
-interface IBlockStyleControlsProps extends KeyString {
+interface IBlockStyleControlsProps {
     editorState: EditorState
     controls?: Array<TEditorControl>
     customControls?: TCustomControl[]
-    onToggleInline: (inlineStyle: any) => void
-    onToggleBlock?: (blockType: any) => void
-    onPromptLink: (style: any, toolbarMode: boolean) => void
-    onPromptMedia?: (style: any, toolbarMode: boolean) => void
-    onClear: () => void
-    onSave: () => void
-    onUndo?: () => void
-    onRedo?: () => void
-    onCustomClick?: (style: any) => void
+    onClick: (style: string, type: string, toolbarMode?: boolean) => void
     toolbarMode?: boolean
     className?: string
 }
@@ -232,10 +220,9 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                     return null
                 }
                 let active = false
-                let action = null
+                const action = props.onClick
                 if (style.type === "inline") {
                     active = editorState.getCurrentInlineStyle().has(style.style)
-                    action = props.onToggleInline
                 }
                 else if (style.type === "block") {
                     const selection = editorState.getSelection()
@@ -243,13 +230,11 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                     if (block) { 
                         active = style.style === block.getType()
                     }
-                    action = props.onToggleBlock
                 }
                 else {
                     if (style.style === "IMAGE" || style.style === "LINK") {
                         active = style.style === getSelectionInfo(editorState).entityType
                     }
-                    action = props[style.clickFnName!]
                 }
 
                 return (
@@ -260,6 +245,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                         label={style.label}
                         onClick={action}
                         style={style.style}
+                        type={style.type}
                         icon={style.icon}
                         toolbarMode={props.toolbarMode}
                     />

@@ -331,7 +331,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(EditorState.redo(editorState))
     }
 
-    const handlePromptForLink = (style: string, toolbarMode: boolean) => {
+    const handlePromptForLink = (toolbarMode?: boolean) => {
         const selection = editorState.getSelection()
 
         if (!selection.isCollapsed()) {
@@ -356,7 +356,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
-    const handlePromptForMedia = (style: string, toolbarMode: boolean, newState?: EditorState) => {
+    const handlePromptForMedia = (toolbarMode?: boolean, newState?: EditorState) => {
         const lastState = newState || editorState
         let urlKey = undefined
         let data = undefined
@@ -385,6 +385,37 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             return
         }
         confirmLink(...args)
+    }
+
+    const handleToolbarClick = (style: string, type: string, toolbarMode?: boolean) => {
+        if (type === "inline") {
+            return toggleInlineStyle(style)
+        }
+        if (type === "block") {
+            return toggleBlockType(style)
+        }
+        switch (style) {
+            case "UNDO":
+                handleUndo()
+                break
+            case "REDO":
+                handleRedo()
+                break
+            case "LINK":
+                handlePromptForLink(toolbarMode)
+                break
+            case "IMAGE":
+                handlePromptForMedia(toolbarMode)
+                break
+            case "clear":
+                handleClearFormat()
+                break
+            case "save":
+                handleSave()
+                break
+            default:
+                handleCustomClick(style)
+        }
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -502,7 +533,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setTimeout(() => (editorRef.current as any).focus(), 1)
     }
 
-    const toggleBlockType = (blockType: any) => {
+    const toggleBlockType = (blockType: string) => {
         setEditorState(
             RichUtils.toggleBlockType(
                 editorState,
@@ -511,7 +542,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         )
     }
 
-    const toggleInlineStyle = (inlineStyle: any) => {
+    const toggleInlineStyle = (inlineStyle: string) => {
         setEditorState(
             RichUtils.toggleInlineStyle(
                 editorState,
@@ -526,7 +557,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         editorStateRef.current = newEditorState
         setFocusImageKey(block.getKey())
         setEditorState(newEditorState)
-        handlePromptForMedia("", false, newEditorState)
+        handlePromptForMedia(false, newEditorState)
     }
 
     const blockRenderer = (contentBlock: ContentBlock) => {
@@ -609,10 +640,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     }}>
                         <EditorControls
                             editorState={editorState}
-                            onToggleInline={toggleInlineStyle}
-                            onPromptLink={handlePromptForLink}
-                            onClear={handleClearFormat}
-                            onSave={handleSave}
+                            onClick={handleToolbarClick}
                             controls={inlineToolbarControls}
                             customControls={customControls}
                             toolbarMode={true}
@@ -622,15 +650,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 {editable && renderToolbar ?
                     <EditorControls
                         editorState={editorState}
-                        onToggleBlock={toggleBlockType}
-                        onToggleInline={toggleInlineStyle}
-                        onPromptLink={handlePromptForLink}
-                        onPromptMedia={handlePromptForMedia}
-                        onClear={handleClearFormat}
-                        onUndo={handleUndo}
-                        onRedo={handleRedo}
-                        onSave={handleSave}
-                        onCustomClick={handleCustomClick}
+                        onClick={handleToolbarClick}
                         controls={controls}
                         customControls={customControls}
                         className={classes.toolbar}
