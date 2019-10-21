@@ -1,5 +1,5 @@
 import React from 'react'
-import { shallow, mount } from 'enzyme'
+import { mount } from 'enzyme'
 import { assert, expect } from 'chai'
 import { EditorState } from 'draft-js'
 import EditorControls, { TEditorControl } from '../src/components/EditorControls'
@@ -16,15 +16,7 @@ describe('<EditorControls />', () => {
         const wrapper = mount(
             <EditorControls
                 editorState={editorState}
-                onClear={() => {}}
-                onSave={() => {}}
-                onCustomClick={(style) => {}}
-                onPromptLink={() => {}}
-                onPromptMedia={() => {}}
-                onRedo={() => {}}
-                onToggleBlock={(blockType) => {}}
-                onToggleInline={(inlineStyle) => {}}
-                onUndo={() => {}}
+                onClick={() => {}}
             />
         )
         const result = wrapper.find(EditorButton)
@@ -46,15 +38,7 @@ describe('<EditorControls />', () => {
             <EditorControls
                 editorState={editorState}
                 controls={controls}
-                onClear={() => {}}
-                onSave={() => {}}
-                onCustomClick={(style) => {}}
-                onPromptLink={() => {}}
-                onPromptMedia={() => {}}
-                onRedo={() => {}}
-                onToggleBlock={(blockType) => {}}
-                onToggleInline={(inlineStyle) => {}}
-                onUndo={() => {}}
+                onClick={() => {}}
             />
         )
         const result = wrapper.find(EditorButton).map(item => {
@@ -68,15 +52,7 @@ describe('<EditorControls />', () => {
             <EditorControls
                 editorState={editorState}
                 controls={[]}
-                onClear={() => {}}
-                onSave={() => {}}
-                onCustomClick={(style) => {}}
-                onPromptLink={() => {}}
-                onPromptMedia={() => {}}
-                onRedo={() => {}}
-                onToggleBlock={(blockType) => {}}
-                onToggleInline={(inlineStyle) => {}}
-                onUndo={() => {}}
+                onClick={() => {}}
             />
         )
         const result = wrapper.find(EditorButton)
