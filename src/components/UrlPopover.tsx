@@ -2,6 +2,8 @@ import React, { FunctionComponent, useState } from 'react'
 import { Popover, TextField, Grid, Button } from '@material-ui/core'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
+import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
+import MovieIcon from '@material-ui/icons/Movie'
 import CheckIcon from '@material-ui/icons/Check'
 import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
@@ -21,11 +23,14 @@ const styles = ({ spacing }: Theme) => createStyles({
 
 export type TAlignment = "left" | "center" | "right"
 
+export type TMediaType = "image" | "video"
+
 export type TUrlData = {
     url?: string
     width?: number
     height?: number
     alignment?: TAlignment
+    type?: TMediaType
 }
 
 interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
@@ -40,7 +45,8 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
         url: undefined,
         width: undefined,
         height: undefined,
-        alignment: undefined
+        alignment: undefined,
+        type: undefined
     })
 
     const { classes } = props
@@ -90,6 +96,44 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
                                         <Button 
+                                            color={(!data.type || data.type === "image") ? "primary" : "default"} 
+                                            size="small" 
+                                            onClick={() => setData({...data, type: "image"})}
+                                        >
+                                            <InsertPhotoIcon />
+                                        </Button>
+                                        <Button 
+                                            color={data.type === "video" ? "primary" : "default"} 
+                                            size="small" 
+                                            onClick={() => setData({...data, type: "video"})}
+                                        >
+                                            <MovieIcon />
+                                        </Button>
+                                    </ButtonGroup>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(event) => onSizeChange(event.target.value, "width")}
+                                        value={data.width || ""}
+                                        label="Width"
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        onChange={(event) => onSizeChange(event.target.value, "height")}
+                                        value={data.height || ""}
+                                        label="Height"
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <ButtonGroup fullWidth>
+                                        <Button 
                                             color={data.alignment === "left" ? "primary" : "default"} 
                                             size="small" 
                                             onClick={() => setData({...data, alignment: "left"})}
@@ -111,27 +155,6 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                         </Button>
                                     </ButtonGroup>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <TextField
-                                        onChange={(event) => onSizeChange(event.target.value, "width")}
-                                        value={data.width || ""}
-                                        label="Width"
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <TextField
-                                        onChange={(event) => onSizeChange(event.target.value, "height")}
-                                        value={data.height || ""}
-                                        label="Height"
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
-                                    />
-                                </Grid>
-                                <Grid item xs={4}></Grid>
                             </>
                             : null}
                     </Grid>
@@ -144,7 +167,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                         </Button>
                         : null }
                         <Button
-                            onClick={() => props.onConfirm(props.isMedia, data.url, data.width, data.height, data.alignment)}
+                            onClick={() => props.onConfirm(props.isMedia, data.url, data.width, data.height, data.alignment, data.type)}
                         >
                             <CheckIcon />
                         </Button>

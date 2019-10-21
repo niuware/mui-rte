@@ -7,7 +7,7 @@ import StrikethroughIcon from '@material-ui/icons/StrikethroughS'
 import HighlightIcon from '@material-ui/icons/Highlight'
 import TitleIcon from '@material-ui/icons/Title'
 import InsertLinkIcon from '@material-ui/icons/InsertLink'
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary'
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered'
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted'
 import FormatQuoteIcon from '@material-ui/icons/FormatQuote'
@@ -19,13 +19,9 @@ import RedoIcon from '@material-ui/icons/Redo'
 import EditorButton from './EditorButton'
 import { getSelectionInfo } from '../utils'
 
-type KeyString = {
-    [key: string]: React.ReactNode | EditorState
-}
-
 export type TEditorControl =
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
-    "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
+    "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
     "strikethrough" | "highlight" | string
 
 export type TControlType = "inline" | "block" | "callback"
@@ -100,7 +96,6 @@ const STYLE_TYPES: TStyleType[] = [
         style: "UNDO",
         icon: <UndoIcon />,
         type: "callback",
-        clickFnName: "onUndo"
     },
     {
         label: 'Redo',
@@ -108,7 +103,6 @@ const STYLE_TYPES: TStyleType[] = [
         style: "REDO",
         icon: <RedoIcon />,
         type: "callback",
-        clickFnName: "onRedo"
     },
     {
         label: 'Link',
@@ -116,17 +110,15 @@ const STYLE_TYPES: TStyleType[] = [
         style: 'LINK',
         icon: <InsertLinkIcon />,
         type: "callback",
-        clickFnName: "onPromptLink",
         id: "mui-rte-link-control"
     },
     {
-        label: 'Image',
-        name: "image",
+        label: 'Media',
+        name: "media",
         style: 'IMAGE',
-        icon: <InsertPhotoIcon />,
-        clickFnName: "onPromptMedia",
+        icon: <PhotoLibraryIcon />,
         type: "callback",
-        id: "mui-rte-image-control"
+        id: "mui-rte-media-control"
     },
     {
         label: 'OL',
@@ -161,32 +153,22 @@ const STYLE_TYPES: TStyleType[] = [
         name: "clear",
         style: 'clear',
         icon: <FormatClearIcon />,
-        type: "callback",
-        clickFnName: "onClear"
+        type: "callback"
     },
     {
         label: 'Save',
         name: "save",
         style: 'save',
         icon: <SaveIcon />,
-        type: "callback",
-        clickFnName: "onSave"
+        type: "callback"
     }
 ]
 
-interface IBlockStyleControlsProps extends KeyString {
+interface IBlockStyleControlsProps {
     editorState: EditorState
     controls?: Array<TEditorControl>
     customControls?: TCustomControl[]
-    onToggleInline: (inlineStyle: any) => void
-    onToggleBlock?: (blockType: any) => void
-    onPromptLink: (style: any, toolbarMode: boolean) => void
-    onPromptMedia?: (style: any, toolbarMode: boolean) => void
-    onClear: () => void
-    onSave: () => void
-    onUndo?: () => void
-    onRedo?: () => void
-    onCustomClick?: (style: any) => void
+    onClick: (style: string, type: string, toolbarMode?: boolean) => void
     toolbarMode?: boolean
     className?: string
 }
@@ -232,10 +214,9 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                     return null
                 }
                 let active = false
-                let action = null
+                const action = props.onClick
                 if (style.type === "inline") {
                     active = editorState.getCurrentInlineStyle().has(style.style)
-                    action = props.onToggleInline
                 }
                 else if (style.type === "block") {
                     const selection = editorState.getSelection()
@@ -243,13 +224,11 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                     if (block) { 
                         active = style.style === block.getType()
                     }
-                    action = props.onToggleBlock
                 }
                 else {
                     if (style.style === "IMAGE" || style.style === "LINK") {
                         active = style.style === getSelectionInfo(editorState).entityType
                     }
-                    action = props[style.clickFnName!]
                 }
 
                 return (
@@ -260,6 +239,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                         label={style.label}
                         onClick={action}
                         style={style.style}
+                        type={style.type}
                         icon={style.icon}
                         toolbarMode={props.toolbarMode}
                     />

@@ -4,10 +4,11 @@ import { IconButton } from '@material-ui/core'
 interface IEditorButtonProps {
     id?: string
     label: string
-    style?: string
+    style: string
+    type: string
     active?: boolean
     icon: JSX.Element
-    onClick: any
+    onClick?: any
     toolbarMode?: boolean
 }
 
@@ -19,7 +20,9 @@ const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButto
             id={props.id + toolbarId}
             onMouseDown={(e) => {
                 e.preventDefault()
-                props.onClick(props.style, props.toolbarMode)
+                if (props.onClick) {
+                    props.onClick(props.style, props.type, props.toolbarMode)
+                }
             }}
             aria-label={props.label}
             color={props.active ? "primary" : "default"}
