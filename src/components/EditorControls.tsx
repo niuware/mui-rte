@@ -7,7 +7,7 @@ import StrikethroughIcon from '@material-ui/icons/StrikethroughS'
 import HighlightIcon from '@material-ui/icons/Highlight'
 import TitleIcon from '@material-ui/icons/Title'
 import InsertLinkIcon from '@material-ui/icons/InsertLink'
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
+import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary'
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered'
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted'
 import FormatQuoteIcon from '@material-ui/icons/FormatQuote'
@@ -21,7 +21,7 @@ import { getSelectionInfo } from '../utils'
 
 export type TEditorControl =
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
-    "bulletList" | "quote" | "code" | "clear" | "save" | "image" |
+    "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
     "strikethrough" | "highlight" | string
 
 export type TControlType = "inline" | "block" | "callback"
@@ -96,7 +96,6 @@ const STYLE_TYPES: TStyleType[] = [
         style: "UNDO",
         icon: <UndoIcon />,
         type: "callback",
-        clickFnName: "onUndo"
     },
     {
         label: 'Redo',
@@ -104,7 +103,6 @@ const STYLE_TYPES: TStyleType[] = [
         style: "REDO",
         icon: <RedoIcon />,
         type: "callback",
-        clickFnName: "onRedo"
     },
     {
         label: 'Link',
@@ -112,17 +110,15 @@ const STYLE_TYPES: TStyleType[] = [
         style: 'LINK',
         icon: <InsertLinkIcon />,
         type: "callback",
-        clickFnName: "onPromptLink",
         id: "mui-rte-link-control"
     },
     {
-        label: 'Image',
-        name: "image",
+        label: 'Media',
+        name: "media",
         style: 'IMAGE',
-        icon: <InsertPhotoIcon />,
-        clickFnName: "onPromptMedia",
+        icon: <PhotoLibraryIcon />,
         type: "callback",
-        id: "mui-rte-image-control"
+        id: "mui-rte-media-control"
     },
     {
         label: 'OL',
@@ -157,16 +153,14 @@ const STYLE_TYPES: TStyleType[] = [
         name: "clear",
         style: 'clear',
         icon: <FormatClearIcon />,
-        type: "callback",
-        clickFnName: "onClear"
+        type: "callback"
     },
     {
         label: 'Save',
         name: "save",
         style: 'save',
         icon: <SaveIcon />,
-        type: "callback",
-        clickFnName: "onSave"
+        type: "callback"
     }
 ]
 

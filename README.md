@@ -225,7 +225,7 @@ Object.assign(defaultTheme, {
 |error|`boolean`|optional|Renders the editor with an error style|
 |onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object|
 |onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object
-|controls|`string[]`|optional|List of controls to display in the main toolbar. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "image", "numberList", "bulletList", "quote", "code", "clear", "save"|
+|controls|`string[]`|optional|List of controls to display in the main toolbar. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "media", "numberList", "bulletList", "quote", "code", "clear", "save"|
 |customControls|`TCustomControl[]`|optional|Defines an array of user custom inline styles, blocks and callbacks. See more information in 'Custom Controls' below.|
 |decorators|`TDecorator[]`|optional|Defines an array of user custom decorators. See more information in 'Custom Decorators'.|
 |toolbar|`boolean`|optional|Defines if the main toolbar should be rendered.|
@@ -255,6 +255,8 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
 |regex|`RegExp`|required|The regular expression to match a decorator.|    
+
+<br />
 
 ## Changelog
 

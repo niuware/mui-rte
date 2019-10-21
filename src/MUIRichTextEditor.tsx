@@ -12,10 +12,10 @@ import {
 } from 'draft-js'
 import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
 import Link from './components/Link'
-import Image from './components/Image'
+import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
-import UrlPopover, { TAlignment, TUrlData } from './components/UrlPopover'
+import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
@@ -144,7 +144,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         style: undefined,
         block: undefined
     })
-    const [focusImageKey, setFocusImageKey] = useState("")
+    const [focusMediaKey, setFocusMediaKey] = useState("")
 
     const editorRef = useRef(null)
     const selectionRef = useRef<TStateOffset>({
@@ -212,13 +212,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         editorStateRef.current = editorState
     }, [editorState])
 
-
     useEffect(() => {
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
     const handleMouseUp = (event: any) => {
-        if (event.target.nodeName === "IMG"){
+        const nodeName = event.target.nodeName
+        if (nodeName === "IMG" || nodeName === "VIDEO"){
             return
         }
         setTimeout(() => {
@@ -228,7 +228,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 selectionRef.current.end === selection.getEndOffset())) {
                     const selectionInfo = getSelectionInfo(editorStateRef.current!)
                     if (selectionInfo.entityType === "IMAGE") {
-                        focusImage(selectionInfo.block)
+                        focusMedia(selectionInfo.block)
                         return
                     }
                     setState({
@@ -358,7 +358,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handlePromptForMedia = (toolbarMode?: boolean, newState?: EditorState) => {
         const lastState = newState || editorState
-        let urlKey = undefined
         let data = undefined
         const selectionInfo = getSelectionInfo(lastState)
         const contentState = lastState.getCurrentContent()
@@ -367,14 +366,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (linkKey) {
             const linkInstance = contentState.getEntity(linkKey)
             data = linkInstance.getData()
-            urlKey = linkKey
         }
         setState({
-            urlKey: urlKey,
+            urlKey: linkKey,
             urlData: data,
             toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-            anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-image-control")!
-                                            : document.getElementById("mui-rte-image-control-toolbar")!,
+            anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-media-control")!
+                                            : document.getElementById("mui-rte-media-control-toolbar")!,
             urlIsMedia: true
         })
     }
@@ -479,7 +477,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(newEditorState)
     }
 
-    const confirmMedia = (url?: string, width?: number, height?: number, alignment?: TAlignment) => {
+    const confirmMedia = (url?: string, width?: number, height?: number, alignment?: TAlignment, type?: TMediaType) => {
         const { urlKey } = state
         if (!url) {
             if (urlKey) {
@@ -497,7 +495,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             url: url,
             width: width,
             height: height,
-            alignment: alignment
+            alignment: alignment,
+            type: type
         }
 
         if (urlKey) {
@@ -506,14 +505,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         else {
-            const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE',data)
+            const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE', data)
             const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
             const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity })
             const newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
 
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
-        setFocusImageKey("")
+        setFocusMediaKey("")
     }
 
     const updateStateForPopover = (editorState: EditorState) => {
@@ -551,11 +550,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         )
     }
 
-    const focusImage = (block: ContentBlock) => {
+    const focusMedia = (block: ContentBlock) => {
         const newSeletion = SelectionState.createEmpty(block.getKey())
         const newEditorState = EditorState.forceSelection(editorStateRef.current!, newSeletion)
         editorStateRef.current = newEditorState
-        setFocusImageKey(block.getKey())
+        setFocusMediaKey(block.getKey())
         setEditorState(newEditorState)
         handlePromptForMedia(false, newEditorState)
     }
@@ -567,14 +566,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const entity = contentBlock.getEntityAt(0)
             if (entity) {
                 const type = contentState.getEntity(entity).getType()
-                if (type === 'IMAGE') {
+                if (type === "IMAGE") {
                     return {
-                        component: Image,
+                        component: Media,
                         editable: false,
                         props: {
-                            onClick: focusImage,
+                            onClick: focusMedia,
                             readOnly: props.readOnly,
-                            focusKey: focusImageKey
+                            focusKey: focusMediaKey
                         }
                     }
                 }
