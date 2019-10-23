@@ -15,13 +15,14 @@ interface IEditorButtonProps {
 const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButtonProps) => {
     const size = !props.toolbarMode ? "medium" : "small"
     const toolbarId = props.toolbarMode ? "-toolbar" : ""
+    const elemId = props.id + toolbarId
     return (
         <IconButton
-            id={props.id + toolbarId}
+            id={elemId}
             onMouseDown={(e) => {
                 e.preventDefault()
                 if (props.onClick) {
-                    props.onClick(props.style, props.type, props.toolbarMode)
+                    props.onClick(props.style, props.type, elemId, props.toolbarMode)
                 }
             }}
             aria-label={props.label}

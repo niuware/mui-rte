@@ -24,16 +24,17 @@ export type TEditorControl =
     "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
     "strikethrough" | "highlight" | string
 
-export type TControlType = "inline" | "block" | "callback"
+export type TControlType = "inline" | "block" | "callback" | "atomic"
 
 export type TCustomControl = {
     id?: string
     name: string
-    icon: JSX.Element
+    icon?: JSX.Element
     type: TControlType
     inlineStyle?: React.CSSProperties
     blockWrapper?: React.ReactElement
-    onClick?: (editorState: EditorState, name: string) => void
+    atomicComponent?: FunctionComponent
+    onClick?: (editorState: EditorState, name: string, anchor: HTMLElement | null) => void
 }
 
 type TStyleType = {
@@ -168,7 +169,7 @@ interface IBlockStyleControlsProps {
     editorState: EditorState
     controls?: Array<TEditorControl>
     customControls?: TCustomControl[]
-    onClick: (style: string, type: string, toolbarMode?: boolean) => void
+    onClick: (style: string, type: string, id: string, toolbarMode?: boolean) => void
     toolbarMode?: boolean
     className?: string
 }
@@ -190,7 +191,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
             }
             else if (props.customControls) {
                 const customControl = props.customControls.find(style => style.name === name)
-                if (customControl) {
+                if (customControl && customControl.type !== "atomic" && customControl.icon) {
                     filteredControls.push({
                         id: customControl.id,
                         name: customControl.name,
@@ -233,7 +234,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
 
                 return (
                     <EditorButton
-                        id={style.id}
+                        id={style.id || style.name}
                         key={`key-${style.label}`}
                         active={active}
                         label={style.label}

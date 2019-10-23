@@ -3,7 +3,7 @@ The Material-UI Rich Text Editor and Viewer
 
 <img src="http://niuware.github.io/public/assets/mui-rte/editor-w-controls-1-2-0.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined block, style, callback, and decorator definitions as well as toolbar and theme customization to enhance the editor to all needs.
+**mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
 
 ## Installation
 
@@ -28,7 +28,7 @@ ReactDOM.render(
 )
 ```
 
-You can load default content as follows:
+You can load default content as the following example. The value should be a stringified `RawDraftContentState` object:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
@@ -50,11 +50,11 @@ Check the [examples](https://github.com/niuware/mui-rte/tree/master/examples) di
 
 ## Custom Controls
 
-You can define your custom inline styles, block styles and callback actions to the editor. Just select an icon from `@material-ui/icons` and define your rules.
+You can define your custom inline styles, blocks, atomic blocks and callback actions to the editor. Just select an icon from `@material-ui/icons` and define your rules.
 
 ### Adding a custom inline style
 
-This sample adds a control to change the background color and font color of the selected text:
+This sample adds a control to change the background color and font color of the typed or selected text:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
@@ -76,7 +76,7 @@ import InvertColorsIcon from '@material-ui/icons/InvertColors'
 />
 ```
 
-### Adding a custom block style
+### Adding a custom block
 
 This sample adds a block to the editor based on a `React Element` defined:
 
@@ -108,6 +108,10 @@ const MyBlock = (props) => {
     ]}
 />
 ```
+
+### Adding a custom atomic block
+
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@material-ui` Card component to the editor.
 
 ### Adding a custom callback control
 
@@ -241,11 +245,12 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |id|`string`|optional|The HTML id attribute for the control|
 |name|`string`|required|The name of the custom control. For rendering the control this name should be added to the `MUIRichTextEditor` `controls` property.|
-|icon|`JSX.Element`|required|The `@material-ui/icons` icon for the control. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
-|type|`string`|required|Either "inline", "block" or "callback"|
-|inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using the custom inline style.|
-|blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering the custom block.|
-|onClick|`(editorState: EditorState, name: string) => void`|optional|The callback function triggered when the custom control is clicked.|   
+|icon|`JSX.Element`|optional|The `@material-ui/icons` icon for the control. For "atomic" control type, the icon is not required. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
+|type|`string`|required|Either "inline", "block", "atomic" or "callback"|
+|inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
+|blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
+|atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
+|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. |   
 
 <br />
 
