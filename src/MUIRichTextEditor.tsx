@@ -16,7 +16,7 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -160,6 +160,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     useImperativeHandle(ref, () => ({
         save: () => {
             handleSave()
+        },
+        insertAtomicBlock: (name: string, data: any) => {
+            handleInsertAtomicBlock(name, data)
         }
     }))
 
@@ -300,6 +303,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
+    const handleInsertAtomicBlock = (name: string, data: any) => {
+        const block = atomicBlockExists(name, props.customControls)
+        if (!block) {
+            return
+        }
+        insertAtomicBlock(block.name.toUpperCase(), data)
+    }
+
     const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
         const newState = RichUtils.handleKeyCommand(editorState, command)
         if (newState) {
@@ -309,14 +320,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return "not-handled"
     }
 
-    const handleCustomClick = (style: any) => {
+    const handleCustomClick = (style: any, id: string) => {
         if (!props.customControls) {
             return
         }
         for (let control of props.customControls) {
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
-                    control.onClick(editorState, control.name)
+                    setTimeout(() => (editorRef.current as any).blur(), 0)
+                    control.onClick(editorState, control.name, document.getElementById(id))
                 }
                 break
             }
@@ -331,50 +343,36 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(EditorState.redo(editorState))
     }
 
-    const handlePromptForLink = (toolbarMode?: boolean) => {
-        const selection = editorState.getSelection()
-
-        if (!selection.isCollapsed()) {
-            const selectionInfo = getSelectionInfo(editorState)
-            const contentState = editorState.getCurrentContent()
-            const linkKey = selectionInfo.linkKey
-            let data = undefined
-            let urlKey = undefined
-            if (linkKey) {
-                const linkInstance = contentState.getEntity(linkKey)
-                data = linkInstance.getData()
-                urlKey = linkKey
-            }
-            setState({
-                urlData: data,
-                urlKey: urlKey,
-                toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-                anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-link-control")!
-                                                : document.getElementById("mui-rte-link-control-toolbar")!,
-                urlIsMedia: undefined
-            })
-        }
-    }
-
-    const handlePromptForMedia = (toolbarMode?: boolean, newState?: EditorState) => {
-        const lastState = newState || editorState
-        let data = undefined
+    const handlePrompt = (lastState: EditorState, type: "link" | "media", toolbarMode?: boolean) => {
         const selectionInfo = getSelectionInfo(lastState)
         const contentState = lastState.getCurrentContent()
         const linkKey = selectionInfo.linkKey
-
+        let data = undefined
         if (linkKey) {
             const linkInstance = contentState.getEntity(linkKey)
             data = linkInstance.getData()
         }
         setState({
-            urlKey: linkKey,
             urlData: data,
+            urlKey: linkKey,
             toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-            anchorUrlPopover: !toolbarMode ? document.getElementById("mui-rte-media-control")!
-                                            : document.getElementById("mui-rte-media-control-toolbar")!,
-            urlIsMedia: true
+            anchorUrlPopover: !toolbarMode ? document.getElementById(`mui-rte-${type}-control`)!
+                                            : document.getElementById(`mui-rte-${type}-control-toolbar`)!,
+            urlIsMedia: type === "media" ? true : undefined
         })
+    }
+
+    const handlePromptForLink = (toolbarMode?: boolean) => {
+        const selection = editorState.getSelection()
+
+        if (!selection.isCollapsed()) {
+            handlePrompt(editorState, "link", toolbarMode)
+        }
+    }
+
+    const handlePromptForMedia = (toolbarMode?: boolean, newState?: EditorState) => {
+        const lastState = newState || editorState
+        handlePrompt(lastState, "media", toolbarMode)
     }
 
     const handleConfirmPrompt = (isMedia?: boolean, ...args: any) => {
@@ -385,7 +383,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         confirmLink(...args)
     }
 
-    const handleToolbarClick = (style: string, type: string, toolbarMode?: boolean) => {
+    const handleToolbarClick = (style: string, type: string, id: string, toolbarMode?: boolean) => {
         if (type === "inline") {
             return toggleInlineStyle(style)
         }
@@ -412,7 +410,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 handleSave()
                 break
             default:
-                handleCustomClick(style)
+                handleCustomClick(style, id)
         }
     }
 
@@ -505,12 +503,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         else {
-            const contentStateWithEntity = contentState.createEntity('IMAGE', 'IMMUTABLE', data)
-            const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-            const newEditorStateRaw = EditorState.set(editorState, { currentContent: contentStateWithEntity })
-            const newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
-
-            updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
+            insertAtomicBlock("IMAGE", data)
         }
         setFocusMediaKey("")
     }
@@ -577,6 +570,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         }
                     }
                 }
+                else {
+                    const block = atomicBlockExists(type.toLowerCase(), props.customControls)
+                    if (!block) {
+                        return null
+                    }
+                    return {
+                        component: block.atomicComponent,
+                        editable: false,
+                        props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                    }
+                }
             }
         }
         return null
@@ -602,6 +606,19 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             start = matchArr.index
             callback(start, start + matchArr[0].length)
         }
+    }
+
+    const insertAtomicBlock = (type: string, data: any) => {
+        const contentState = editorState.getCurrentContent()
+        const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
+        const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
+        const newEditorStateRaw = EditorState.set(editorState, { 
+            currentContent: contentStateWithEntity, 
+            selection: editorState.getCurrentContent().getSelectionAfter() 
+        })
+        const newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
+
+        updateStateForPopover(newEditorState)
     }
 
     const renderToolbar = props.toolbar === undefined || props.toolbar

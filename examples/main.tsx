@@ -11,6 +11,7 @@ import InlineToolbar from './inline-toolbar'
 import CustomInlineToolbar from './custom-inline-toolbar'
 import LoadHTML from './load-html'
 import ResetValue from './reset-value'
+import AtomicCustomBlock from './atomic-custom-block'
 
 const App = () => {
 
@@ -34,6 +35,7 @@ const App = () => {
             <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
             <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
+            <button onClick={() => setSample(<AtomicCustomBlock />)}>Atomic Custom Block</button>
             {sample}
         </div>
     )

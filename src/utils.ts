@@ -1,6 +1,7 @@
 import { EditorState, DraftBlockType, ContentBlock, ContentState, 
     Modifier, SelectionState } from 'draft-js'
 import Immutable from 'immutable'
+import { TCustomControl } from './components/EditorControls'
 
 export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
@@ -71,4 +72,14 @@ const removeBlockFromMap = (editorState: EditorState, block: ContentBlock): Cont
     }) as ContentState
 }
 
-export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap }
+const atomicBlockExists = (name: string, controls?: TCustomControl[]) => {
+    if (!controls) {
+        return undefined
+    }
+    return controls.find(control => 
+        control.type === "atomic" && 
+        control.name === name && 
+        control.atomicComponent !== undefined)
+}
+
+export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists }
