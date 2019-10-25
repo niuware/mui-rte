@@ -308,7 +308,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!block) {
             return
         }
-        insertAtomicBlock(block.name.toUpperCase(), data)
+        const newEditorState = insertAtomicBlock(block.name.toUpperCase(), data, { 
+            selection: editorState.getCurrentContent().getSelectionAfter()
+        })
+        updateStateForPopover(newEditorState)
     }
 
     const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
@@ -503,7 +506,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         else {
-            insertAtomicBlock("IMAGE", data)
+            const newEditorState = insertAtomicBlock("IMAGE", data)
+            updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         setFocusMediaKey("")
     }
@@ -608,17 +612,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
-    const insertAtomicBlock = (type: string, data: any) => {
+    const insertAtomicBlock = (type: string, data: any, options?: any) => {
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
         const newEditorStateRaw = EditorState.set(editorState, { 
             currentContent: contentStateWithEntity, 
-            selection: editorState.getCurrentContent().getSelectionAfter() 
+            ...options
         })
-        const newEditorState = AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
-
-        updateStateForPopover(newEditorState)
+        return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
     }
 
     const renderToolbar = props.toolbar === undefined || props.toolbar
@@ -663,13 +665,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         />
                     </Paper>
                     : null}
-                {editable && renderToolbar ?
+                {editable || renderToolbar ?
                     <EditorControls
                         editorState={editorState}
                         onClick={handleToolbarClick}
                         controls={controls}
                         customControls={customControls}
                         className={classes.toolbar}
+                        disabled={!editable}
                     />
                     : null}
                 {placeholder}

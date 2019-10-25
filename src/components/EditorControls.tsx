@@ -172,6 +172,7 @@ interface IBlockStyleControlsProps {
     onClick: (style: string, type: string, id: string, toolbarMode?: boolean) => void
     toolbarMode?: boolean
     className?: string
+    disabled?: boolean
 }
 
 const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
@@ -243,6 +244,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                         type={style.type}
                         icon={style.icon}
                         toolbarMode={props.toolbarMode}
+                        disabled={props.disabled}
                     />
                 )
             })}

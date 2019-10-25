@@ -10,6 +10,7 @@ interface IEditorButtonProps {
     icon: JSX.Element
     onClick?: any
     toolbarMode?: boolean
+    disabled?: boolean
 }
 
 const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButtonProps) => {
@@ -28,6 +29,7 @@ const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButto
             aria-label={props.label}
             color={props.active ? "primary" : "default"}
             size={size}
+            disabled={props.disabled || false}
         >
             {props.icon}
         </IconButton>
