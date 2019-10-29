@@ -175,7 +175,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         ]
         if (props.decorators) {
             props.decorators.forEach(deco => decorators.push({
-                strategy: (contentBlock: any, callback: any, contentState: any) => {
+                strategy: (contentBlock: any, callback: any) => {
                     findDecoWithRegex(deco.regex, contentBlock, callback)
                 },
                 component: deco.component

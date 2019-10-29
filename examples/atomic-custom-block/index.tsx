@@ -213,7 +213,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
     )
 }
 
-const AtomicCustomBlock: FunctionComponent = (props) => {
+const AtomicCustomBlock: FunctionComponent = () => {
     
     const ref = useRef()
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
@@ -243,7 +243,7 @@ const AtomicCustomBlock: FunctionComponent = (props) => {
                         name: "add-card",
                         icon: <WebAssetIcon />,
                         type: "callback",
-                        onClick: (editorState, name, anchor) => {
+                        onClick: (_editorState, _name, anchor) => {
                             setAnchor(anchor)
                         }
                     }

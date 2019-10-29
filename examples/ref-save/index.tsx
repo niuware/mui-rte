@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useRef, Ref, MutableRefObject } from 'react'
+import React, { FunctionComponent, useRef } from 'react'
 import MUIRichTextEditor from '../../'
 
-const RefSave: FunctionComponent = (props) => {
+const RefSave: FunctionComponent = () => {
 
     const ref = useRef()
 

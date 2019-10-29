@@ -46,7 +46,7 @@ const CustomControls = () => {
                     name: "my-callback",
                     icon: <DoneIcon />,
                     type: "callback",
-                    onClick: (editorState, name) => {
+                    onClick: (_, name) => {
                         console.log(`Clicked ${name} control`)
                     }
                 }
