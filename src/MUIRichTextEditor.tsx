@@ -10,7 +10,7 @@ import {
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
     SelectionState
 } from 'draft-js'
-import EditorControls, { TEditorControl, TCustomControl } from './components/EditorControls'
+import Toolbar, { TToolbarControl, TCustomControl } from './components/Toolbar'
 import Link from './components/Link'
 import Media from './components/Media'
 import Blockquote from './components/Blockquote'
@@ -83,14 +83,14 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     readOnly?: boolean
     inheritFontSize?: boolean
     error?: boolean
-    controls?: Array<TEditorControl>
+    controls?: Array<TToolbarControl>
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     customControls?: TCustomControl[],
     decorators?: TDecorator[]
     toolbar?: boolean
     inlineToolbar?: boolean
-    inlineToolbarControls?: Array<TEditorControl>
+    inlineToolbarControls?: Array<TToolbarControl>
 }
 
 type IMUIRichTextEditorState = {
@@ -346,7 +346,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setEditorState(EditorState.redo(editorState))
     }
 
-    const handlePrompt = (lastState: EditorState, type: "link" | "media", toolbarMode?: boolean) => {
+    const handlePrompt = (lastState: EditorState, type: "link" | "media", inlineMode?: boolean) => {
         const selectionInfo = getSelectionInfo(lastState)
         const contentState = lastState.getCurrentContent()
         const linkKey = selectionInfo.linkKey
@@ -358,24 +358,24 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setState({
             urlData: data,
             urlKey: linkKey,
-            toolbarPosition: !toolbarMode ? undefined : state.toolbarPosition,
-            anchorUrlPopover: !toolbarMode ? document.getElementById(`mui-rte-${type}-control`)!
+            toolbarPosition: !inlineMode ? undefined : state.toolbarPosition,
+            anchorUrlPopover: !inlineMode ? document.getElementById(`mui-rte-${type}-control`)!
                                             : document.getElementById(`mui-rte-${type}-control-toolbar`)!,
             urlIsMedia: type === "media" ? true : undefined
         })
     }
 
-    const handlePromptForLink = (toolbarMode?: boolean) => {
+    const handlePromptForLink = (inlineMode?: boolean) => {
         const selection = editorState.getSelection()
 
         if (!selection.isCollapsed()) {
-            handlePrompt(editorState, "link", toolbarMode)
+            handlePrompt(editorState, "link", inlineMode)
         }
     }
 
-    const handlePromptForMedia = (toolbarMode?: boolean, newState?: EditorState) => {
+    const handlePromptForMedia = (inlineMode?: boolean, newState?: EditorState) => {
         const lastState = newState || editorState
-        handlePrompt(lastState, "media", toolbarMode)
+        handlePrompt(lastState, "media", inlineMode)
     }
 
     const handleConfirmPrompt = (isMedia?: boolean, ...args: any) => {
@@ -386,7 +386,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         confirmLink(...args)
     }
 
-    const handleToolbarClick = (style: string, type: string, id: string, toolbarMode?: boolean) => {
+    const handleToolbarClick = (style: string, type: string, id: string, inlineMode?: boolean) => {
         if (type === "inline") {
             return toggleInlineStyle(style)
         }
@@ -401,10 +401,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 handleRedo()
                 break
             case "LINK":
-                handlePromptForLink(toolbarMode)
+                handlePromptForLink(inlineMode)
                 break
             case "IMAGE":
-                handlePromptForMedia(toolbarMode)
+                handlePromptForMedia(inlineMode)
                 break
             case "clear":
                 handleClearFormat()
@@ -656,17 +656,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         top: state.toolbarPosition.top,
                         left: state.toolbarPosition.left
                     }}>
-                        <EditorControls
+                        <Toolbar
                             editorState={editorState}
                             onClick={handleToolbarClick}
                             controls={inlineToolbarControls}
                             customControls={customControls}
-                            toolbarMode={true}
+                            inlineMode={true}
                         />
                     </Paper>
                     : null}
                 {editable || renderToolbar ?
-                    <EditorControls
+                    <Toolbar
                         editorState={editorState}
                         onClick={handleToolbarClick}
                         controls={controls}

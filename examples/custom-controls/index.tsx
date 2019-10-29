@@ -2,7 +2,7 @@ import React, { FunctionComponent } from 'react'
 import { Chip, Avatar, Button } from '@material-ui/core'
 import InvertColorsIcon from '@material-ui/icons/InvertColors'
 import MUIRichTextEditor from '../../'
-import { TToolbarComponentProps } from '../../src/components/EditorControls'
+import { TToolbarComponentProps } from '../../src/components/Toolbar'
 
 const save = (data: string) => {
     console.log(data)

@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react'
 import { IconButton } from '@material-ui/core'
-import { TToolbarComponentProps } from './EditorControls'
+import { TToolbarComponentProps } from './Toolbar'
 
-interface IEditorButtonProps {
+interface IToolbarButtonProps {
     id?: string
     label: string
     style: string
@@ -10,21 +10,21 @@ interface IEditorButtonProps {
     active?: boolean
     icon?: JSX.Element
     onClick?: any
-    toolbarMode?: boolean
+    inlineMode?: boolean
     disabled?: boolean
     component?: FunctionComponent<TToolbarComponentProps>
 }
 
-const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButtonProps) => {
-    const size = !props.toolbarMode ? "medium" : "small"
-    const toolbarId = props.toolbarMode ? "-toolbar" : ""
+const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props: IToolbarButtonProps) => {
+    const size = !props.inlineMode ? "medium" : "small"
+    const toolbarId = props.inlineMode ? "-toolbar" : ""
     const elemId = props.id + toolbarId
     const sharedProps = {
         id: elemId,
         onMouseDown: (e: React.MouseEvent) => {
             e.preventDefault()
             if (props.onClick) {
-                props.onClick(props.style, props.type, elemId, props.toolbarMode)
+                props.onClick(props.style, props.type, elemId, props.inlineMode)
             }
         },
         disabled: props.disabled || false
@@ -52,4 +52,4 @@ const EditorButton: FunctionComponent<IEditorButtonProps> = (props: IEditorButto
     return null
 }
 
-export default EditorButton
+export default ToolbarButton
