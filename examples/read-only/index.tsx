@@ -7,7 +7,7 @@ const ReadOnly = () => {
     return (
         <MUIRichTextEditor 
             value={content} 
-            readOnly={true} 
+            readOnly={true}
         />
     )
 }
