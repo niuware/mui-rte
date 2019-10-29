@@ -16,21 +16,29 @@ import FormatClearIcon from '@material-ui/icons/FormatClear'
 import SaveIcon from '@material-ui/icons/Save'
 import UndoIcon from '@material-ui/icons/Undo'
 import RedoIcon from '@material-ui/icons/Redo'
-import EditorButton from './EditorButton'
+import ToolbarButton from './ToolbarButton'
 import { getSelectionInfo } from '../utils'
 
-export type TEditorControl =
+export type TToolbarControl =
     "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
     "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
     "strikethrough" | "highlight" | string
 
 export type TControlType = "inline" | "block" | "callback" | "atomic"
 
+export type TToolbarComponentProps = {
+    id: string,
+    onMouseDown: (e: React.MouseEvent) => void,
+    active: boolean,
+    disabled: boolean
+}
+
 export type TCustomControl = {
     id?: string
     name: string
     icon?: JSX.Element
     type: TControlType
+    component?: FunctionComponent<TToolbarComponentProps>
     inlineStyle?: React.CSSProperties
     blockWrapper?: React.ReactElement
     atomicComponent?: FunctionComponent
@@ -39,10 +47,11 @@ export type TCustomControl = {
 
 type TStyleType = {
     id?: string
-    name: TEditorControl | string
+    name: TToolbarControl | string
     label: string
     style: string
-    icon: JSX.Element
+    icon?: JSX.Element
+    component?: FunctionComponent<TToolbarComponentProps>
     type: TControlType
     active?: boolean
     clickFnName?: string
@@ -167,15 +176,15 @@ const STYLE_TYPES: TStyleType[] = [
 
 interface IBlockStyleControlsProps {
     editorState: EditorState
-    controls?: Array<TEditorControl>
+    controls?: Array<TToolbarControl>
     customControls?: TCustomControl[]
-    onClick: (style: string, type: string, id: string, toolbarMode?: boolean) => void
-    toolbarMode?: boolean
+    onClick: (style: string, type: string, id: string, inlineMode?: boolean) => void
+    inlineMode?: boolean
     className?: string
     disabled?: boolean
 }
 
-const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
+const Toolbar: FunctionComponent<IBlockStyleControlsProps> = (props) => {
     const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
     const {editorState} = props
 
@@ -192,13 +201,15 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
             }
             else if (props.customControls) {
                 const customControl = props.customControls.find(style => style.name === name)
-                if (customControl && customControl.type !== "atomic" && customControl.icon) {
+                if (customControl && customControl.type !== "atomic" && 
+                    (customControl.icon || customControl.component)) {
                     filteredControls.push({
-                        id: customControl.id,
+                        id: customControl.id || (customControl.name + "Id"),
                         name: customControl.name,
                         label: customControl.name,
                         style: customControl.name.toUpperCase(),
                         icon: customControl.icon,
+                        component: customControl.component,
                         type: customControl.type,
                         clickFnName: "onCustomClick"
                     })
@@ -211,7 +222,7 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
     return (
         <div className={props.className}>
             {availableControls.map(style => {
-                if (props.toolbarMode && 
+                if (props.inlineMode && 
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {
                     return null
                 }
@@ -234,8 +245,8 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                 }
 
                 return (
-                    <EditorButton
-                        id={style.id || style.name}
+                    <ToolbarButton
+                        id={style.id}
                         key={`key-${style.label}`}
                         active={active}
                         label={style.label}
@@ -243,7 +254,8 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
                         style={style.style}
                         type={style.type}
                         icon={style.icon}
-                        toolbarMode={props.toolbarMode}
+                        component={style.component}
+                        inlineMode={props.inlineMode}
                         disabled={props.disabled}
                     />
                 )
@@ -251,4 +263,4 @@ const EditorControls: FunctionComponent<IBlockStyleControlsProps> = (props) => {
         </div>
     )
 }
-export default EditorControls
+export default Toolbar

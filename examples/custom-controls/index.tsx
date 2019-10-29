@@ -1,8 +1,8 @@
-import React from 'react'
-import MUIRichTextEditor from '../../'
+import React, { FunctionComponent } from 'react'
+import { Chip, Avatar, Button } from '@material-ui/core'
 import InvertColorsIcon from '@material-ui/icons/InvertColors'
-import TableChartIcon from '@material-ui/icons/TableChart'
-import DoneIcon from '@material-ui/icons/Done'
+import MUIRichTextEditor from '../../'
+import { TToolbarComponentProps } from '../../src/components/Toolbar'
 
 const save = (data: string) => {
     console.log(data)
@@ -17,6 +17,32 @@ const MyBlock = (props: any) => {
             My Block says:
             {props.children}
         </div>
+    )
+}
+
+const MyCallbackComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
+    return (
+        <Chip 
+            id={props.id}
+            avatar={<Avatar>C</Avatar>} 
+            onClick={props.onMouseDown}
+            label="Callback"
+            disabled={props.disabled}
+        />
+    )
+}
+
+const MyBlockComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
+    return (
+        <Button
+            id={props.id}
+            variant="contained"
+            onMouseDown={props.onMouseDown}
+            color={props.active ? "primary": "default"}
+            disabled={props.disabled}
+        >
+            My Block
+        </Button>
     )
 }
 
@@ -38,13 +64,13 @@ const CustomControls = () => {
                 },
                 {
                     name: "my-block",
-                    icon: <TableChartIcon />,
+                    component: MyBlockComponent,
                     type: "block",
                     blockWrapper: <MyBlock />
                 },
                 {
                     name: "my-callback",
-                    icon: <DoneIcon />,
+                    component: MyCallbackComponent,
                     type: "callback",
                     onClick: (_, name) => {
                         console.log(`Clicked ${name} control`)

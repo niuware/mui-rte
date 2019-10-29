@@ -1,7 +1,7 @@
 # mui-rte
 The Material-UI Rich Text Editor and Viewer
 
-<img src="http://niuware.github.io/public/assets/mui-rte/editor-w-controls-1-2-0.png" width="600" />
+<img src="http://niuware.github.io/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
 **mui-rte** is a complete text editor and viewer for `material-ui` v3 and v4 based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
 
@@ -50,7 +50,7 @@ Check the [examples](https://github.com/niuware/mui-rte/tree/master/examples) di
 
 ## Custom Controls
 
-You can define your custom inline styles, blocks, atomic blocks and callback actions to the editor. Just select an icon from `@material-ui/icons` and define your rules.
+You can define your custom inline styles, blocks, atomic blocks and callback actions to the editor. Just select an icon from `@material-ui/icons` or create your own `FunctionComponent` and define your rules.
 
 ### Adding a custom inline style
 
@@ -78,7 +78,7 @@ import InvertColorsIcon from '@material-ui/icons/InvertColors'
 
 ### Adding a custom block
 
-This sample adds a block to the editor based on a `React Element` defined:
+This sample adds a block to the editor based on a `React Element`:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
@@ -111,7 +111,7 @@ const MyBlock = (props) => {
 
 ### Adding a custom atomic block
 
-Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@material-ui` Card component to the editor.
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@material-ui/core` Card component to the editor.
 
 ### Adding a custom callback control
 
@@ -128,7 +128,7 @@ import DoneIcon from '@material-ui/icons/Done'
             name: "my-callback",
             icon: <DoneIcon />,
             type: "callback",
-            onClick: (editorState, name) => {
+            onClick: (editorState, name, anchor) => {
                 console.log(`Clicked ${name} control`)
             }
         }
@@ -246,11 +246,23 @@ Object.assign(defaultTheme, {
 |id|`string`|optional|The HTML id attribute for the control|
 |name|`string`|required|The name of the custom control. For rendering the control this name should be added to the `MUIRichTextEditor` `controls` property.|
 |icon|`JSX.Element`|optional|The `@material-ui/icons` icon for the control. For "atomic" control type, the icon is not required. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
+|component|`React.FunctionComponent<TToolbarComponentProps>`|optional|The custom function component for the control. The icon has priority over the component, so if the icon is set the component will be ignored. For "atomic" control type, the component is not required.|
 |type|`string`|required|Either "inline", "block", "atomic" or "callback"|
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
 |blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
 |atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
 |onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. |   
+
+<br />
+
+`TToolbarComponentProps`
+
+|Property|Type|description|
+|---|---|---|---|
+|id|string|The id for the component.|
+|onMouseDown|(e: React.MouseEvent) => void|The `mousedown` handler.|
+|active|boolean|Defines if the block or inline type is active for the current editor selection.|
+|disabled|boolean|Sets if the toolbar is disabled.|
 
 <br />
 

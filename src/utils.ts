@@ -1,7 +1,7 @@
 import { EditorState, DraftBlockType, ContentBlock, ContentState, 
     Modifier, SelectionState } from 'draft-js'
 import Immutable from 'immutable'
-import { TCustomControl } from './components/EditorControls'
+import { TCustomControl } from './components/Toolbar'
 
 export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
