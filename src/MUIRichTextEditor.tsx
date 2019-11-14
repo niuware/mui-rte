@@ -78,6 +78,7 @@ export type TDecorator = {
 }
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
+    id?: string
     value?: any
     label?: string,
     readOnly?: boolean
@@ -155,7 +156,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const editorStateRef = useRef<EditorState | null>(editorState)
 
     /**
-     * Expose the save method 
+     * Expose methods
      */
     useImperativeHandle(ref, () => ({
         save: () => {
@@ -331,7 +332,18 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
                     setTimeout(() => (editorRef.current as any).blur(), 0)
-                    control.onClick(editorState, control.name, document.getElementById(id))
+                    const newState = control.onClick(editorState, control.name, document.getElementById(id))
+                    if (newState) {
+                        if (newState.getSelection().isCollapsed()) {
+                            setEditorState(newState)
+                        }
+                        else {
+                            updateStateForPopover(newState)
+                        }
+                    }
+                    else {
+                        refocus()
+                    }
                 }
                 break
             }
@@ -626,7 +638,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const renderToolbar = props.toolbar === undefined || props.toolbar
     const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
     const editable = props.readOnly === undefined || !props.readOnly
-
+    const id = props.id || "mui-rte"
     let className = ""
     let placeholder: React.ReactElement | null = null
     if (!focus) {
@@ -647,8 +659,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     return (
-        <div className={classes.root}>
-            <div className={classNames(classes.container, {
+        <div id={`${id}-root`} className={classes.root}>
+            <div id={`${id}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.inlineToolbar && editable && state.toolbarPosition ?
@@ -657,6 +669,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         left: state.toolbarPosition.left
                     }}>
                         <Toolbar
+                            id={id}
                             editorState={editorState}
                             onClick={handleToolbarClick}
                             controls={inlineToolbarControls}
@@ -667,6 +680,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     : null}
                 {editable || renderToolbar ?
                     <Toolbar
+                        id={id}
                         editorState={editorState}
                         onClick={handleToolbarClick}
                         controls={controls}
@@ -676,8 +690,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     />
                     : null}
                 {placeholder}
-                <div className={classes.editor}>
-                    <div className={classNames(className, classes.editorContainer, {
+                <div id={`${id}-editor`} className={classes.editor}>
+                    <div id={`${id}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
                     })} onClick={handleFocus} onBlur={handleBlur}>

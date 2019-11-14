@@ -42,7 +42,7 @@ export type TCustomControl = {
     inlineStyle?: React.CSSProperties
     blockWrapper?: React.ReactElement
     atomicComponent?: FunctionComponent
-    onClick?: (editorState: EditorState, name: string, anchor: HTMLElement | null) => void
+    onClick?: (editorState: EditorState, name: string, anchor: HTMLElement | null) => EditorState | void
 }
 
 type TStyleType = {
@@ -174,7 +174,8 @@ const STYLE_TYPES: TStyleType[] = [
     }
 ]
 
-interface IBlockStyleControlsProps {
+type TToolbarProps = {
+    id: string
     editorState: EditorState
     controls?: Array<TToolbarControl>
     customControls?: TCustomControl[]
@@ -184,9 +185,10 @@ interface IBlockStyleControlsProps {
     disabled?: boolean
 }
 
-const Toolbar: FunctionComponent<IBlockStyleControlsProps> = (props) => {
+const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
     const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
     const {editorState} = props
+    const id = props.inlineMode ? "-inline-toolbar" : "-toolbar"
 
     useEffect(() => {
         if (!props.controls) {
@@ -220,7 +222,7 @@ const Toolbar: FunctionComponent<IBlockStyleControlsProps> = (props) => {
     }, [props.controls, props.customControls])
 
     return (
-        <div className={props.className}>
+        <div id={`${props.id}${id}`} className={props.className}>
             {availableControls.map(style => {
                 if (props.inlineMode && 
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {

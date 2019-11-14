@@ -115,11 +115,12 @@ Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atom
 
 ### Adding a custom callback control
 
-This sample adds a control that will trigger a custom callback function:
+This sample adds a control that will trigger a custom callback function to clear the editor state:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
 import DoneIcon from '@material-ui/icons/Done'
+import { EditorState } from 'draft-js'
 
 <MUIRichTextEditor 
     controls={["my-callback"]}
@@ -130,6 +131,7 @@ import DoneIcon from '@material-ui/icons/Done'
             type: "callback",
             onClick: (editorState, name, anchor) => {
                 console.log(`Clicked ${name} control`)
+                return EditorState.createEmpty()
             }
         }
     ]}
@@ -222,6 +224,7 @@ Object.assign(defaultTheme, {
 
 |Property|Type||description|
 |---|---|---|---|
+|id|`string`|optional|Base Id name for the component HTML elements.|
 |label|`string`|optional|String to show when there is no content.|
 |readOnly|`boolean`|optional|Read only mode. The toolbar is disabled by default.|
 |value|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
@@ -251,7 +254,7 @@ Object.assign(defaultTheme, {
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
 |blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
 |atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
-|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. |   
+|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => EditorState | void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
 
 <br />
 

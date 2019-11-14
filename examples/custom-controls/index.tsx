@@ -3,6 +3,7 @@ import { Chip, Avatar, Button } from '@material-ui/core'
 import InvertColorsIcon from '@material-ui/icons/InvertColors'
 import MUIRichTextEditor from '../../'
 import { TToolbarComponentProps } from '../../src/components/Toolbar'
+import { EditorState } from 'draft-js'
 
 const save = (data: string) => {
     console.log(data)
@@ -32,6 +33,17 @@ const MyCallbackComponent: FunctionComponent<TToolbarComponentProps> = (props) =
     )
 }
 
+const ClearComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
+    return (
+        <Chip 
+            id={props.id}
+            onClick={props.onMouseDown}
+            label="Clear all"
+            disabled={props.disabled}
+        />
+    )
+}
+
 const MyBlockComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
     return (
         <Button
@@ -51,7 +63,7 @@ const CustomControls = () => {
         <MUIRichTextEditor 
             label="Type something here..."
             onSave={save}
-            controls={["title", "bold", "my-block", "my-style", "clear", "my-callback", "save"]}
+            controls={["title", "bold", "my-block", "my-style", "clear", "my-callback", "clear-callback", "save"]}
             customControls={[
                 {
                     name: "my-style",
@@ -74,6 +86,14 @@ const CustomControls = () => {
                     type: "callback",
                     onClick: (_, name) => {
                         console.log(`Clicked ${name} control`)
+                    }
+                },
+                {
+                    name: "clear-callback",
+                    component: ClearComponent,
+                    type: "callback",
+                    onClick: () => {
+                        return EditorState.createEmpty()
                     }
                 }
             ]}
