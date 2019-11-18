@@ -159,6 +159,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
      * Expose methods
      */
     useImperativeHandle(ref, () => ({
+        focus: () => {
+            handleFocus()
+        },
         save: () => {
             handleSave()
         },

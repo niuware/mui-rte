@@ -9,6 +9,10 @@ const RefSave: FunctionComponent = () => {
         (ref as any).current.save()
     }
 
+    const handleFocus = () => {
+        (ref as any).current.focus()
+    }
+
     const handleSave = (data: string) => {
         console.log(data)
     }
@@ -22,6 +26,13 @@ const RefSave: FunctionComponent = () => {
                 }} 
                 onClick={handleClick}>
                 Save
+            </button>
+            <button style={{
+                    marginLeft: 5,
+                    padding: 5
+                }}
+                onClick={handleFocus}>
+                Focus
             </button>
             <MUIRichTextEditor 
                 label="Type something here..."
