@@ -2,8 +2,8 @@ import React from 'react'
 import { mount } from 'enzyme'
 import { assert, expect } from 'chai'
 import { EditorState } from 'draft-js'
-import EditorControls, { TEditorControl } from '../src/components/EditorControls'
-import EditorButton from '../src/components/EditorButton'
+import Toolbar, { TToolbarControl } from '../src/components/Toolbar'
+import EditorButton from '../src/components/ToolbarButton'
 
 describe('<EditorControls />', () => {
     let editorState: EditorState
@@ -14,7 +14,8 @@ describe('<EditorControls />', () => {
 
     it('should render all controls', () => {
         const wrapper = mount(
-            <EditorControls
+            <Toolbar
+                id="mui-rte"
                 editorState={editorState}
                 onClick={() => {}}
             />
@@ -24,7 +25,7 @@ describe('<EditorControls />', () => {
     })
 
     it('should render controls in order', () => {
-        const controls: TEditorControl[] = [
+        const controls: TToolbarControl[] = [
             "save",
             "code",
             "underline"
@@ -35,7 +36,8 @@ describe('<EditorControls />', () => {
             "Underline"
         ]
         const wrapper = mount(
-            <EditorControls
+            <Toolbar
+                id="mui-rte"
                 editorState={editorState}
                 controls={controls}
                 onClick={() => {}}
@@ -49,7 +51,8 @@ describe('<EditorControls />', () => {
 
     it('should not render controls', () => {
         const wrapper = mount(
-            <EditorControls
+            <Toolbar
+                id="mui-rte"
                 editorState={editorState}
                 controls={[]}
                 onClick={() => {}}
