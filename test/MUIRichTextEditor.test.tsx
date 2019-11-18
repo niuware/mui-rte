@@ -4,26 +4,17 @@ import { spy } from 'sinon'
 import { assert, expect } from 'chai'
 import { Editor, convertFromRaw } from 'draft-js'
 import MUIRichTextEditor from '../src/MUIRichTextEditor'
-import EditorControls from '../src/components/EditorControls'
-import EditorButton from '../src/components/EditorButton'
+import Toolbar from '../src/components/Toolbar'
+import ToolbarButton from '../src/components/ToolbarButton'
 
 describe('<MUIRichTextEditor />', () => {
 
     it('should render controls and editor', () => {
         const wrapper = mount(<MUIRichTextEditor />)
-        const editorControls = wrapper.find(EditorControls)
+        const toolbar = wrapper.find(Toolbar)
         const editor = wrapper.find(Editor)
 
-        assert.strictEqual(editorControls.length, 1)
-        assert.strictEqual(editor.length, 1)
-    })
-
-    it('should render editor only', () => {
-        const wrapper = mount(<MUIRichTextEditor readOnly={true} />)
-        const editorControls = wrapper.find(EditorControls)
-        const editor = wrapper.find(Editor)
-
-        assert.strictEqual(editorControls.length, 0)
+        assert.strictEqual(toolbar.length, 1)
         assert.strictEqual(editor.length, 1)
     })
 
@@ -38,7 +29,7 @@ describe('<MUIRichTextEditor />', () => {
         const saveSpy = spy()
         const component = <MUIRichTextEditor onSave={saveSpy} />
         const wrapper = mount(component)
-        const saveButton = wrapper.find(EditorButton).filterWhere((button: any) => {
+        const saveButton = wrapper.find(ToolbarButton).filterWhere((button: any) => {
             return button.prop("label") === "Save"
         })
         assert.strictEqual(saveButton.length, 1)
