@@ -136,11 +136,55 @@ const styleRenderMap: DraftStyleMap = {
     }
 }
 
+const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
+    contentBlock.findEntityRanges(
+        (character: any) => {
+            const entityKey = character.getEntity()
+            return (
+                entityKey !== null &&
+                contentState.getEntity(entityKey).getType() === 'LINK'
+            )
+        },
+        callback
+    )
+}
+
+const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
+    const text = contentBlock.getText()
+    let matchArr, start
+    while ((matchArr = regex.exec(text)) !== null) {
+        start = matchArr.index
+        callback(start, start + matchArr[0].length)
+    }
+}
+
+const useEditorState = (props: IMUIRichTextEditorProps) => {
+    const decorators: DraftDecorator[] = [
+        {
+            strategy: findLinkEntities,
+            component: Link,
+        }
+    ]
+    if (props.decorators) {
+        props.decorators.forEach(deco => decorators.push({
+            strategy: (contentBlock: any, callback: any) => {
+                findDecoWithRegex(deco.regex, contentBlock, callback)
+            },
+            component: deco.component
+        }))
+    }
+    const decorator = new CompositeDecorator(decorators)
+    return (props.value)
+        ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
+        : EditorState.createEmpty(decorator)
+}
+
 const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
     const [state, setState] = useState<IMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
-    const [editorState, setEditorState] = useState(EditorState.createEmpty())
+
+    const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
         block: undefined
@@ -171,24 +215,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }))
 
     useEffect(() => {
-        const decorators: DraftDecorator[] = [
-            {
-                strategy: findLinkEntities,
-                component: Link,
-            }
-        ]
-        if (props.decorators) {
-            props.decorators.forEach(deco => decorators.push({
-                strategy: (contentBlock: any, callback: any) => {
-                    findDecoWithRegex(deco.regex, contentBlock, callback)
-                },
-                component: deco.component
-            }))
-        }
-        const decorator = new CompositeDecorator(decorators)
-        const editorState = (props.value)
-            ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
-            : EditorState.createEmpty(decorator)
+        const editorState = useEditorState(props)
         const customBlockMap: any = {}
         const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
         if (props.customControls) {
@@ -603,28 +630,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             }
         }
         return null
-    }
-
-    const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
-        contentBlock.findEntityRanges(
-            (character: any) => {
-                const entityKey = character.getEntity()
-                return (
-                    entityKey !== null &&
-                    contentState.getEntity(entityKey).getType() === 'LINK'
-                )
-            },
-            callback
-        )
-    }
-
-    const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
-        const text = contentBlock.getText()
-        let matchArr, start
-        while ((matchArr = regex.exec(text)) !== null) {
-            start = matchArr.index
-            callback(start, start + matchArr[0].length)
-        }
     }
 
     const insertAtomicBlock = (type: string, data: any, options?: any) => {
