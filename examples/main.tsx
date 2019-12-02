@@ -12,6 +12,7 @@ import CustomInlineToolbar from './custom-inline-toolbar'
 import LoadHTML from './load-html'
 import ResetValue from './reset-value'
 import AtomicCustomBlock from './atomic-custom-block'
+import KeyBindings from './key-bindings'
 
 const App = () => {
 
@@ -36,6 +37,7 @@ const App = () => {
             <button onClick={() => setSample(<Events />)}>Events</button>
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
             <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
+            <button onClick={() => setSample(<KeyBindings />)}>Key Bindings</button>
             <div style={{
                 margin: "20px 0"
             }}>

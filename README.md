@@ -238,6 +238,8 @@ Object.assign(defaultTheme, {
 |toolbar|`boolean`|optional|Defines if the main toolbar should be rendered.|
 |inlineToolbar|`boolean`|optional|Defines if the inline toolbar should be rendered.|
 |inlineToolbarControls|`string[]`|optional|List of controls to display in the inline toolbar. Available values are: "bold", "italic", "underline", "strikethrough", "highlight", "link", "clear", and user defined inline controls. If not provided and `inlineToolbar` is `true` the following inline styles will be displayed: bold, italic, underline and clear.|
+|keyCommands|`TKeyCommand[]`|optional|Defines an array of `TKeyCommand` objects for adding key bindings to the editor.|
+|draftEditorProps|`TDraftEditorProps`|optional|Defines an object containing specific `draft-js` `Editor` properties.|
    
 
 <br />
@@ -274,7 +276,26 @@ Object.assign(defaultTheme, {
 |Property|Type||description|
 |---|---|---|---|
 |component|`React.FunctionComponent`|required|The React component to use for rendering the decorator.|
-|regex|`RegExp`|required|The regular expression to match a decorator.|    
+|regex|`RegExp`|required|The regular expression to match a decorator.|  
+
+<br />
+
+`TKeyCommand`
+
+|Property|Type||description|
+|---|---|---|---|
+|key|`number`|required|The code of the key to bind.|
+|name|`string`|required|The name of the command.|
+|callback|`(state: EditorState) => EditorState`|required|The callback function to execute when the key binding is matched. It should return the `EditorState` to set.|
+
+<br />
+
+`TDraftEditorProps`
+
+|Property|Type||description|
+|---|---|---|---|
+|spellCheck|`boolean`|optional|Use browser spelling check.|
+|stripPastedStyles|`boolean`|optional|Remove styles when pasting text into the editor.|   
 
 <br />
 
