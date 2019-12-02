@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
-    SelectionState
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl } from './components/Toolbar'
 import Link from './components/Link'
@@ -77,6 +77,17 @@ export type TDecorator = {
     regex: RegExp
 }
 
+type TDraftEditorProps = {
+    spellCheck?: boolean
+    stripPastedStyles?: boolean
+}
+
+type TKeyCommand = {
+    key: number
+    name: string
+    callback: (state: EditorState) => EditorState
+}
+
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
@@ -85,13 +96,15 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     inheritFontSize?: boolean
     error?: boolean
     controls?: Array<TToolbarControl>
-    onSave?: (data: string) => void
-    onChange?: (state: EditorState) => void
-    customControls?: TCustomControl[],
+    customControls?: TCustomControl[]
     decorators?: TDecorator[]
     toolbar?: boolean
     inlineToolbar?: boolean
     inlineToolbarControls?: Array<TToolbarControl>
+    draftEditorProps?: TDraftEditorProps
+    keyCommands?: TKeyCommand[]
+    onSave?: (data: string) => void
+    onChange?: (state: EditorState) => void
 }
 
 type IMUIRichTextEditorState = {
@@ -135,6 +148,8 @@ const styleRenderMap: DraftStyleMap = {
         backgroundColor: "yellow"
     }
 }
+
+const { hasCommandModifier } = KeyBindingUtil
 
 const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
     contentBlock.findEntityRanges(
@@ -351,6 +366,16 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             handleChange(newState)
             return "handled"
         }
+        else {
+            if (props.keyCommands) {
+                const keyCommand = props.keyCommands.find(comm => comm.name === command)
+                if (keyCommand) {
+                    const newState = keyCommand.callback(editorState)
+                    handleChange(newState)
+                    return "handled"
+                }
+            }
+        }
         return "not-handled"
     }
 
@@ -372,7 +397,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         }
                     }
                     else {
-                        refocus()
+                        if (!editorState.getSelection().isCollapsed()) {
+                            refocus()
+                        }
                     }
                 }
                 break
@@ -643,6 +670,16 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
     }
 
+    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
+        if (hasCommandModifier(e) && props.keyCommands) {
+            const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
+            if (comm) {
+                return comm.name
+            }
+        }
+        return getDefaultKeyBinding(e)
+    }
+
     const renderToolbar = props.toolbar === undefined || props.toolbar
     const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
     const editable = props.readOnly === undefined || !props.readOnly
@@ -711,7 +748,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             onChange={handleChange}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
+                            keyBindingFn={keyBindingFn}
                             ref={editorRef}
+                            {...props.draftEditorProps}
                         />
                     </div>
                 </div>
