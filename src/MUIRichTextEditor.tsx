@@ -328,7 +328,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleChange = (state: EditorState) => {
-        console.log('handle change called')
         setEditorState(state)
         if (props.onChange) {
             props.onChange(state)
@@ -725,7 +724,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
 			if (promise) {
 				promise.then(uploaded => {
-                    console.log(`Passed file with width: ${file.width} and height: ${file.height}`)
                     confirmMedia(uploaded.publicUrl, file.width, file.height, "left", "image")
 				})
 			}
