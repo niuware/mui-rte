@@ -105,6 +105,8 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     keyCommands?: TKeyCommand[]
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    onUpload?: (file: Blob) => Promise<any>
+    filePasteCallback?: (files: Array<Blob>, func: any) => void
 }
 
 type IMUIRichTextEditorState = {
@@ -214,6 +216,23 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
 
+    let fileReader:FileReader
+    if ('undefined' === typeof FileReader) {
+        console.warn(
+            'Please use a browser that implements FileReader if you want to paste images into the editor.'
+        )
+    } else {
+        fileReader = new FileReader();
+
+        fileReader.onabort = e => {
+            console.warn(`File upload aborted. Reason: ${e}`);
+        }
+
+        fileReader.onerror = e => {
+            console.error(`There was an error uploading the file. ${e}`);
+        }
+    }
+
     /**
      * Expose methods
      */
@@ -310,6 +329,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleChange = (state: EditorState) => {
+        console.log('handle change called')
         setEditorState(state)
         if (props.onChange) {
             props.onChange(state)
@@ -680,6 +700,51 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return getDefaultKeyBinding(e)
     }
 
+    const _uploadFile = (file: Blob) => {
+		const { type } = file;
+
+        const FILE_TYPES_WHITELIST = ['image/jpeg', 'image/png', 'image/gif'];
+		if (FILE_TYPES_WHITELIST.indexOf(type) === -1) {
+			return console.error(`You can't upload a ${type} file!`);
+		}
+
+		// we assign a specific onload function for each
+		// file so that we have access to its name, size,
+		// and type via closure
+		fileReader.onload = e => {
+            file.body = fileReader.result
+
+            // TODO: Here we can set the media with the
+            // base64 data srcthen update it with the URL
+            // after upload which resides in file.body
+            // Not sure how to call confimMedia and get
+            // reference to update it in .then() though
+            
+            let promise = null
+            if (props.onUpload)
+                promise = props.onUpload(file)   
+
+			if (promise) {
+				promise.then(uploaded => {
+                    console.log(`Passed file with width: ${file.width} and height: ${file.height}`)
+                    confirmMedia(uploaded.publicUrl, file.width, file.height, "left", "image")
+				})
+			}
+		}
+
+		fileReader.readAsDataURL(file);
+	}
+
+
+    const handlePastedFiles = (files: Array<Blob>): DraftHandleValue => {
+		if (fileReader) {
+			for (let i = 0, l = files.length; i < l; i++) {
+				_uploadFile(files[i])
+			}
+		}
+		return 'not-handled'
+    }
+
     const renderToolbar = props.toolbar === undefined || props.toolbar
     const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
     const editable = props.readOnly === undefined || !props.readOnly
@@ -749,6 +814,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             keyBindingFn={keyBindingFn}
+                            handlePastedFiles={handlePastedFiles}
                             ref={editorRef}
                             {...props.draftEditorProps}
                         />
