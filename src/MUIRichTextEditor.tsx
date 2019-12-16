@@ -106,7 +106,6 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     onUpload?: (file: Blob) => Promise<any>
-    filePasteCallback?: (files: Array<Blob>, func: any) => void
 }
 
 type IMUIRichTextEditorState = {
