@@ -10,7 +10,7 @@ import {
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
     SelectionState, KeyBindingUtil, getDefaultKeyBinding
 } from 'draft-js'
-import Toolbar, { TToolbarControl, TCustomControl } from './components/Toolbar'
+import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
 import Media from './components/Media'
 import Blockquote from './components/Blockquote'
@@ -88,6 +88,8 @@ type TKeyCommand = {
     callback: (state: EditorState) => EditorState
 }
 
+
+
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
@@ -99,6 +101,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     customControls?: TCustomControl[]
     decorators?: TDecorator[]
     toolbar?: boolean
+    toolbarButtonSize?: TToolbarButtonSize
     inlineToolbar?: boolean
     inlineToolbarControls?: Array<TToolbarControl>
     draftEditorProps?: TDraftEditorProps
@@ -732,6 +735,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         customControls={customControls}
                         className={classes.toolbar}
                         disabled={!editable}
+                        size={props.toolbarButtonSize}
                     />
                     : null}
                 {placeholder}
