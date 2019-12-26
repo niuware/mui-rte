@@ -18,7 +18,7 @@ interface IToolbarButtonProps {
 const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props: IToolbarButtonProps) => {
     const size = !props.inlineMode ? "medium" : "small"
     const toolbarId = props.inlineMode ? "-toolbar" : ""
-    const elemId = props.id + toolbarId
+    const elemId = (props.id || props.label) + "-button" + toolbarId
     const sharedProps = {
         id: elemId,
         onMouseDown: (e: React.MouseEvent) => {
