@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react'
 import { IconButton } from '@material-ui/core'
-import { TToolbarComponentProps } from './Toolbar'
+import { TToolbarComponentProps, TToolbarButtonSize } from './Toolbar'
 
 interface IToolbarButtonProps {
     id?: string
@@ -12,11 +12,12 @@ interface IToolbarButtonProps {
     onClick?: any
     inlineMode?: boolean
     disabled?: boolean
+    size?: TToolbarButtonSize
     component?: FunctionComponent<TToolbarComponentProps>
 }
 
 const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props: IToolbarButtonProps) => {
-    const size = !props.inlineMode ? "medium" : "small"
+    const size = !props.inlineMode ? (props.size || "medium") : "small"
     const toolbarId = props.inlineMode ? "-toolbar" : ""
     const elemId = (props.id || props.label) + "-button" + toolbarId
     const sharedProps = {

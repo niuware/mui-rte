@@ -236,6 +236,7 @@ Object.assign(defaultTheme, {
 |customControls|`TCustomControl[]`|optional|Defines an array of user custom inline styles, blocks and callbacks. See more information in 'Custom Controls' below.|
 |decorators|`TDecorator[]`|optional|Defines an array of user custom decorators. See more information in 'Custom Decorators'.|
 |toolbar|`boolean`|optional|Defines if the main toolbar should be rendered.|
+|toolbarButtonSize|`small` \| `medium`|optional|Sets the size on the default `IconButton` component for the main toolbar.|
 |inlineToolbar|`boolean`|optional|Defines if the inline toolbar should be rendered.|
 |inlineToolbarControls|`string[]`|optional|List of controls to display in the inline toolbar. Available values are: "bold", "italic", "underline", "strikethrough", "highlight", "link", "clear", and user defined inline controls. If not provided and `inlineToolbar` is `true` the following inline styles will be displayed: bold, italic, underline and clear.|
 |keyCommands|`TKeyCommand[]`|optional|Defines an array of `TKeyCommand` objects for adding key bindings to the editor.|

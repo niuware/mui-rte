@@ -26,6 +26,8 @@ export type TToolbarControl =
 
 export type TControlType = "inline" | "block" | "callback" | "atomic"
 
+export type TToolbarButtonSize = "small" | "medium"
+
 export type TToolbarComponentProps = {
     id: string,
     onMouseDown: (e: React.MouseEvent) => void,
@@ -183,6 +185,7 @@ type TToolbarProps = {
     inlineMode?: boolean
     className?: string
     disabled?: boolean
+    size?: TToolbarButtonSize
 }
 
 const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
@@ -259,6 +262,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                         component={style.component}
                         inlineMode={props.inlineMode}
                         disabled={props.disabled}
+                        size={props.size}
                     />
                 )
             })}
