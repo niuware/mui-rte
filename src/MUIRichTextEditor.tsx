@@ -431,8 +431,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             urlData: data,
             urlKey: linkKey,
             toolbarPosition: !inlineMode ? undefined : state.toolbarPosition,
-            anchorUrlPopover: !inlineMode ? document.getElementById(`mui-rte-${type}-control`)!
-                                            : document.getElementById(`mui-rte-${type}-control-toolbar`)!,
+            anchorUrlPopover: !inlineMode ? document.getElementById(`mui-rte-${type}-control-button`)!
+                                            : document.getElementById(`mui-rte-${type}-control-button-toolbar`)!,
             urlIsMedia: type === "media" ? true : undefined
         })
     }
