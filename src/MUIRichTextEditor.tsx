@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
-    SelectionState, KeyBindingUtil, getDefaultKeyBinding
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding, ContentState
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
@@ -72,10 +72,22 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     }
 })
 
-export type TDecorator = {
+export type TRegExpDecorator = {
     component: FunctionComponent
     regex: RegExp
 }
+
+export type TEntityDecorator = {
+    component: FunctionComponent
+    entityType: string | RegExp
+}
+export type TGenericDecorator = {
+    component: FunctionComponent
+    strategy: (block: ContentBlock, callback: (start: number, end: number) => void, contentState: ContentState) => void;
+    props?: object;
+}
+
+export type TDecorator = TRegExpDecorator | TEntityDecorator | TGenericDecorator
 
 type TDraftEditorProps = {
     spellCheck?: boolean
@@ -184,12 +196,41 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         }
     ]
     if (props.decorators) {
-        props.decorators.forEach(deco => decorators.push({
-            strategy: (contentBlock: any, callback: any) => {
-                findDecoWithRegex(deco.regex, contentBlock, callback)
-            },
-            component: deco.component
-        }))
+        props.decorators.forEach(deco => {
+            if (isRegExpDecorator(deco)) {
+                decorators.push( {
+                    strategy: (contentBlock: any, callback: any) => {
+                        findDecoWithRegex(deco.regex, contentBlock, callback)
+                    },
+                    component: deco.component
+                })
+            } else if (isEntityDecorator(deco)) {
+                decorators.push( {
+                    strategy: (contentBlock: ContentBlock, callback, editorState) => {
+                        contentBlock.findEntityRanges(
+                          charmeta => {
+                            if (charmeta.getEntity() !== null) {
+                              let entity = editorState.getEntity(charmeta.getEntity());
+                              if (typeof deco.entityType === 'string' && deco.entityType === entity.getData().entityType) {
+                                return true;
+                              } else if (deco.entityType instanceof RegExp && deco.entityType.test(entity.getData().entityType)) {
+                                return true
+                              }
+                            }
+                            return false;
+                          },
+                          (start, end) => {
+                            callback(start, end);
+                          }
+                        );
+                    },
+                    component: deco.component
+                })                
+            } else if (isGenericDecorator(deco)) {
+                decorators.push( deco )
+            }
+            
+        })
     }
     const decorator = new CompositeDecorator(decorators)
     return (props.value)
@@ -771,4 +812,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     )
 }
 
+function isRegExpDecorator(deco: TDecorator): deco is TRegExpDecorator {
+    return (deco as TRegExpDecorator).regex !== undefined;
+}
+function isEntityDecorator(deco: TDecorator): deco is TEntityDecorator {
+    return (deco as TEntityDecorator).entityType !== undefined;
+}
+function isGenericDecorator(deco: TDecorator): deco is TGenericDecorator {
+    return (deco as TGenericDecorator).strategy !== undefined;
+}
 export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(forwardRef(MUIRichTextEditor))
