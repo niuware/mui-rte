@@ -726,7 +726,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         />
                     </Paper>
                     : null}
-                {editable || renderToolbar ?
+                {renderToolbar ?
                     <Toolbar
                         id={id}
                         editorState={editorState}
