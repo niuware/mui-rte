@@ -1,4 +1,6 @@
 # mui-rte
+![Tests](https://github.com/niuware/mui-rte/workflows/Tests/badge.svg)   
+
 The Material-UI Rich Text Editor and Viewer
 
 <img src="http://niuware.github.io/public/assets/mui-rte/editor-1-9-0.png" width="600" />
