@@ -11,4 +11,4 @@ jobs:
     - name: Install node dependencies
       run: npm install
     - name: Test
-      run: mocha -r ts-node/register test/setup.ts test/*.test.*
+      run: npm run test
