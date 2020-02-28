@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install node dependencies
+      run: npm install
+    - name: Test
+      run: mocha -r ts-node/register test/setup.ts test/*.test.*
