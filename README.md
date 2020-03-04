@@ -243,6 +243,7 @@ Object.assign(defaultTheme, {
 |inlineToolbarControls|`string[]`|optional|List of controls to display in the inline toolbar. Available values are: "bold", "italic", "underline", "strikethrough", "highlight", "link", "clear", and user defined inline controls. If not provided and `inlineToolbar` is `true` the following inline styles will be displayed: bold, italic, underline and clear.|
 |keyCommands|`TKeyCommand[]`|optional|Defines an array of `TKeyCommand` objects for adding key bindings to the editor.|
 |draftEditorProps|`TDraftEditorProps`|optional|Defines an object containing specific `draft-js` `Editor` properties.|
+|maxLength|`number`|optional|Sets the maximum characters count that can be input into the editor.|
    
 
 <br />

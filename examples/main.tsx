@@ -13,6 +13,7 @@ import LoadHTML from './load-html'
 import ResetValue from './reset-value'
 import AtomicCustomBlock from './atomic-custom-block'
 import KeyBindings from './key-bindings'
+import MaxLength from './max-length'
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
             <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
             <button onClick={() => setSample(<KeyBindings />)}>Key Bindings</button>
+            <button onClick={() => setSample(<MaxLength />)}>Max length</button>
             <div style={{
                 margin: "20px 0"
             }}>
