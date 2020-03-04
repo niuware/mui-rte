@@ -88,8 +88,6 @@ type TKeyCommand = {
     callback: (state: EditorState) => EditorState
 }
 
-
-
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
@@ -106,6 +104,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     inlineToolbarControls?: Array<TToolbarControl>
     draftEditorProps?: TDraftEditorProps
     keyCommands?: TKeyCommand[]
+    maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
 }
@@ -317,6 +316,16 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (props.onChange) {
             props.onChange(state)
         }
+    }
+
+    const handleBeforeInput = (): DraftHandleValue => {
+        if (props.maxLength) {
+            const length = editorState.getCurrentContent().getPlainText('').length
+            if (length >= props.maxLength) {
+                return "handled"
+            }
+        }
+        return "not-handled"
     }
 
     const handleFocus = () => {
@@ -752,6 +761,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             onChange={handleChange}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
+                            handleBeforeInput={handleBeforeInput}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
