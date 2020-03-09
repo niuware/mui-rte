@@ -20,7 +20,7 @@ import ToolbarButton from './ToolbarButton'
 import { getSelectionInfo } from '../utils'
 
 export type TToolbarControl =
-    "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
+    "h1" | "h2" | "h3" | "bold" | "italic" | "underline" | "link" | "numberList" |
     "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
     "strikethrough" | "highlight" | string
 
@@ -61,10 +61,24 @@ type TStyleType = {
 
 const STYLE_TYPES: TStyleType[] = [
     {
+        label: 'H1',
+        name: "h1",
+        style: 'header-one',
+        icon: 'H1',
+        type: "block"
+    },
+    {
         label: 'H2',
-        name: "title",
+        name: "h2",
         style: 'header-two',
-        icon: <TitleIcon />,
+        icon: 'H2',
+        type: "block"
+    },
+    {
+        label: 'H3',
+        name: "h3",
+        style: 'header-three',
+        icon: 'H3',
         type: "block"
     },
     {
