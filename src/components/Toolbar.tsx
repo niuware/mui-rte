@@ -64,21 +64,21 @@ const STYLE_TYPES: TStyleType[] = [
         label: 'H1',
         name: "h1",
         style: 'header-one',
-        icon: 'H1',
+        icon: React.createElement('span', null, 'H1'),
         type: "block"
     },
     {
         label: 'H2',
         name: "h2",
         style: 'header-two',
-        icon: 'H2',
+        icon: React.createElement('span', null, 'H2'),
         type: "block"
     },
     {
         label: 'H3',
         name: "h3",
         style: 'header-three',
-        icon: 'H3',
+        icon: React.createElement('span', null, 'H3'),
         type: "block"
     },
     {
@@ -220,7 +220,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
             }
             else if (props.customControls) {
                 const customControl = props.customControls.find(style => style.name === name)
-                if (customControl && customControl.type !== "atomic" && 
+                if (customControl && customControl.type !== "atomic" &&
                     (customControl.icon || customControl.component)) {
                     filteredControls.push({
                         id: customControl.id || (customControl.name + "Id"),
@@ -241,7 +241,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
     return (
         <div id={`${props.id}${id}`} className={props.className}>
             {availableControls.map(style => {
-                if (props.inlineMode && 
+                if (props.inlineMode &&
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {
                     return null
                 }
@@ -253,7 +253,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                 else if (style.type === "block") {
                     const selection = editorState.getSelection()
                     const block = editorState.getCurrentContent().getBlockForKey(selection.getStartKey())
-                    if (block) { 
+                    if (block) {
                         active = style.style === block.getType()
                     }
                 }
