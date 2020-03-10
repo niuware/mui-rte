@@ -106,6 +106,8 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     keyCommands?: TKeyCommand[]
     maxLength?: number
     onSave?: (data: string) => void
+    onBlur?: (data: string) => void
+    onFocus?: () => void
     onChange?: (state: EditorState) => void
 }
 
@@ -330,11 +332,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handleFocus = () => {
         setFocus(true)
+        if (props.onFocus) {
+            props.onFocus()
+        }
         setTimeout(() => (editorRef.current as any).focus(), 0)
     }
 
     const handleBlur = () => {
         setFocus(false)
+        if (props.onBlur) {
+            props.onBlur(JSON.stringify(convertToRaw(editorState.getCurrentContent())))
+        }
         if (!state.anchorUrlPopover) {
             setState({
                 ...state,
