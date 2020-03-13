@@ -722,7 +722,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             })}>
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
-                        top: state.toolbarPosition.top,
+                        top: state.toolbarPosition.top + 75,
                         left: state.toolbarPosition.left
                     }}>
                         <Toolbar
@@ -731,7 +731,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             onClick={handleToolbarClick}
                             controls={inlineToolbarControls}
                             customControls={customControls}
-                            inlineMode={true}
                         />
                     </Paper>
                     : null}
