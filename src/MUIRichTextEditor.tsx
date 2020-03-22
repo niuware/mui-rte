@@ -16,7 +16,7 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGte } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -319,13 +319,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleBeforeInput = (): DraftHandleValue => {
-        if (props.maxLength) {
-            const length = editorState.getCurrentContent().getPlainText('').length
-            if (length >= props.maxLength) {
-                return "handled"
-            }
-        }
-        return "not-handled"
+        const currentLength = editorState.getCurrentContent().getPlainText('').length
+        return isGte(currentLength, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleFocus = () => {
@@ -496,6 +491,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             default:
                 handleCustomClick(style, id)
         }
+    }
+
+    const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+        const currentLength = editorState.getCurrentContent().getPlainText('').length
+        return isGte(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -762,6 +762,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
+                            handlePastedText={handlePastedText}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
