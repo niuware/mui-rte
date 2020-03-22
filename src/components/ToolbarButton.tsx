@@ -4,6 +4,7 @@ import { TToolbarComponentProps, TToolbarButtonSize } from './Toolbar'
 
 interface IToolbarButtonProps {
     id?: string
+    editorId?: string
     label: string
     style: string
     type: string
@@ -19,7 +20,8 @@ interface IToolbarButtonProps {
 const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props: IToolbarButtonProps) => {
     const size = !props.inlineMode ? (props.size || "medium") : "small"
     const toolbarId = props.inlineMode ? "-toolbar" : ""
-    const elemId = (props.id || props.label) + "-button" + toolbarId
+    const editorId = props.editorId || "mui-rte"
+    const elemId = editorId + "-" + (props.id || props.label) + "-button" + toolbarId
     const sharedProps = {
         id: elemId,
         onMouseDown: (e: React.MouseEvent) => {

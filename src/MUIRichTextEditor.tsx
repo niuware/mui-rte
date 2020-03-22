@@ -16,7 +16,7 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGte } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -216,6 +216,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
 
+    const editorId = props.id || "mui-rte"
+
     /**
      * Expose methods
      */
@@ -319,13 +321,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleBeforeInput = (): DraftHandleValue => {
-        if (props.maxLength) {
-            const length = editorState.getCurrentContent().getPlainText('').length
-            if (length >= props.maxLength) {
-                return "handled"
-            }
-        }
-        return "not-handled"
+        const currentLength = editorState.getCurrentContent().getPlainText('').length
+        return isGte(currentLength, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleFocus = () => {
@@ -440,8 +437,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             urlData: data,
             urlKey: linkKey,
             toolbarPosition: !inlineMode ? undefined : state.toolbarPosition,
-            anchorUrlPopover: !inlineMode ? document.getElementById(`mui-rte-${type}-control-button`)!
-                                            : document.getElementById(`mui-rte-${type}-control-button-toolbar`)!,
+            anchorUrlPopover: !inlineMode ? document.getElementById(`${editorId}-${type}-control-button`)!
+                                            : document.getElementById(`${editorId}-${type}-control-button-toolbar`)!,
             urlIsMedia: type === "media" ? true : undefined
         })
     }
@@ -496,6 +493,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             default:
                 handleCustomClick(style, id)
         }
+    }
+
+    const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+        const currentLength = editorState.getCurrentContent().getPlainText('').length
+        return isGte(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -695,7 +697,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const renderToolbar = props.toolbar === undefined || props.toolbar
     const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
     const editable = props.readOnly === undefined || !props.readOnly
-    const id = props.id || "mui-rte"
     let className = ""
     let placeholder: React.ReactElement | null = null
     if (!focus) {
@@ -716,8 +717,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     return (
-        <div id={`${id}-root`} className={classes.root}>
-            <div id={`${id}-container`} className={classNames(classes.container, {
+        <div id={`${editorId}-root`} className={classes.root}>
+            <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.inlineToolbar && editable && state.toolbarPosition ?
@@ -726,7 +727,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         left: state.toolbarPosition.left
                     }}>
                         <Toolbar
-                            id={id}
+                            id={editorId}
                             editorState={editorState}
                             onClick={handleToolbarClick}
                             controls={inlineToolbarControls}
@@ -737,7 +738,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     : null}
                 {renderToolbar ?
                     <Toolbar
-                        id={id}
+                        id={editorId}
                         editorState={editorState}
                         onClick={handleToolbarClick}
                         controls={controls}
@@ -748,8 +749,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     />
                     : null}
                 {placeholder}
-                <div id={`${id}-editor`} className={classes.editor}>
-                    <div id={`${id}-editor-container`} className={classNames(className, classes.editorContainer, {
+                <div id={`${editorId}-editor`} className={classes.editor}>
+                    <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
                     })} onClick={handleFocus} onBlur={handleBlur}>
@@ -762,6 +763,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
+                            handlePastedText={handlePastedText}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
