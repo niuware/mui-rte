@@ -122,7 +122,7 @@ const STYLE_TYPES: TStyleType[] = [
         style: 'LINK',
         icon: <InsertLinkIcon />,
         type: "callback",
-        id: "mui-rte-link-control"
+        id: "link-control"
     },
     {
         label: 'Media',
@@ -130,7 +130,7 @@ const STYLE_TYPES: TStyleType[] = [
         style: 'IMAGE',
         icon: <PhotoLibraryIcon />,
         type: "callback",
-        id: "mui-rte-media-control"
+        id: "media-control"
     },
     {
         label: 'OL',
@@ -252,6 +252,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                 return (
                     <ToolbarButton
                         id={style.id}
+                        editorId={props.id}
                         key={`key-${style.label}`}
                         active={active}
                         label={style.label}
