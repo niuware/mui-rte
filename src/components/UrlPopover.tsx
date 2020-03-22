@@ -1,5 +1,8 @@
 import React, { FunctionComponent, useState } from 'react'
-import { Popover, TextField, Grid, Button } from '@material-ui/core'
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import Popover from "@material-ui/core/Popover";
+import TextField from "@material-ui/core/TextField";
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'

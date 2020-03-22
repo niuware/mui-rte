@@ -3,7 +3,7 @@ import React, { FunctionComponent, useEffect, useState, useRef,
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
-import { Paper } from '@material-ui/core'
+import Paper from '@material-ui/core/Paper'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,

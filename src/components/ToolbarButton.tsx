@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import { IconButton } from '@material-ui/core'
+import IconButton from '@material-ui/core/IconButton'
 import { TToolbarComponentProps, TToolbarButtonSize } from './Toolbar'
 
 interface IToolbarButtonProps {
