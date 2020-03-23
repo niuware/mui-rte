@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef, 
+import React, { FunctionComponent, useEffect, useState, useRef,
     forwardRef, useImperativeHandle, RefForwardingComponent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
@@ -7,14 +7,12 @@ import { Paper } from '@material-ui/core'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
-    SelectionState, KeyBindingUtil, getDefaultKeyBinding
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect,
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding, ContentState
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
-import Link from './components/Link'
 import Media from './components/Media'
-import Blockquote from './components/Blockquote'
-import CodeBlock from './components/CodeBlock'
+import Link from './components/Link';
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
 
@@ -90,7 +88,6 @@ type TKeyCommand = {
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
-    value?: any
     label?: string,
     readOnly?: boolean
     inheritFontSize?: boolean
@@ -107,6 +104,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    editorState: EditorState
 }
 
 type IMUIRichTextEditorState = {
@@ -133,19 +131,19 @@ type TCustomRenderers = {
 }
 
 const blockRenderMap = Immutable.Map({
-    'blockquote': {
-        element: "blockquote",
-        wrapper: <Blockquote />
-    },
-    'code-block': {
-        element: "pre",
-        wrapper: <CodeBlock />
-    }
+    // 'blockquote': {
+    //     element: "blockquote",
+    //     wrapper: <Blockquote />
+    // },
+    // 'code-block': {
+    //     element: "pre",
+    //     wrapper: <CodeBlock />
+    // }
 })
 const styleRenderMap: DraftStyleMap = {
-    'STRIKETROUGH': {
-        textDecoration: "line-through"
-    },
+    // 'STRIKETROUGH': {
+    //     textDecoration: "line-through"
+    // },
     'HIGHLIGHT': {
         backgroundColor: "yellow"
     }
@@ -153,55 +151,15 @@ const styleRenderMap: DraftStyleMap = {
 
 const { hasCommandModifier } = KeyBindingUtil
 
-const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
-    contentBlock.findEntityRanges(
-        (character: any) => {
-            const entityKey = character.getEntity()
-            return (
-                entityKey !== null &&
-                contentState.getEntity(entityKey).getType() === 'LINK'
-            )
-        },
-        callback
-    )
-}
-
-const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
-    const text = contentBlock.getText()
-    let matchArr, start
-    while ((matchArr = regex.exec(text)) !== null) {
-        start = matchArr.index
-        callback(start, start + matchArr[0].length)
-    }
-}
-
-const useEditorState = (props: IMUIRichTextEditorProps) => {
-    const decorators: DraftDecorator[] = [
-        {
-            strategy: findLinkEntities,
-            component: Link,
-        }
-    ]
-    if (props.decorators) {
-        props.decorators.forEach(deco => decorators.push({
-            strategy: (contentBlock: any, callback: any) => {
-                findDecoWithRegex(deco.regex, contentBlock, callback)
-            },
-            component: deco.component
-        }))
-    }
-    const decorator = new CompositeDecorator(decorators)
-    return (props.value)
-        ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
-        : EditorState.createEmpty(decorator)
-}
 
 const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
     const [state, setState] = useState<IMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
 
-    const [editorState, setEditorState] = useState(() => useEditorState(props))
+    const editorState = props.editorState;
+
+    //const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
         block: undefined
@@ -214,7 +172,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         end: 0
     })
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
-    const editorStateRef = useRef<EditorState | null>(editorState)
+    const editorStateRef = useRef<EditorState>(editorState)
 
     /**
      * Expose methods
@@ -232,7 +190,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }))
 
     useEffect(() => {
-        const editorState = useEditorState(props)
+        //const editorState = useEditorState(props)
         const customBlockMap: any = {}
         const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
         if (props.customControls) {
@@ -252,12 +210,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
-        setEditorState(editorState)
+        //setEditorState(editorState)
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
         }
-    }, [props.value])
+    }, [editorState])
 
     useEffect(() => {
         editorStateRef.current = editorState
@@ -274,7 +232,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
         setTimeout(() => {
             const selection = editorStateRef.current!.getSelection()
-            if (selection.isCollapsed() || (toolbarPositionRef !== undefined && 
+            if (selection.isCollapsed() || (toolbarPositionRef !== undefined &&
                 selectionRef.current.start === selection.getStartOffset() &&
                 selectionRef.current.end === selection.getEndOffset())) {
                     const selectionInfo = getSelectionInfo(editorStateRef.current!)
@@ -312,7 +270,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleChange = (state: EditorState) => {
-        setEditorState(state)
+        //setEditorState(state)
         if (props.onChange) {
             props.onChange(state)
         }
@@ -352,7 +310,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             }
         })
         newEditorState = RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType)
-        setEditorState(newEditorState)
+        handleChange(newEditorState);
     }
 
     const handleSave = () => {
@@ -366,7 +324,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!block) {
             return
         }
-        const newEditorState = insertAtomicBlock(block.name.toUpperCase(), data, { 
+        const newEditorState = insertAtomicBlock(block.name.toUpperCase(), data, {
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
@@ -402,7 +360,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                     const newState = control.onClick(editorState, control.name, document.getElementById(id))
                     if (newState) {
                         if (newState.getSelection().isCollapsed()) {
-                            setEditorState(newState)
+                            handleChange(newState)
                         }
                         else {
                             updateStateForPopover(newState)
@@ -420,11 +378,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleUndo = () => {
-        setEditorState(EditorState.undo(editorState))
+        handleChange(EditorState.undo(editorState))
     }
 
     const handleRedo = () => {
-        setEditorState(EditorState.redo(editorState))
+        handleChange(EditorState.redo(editorState))
     }
 
     const handlePrompt = (lastState: EditorState, type: "link" | "media", inlineMode?: boolean) => {
@@ -556,7 +514,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const mediaBlock = contentState.getBlockForKey(blockKey)
         const newContentState = removeBlockFromMap(editorState, mediaBlock)
         const newEditorState = EditorState.push(editorState, newContentState, "remove-range")
-        setEditorState(newEditorState)
+        handleChange(newEditorState)
     }
 
     const confirmMedia = (url?: string, width?: number, height?: number, alignment?: TAlignment, type?: TMediaType) => {
@@ -594,7 +552,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const updateStateForPopover = (editorState: EditorState) => {
-        setEditorState(editorState)
+        handleChange(editorState)
         refocus()
         setState({
             ...state,
@@ -611,7 +569,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const toggleBlockType = (blockType: string) => {
-        setEditorState(
+        handleChange(
             RichUtils.toggleBlockType(
                 editorState,
                 blockType
@@ -620,7 +578,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const toggleInlineStyle = (inlineStyle: string) => {
-        setEditorState(
+        handleChange(
             RichUtils.toggleInlineStyle(
                 editorState,
                 inlineStyle
@@ -633,7 +591,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const newEditorState = EditorState.forceSelection(editorStateRef.current!, newSeletion)
         editorStateRef.current = newEditorState
         setFocusMediaKey(block.getKey())
-        setEditorState(newEditorState)
+        handleChange(newEditorState)
         handlePromptForMedia(false, newEditorState)
     }
 
@@ -675,8 +633,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-        const newEditorStateRaw = EditorState.set(editorState, { 
-            currentContent: contentStateWithEntity, 
+        const newEditorStateRaw = EditorState.set(editorState, {
+            currentContent: contentStateWithEntity,
             ...options
         })
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
@@ -780,4 +738,5 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     )
 }
 
+export { Link }
 export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(forwardRef(MUIRichTextEditor))
