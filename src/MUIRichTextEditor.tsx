@@ -12,7 +12,6 @@ import {
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Media from './components/Media'
-import Link from './components/Link';
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
 
@@ -210,12 +209,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
+        //handleChange(editorState);
         //setEditorState(editorState)
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
         }
-    }, [editorState])
+    }, [])
 
     useEffect(() => {
         editorStateRef.current = editorState
@@ -738,5 +738,4 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     )
 }
 
-export { Link }
 export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(forwardRef(MUIRichTextEditor))
