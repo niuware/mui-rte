@@ -397,7 +397,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         setState({
             urlData: data,
             urlKey: linkKey,
-            toolbarPosition: !inlineMode ? undefined : state.toolbarPosition,
+            toolbarPosition: !inlineMode && type !== "link" ? undefined : state.toolbarPosition,
             anchorUrlPopover: !inlineMode ? document.getElementById(`mui-rte-${type}-control-button`)!
                                             : document.getElementById(`mui-rte-${type}-control-button-toolbar`)!,
             urlIsMedia: type === "media" ? true : undefined
