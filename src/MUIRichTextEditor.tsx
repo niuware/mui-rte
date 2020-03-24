@@ -150,6 +150,27 @@ const styleRenderMap: DraftStyleMap = {
 
 const { hasCommandModifier } = KeyBindingUtil
 
+const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
+    contentBlock.findEntityRanges(
+        (character: any) => {
+            const entityKey = character.getEntity()
+            return (
+                entityKey !== null &&
+                contentState.getEntity(entityKey).getType() === 'LINK'
+            )
+        },
+        callback
+    )
+}
+
+const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
+    const text = contentBlock.getText()
+    let matchArr, start
+    while ((matchArr = regex.exec(text)) !== null) {
+        start = matchArr.index
+        callback(start, start + matchArr[0].length)
+    }
+}
 
 const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
@@ -738,4 +759,5 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     )
 }
 
+export { findLinkEntities, findDecoWithRegex }
 export default withStyles(styles, { withTheme: true, name: "MUIRichTextEditor" })(forwardRef(MUIRichTextEditor))
