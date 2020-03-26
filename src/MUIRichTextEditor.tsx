@@ -12,6 +12,9 @@ import {
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Media from './components/Media'
+import Blockquote from './components/Blockquote'
+import CodeBlock from './components/CodeBlock'
+
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists } from './utils'
 
@@ -130,14 +133,14 @@ type TCustomRenderers = {
 }
 
 const blockRenderMap = Immutable.Map({
-    // 'blockquote': {
-    //     element: "blockquote",
-    //     wrapper: <Blockquote />
-    // },
-    // 'code-block': {
-    //     element: "pre",
-    //     wrapper: <CodeBlock />
-    // }
+    'blockquote': {
+        element: "blockquote",
+        wrapper: <Blockquote />
+    },
+    'code-block': {
+        element: "pre",
+        wrapper: <CodeBlock />
+    }
 })
 const styleRenderMap: DraftStyleMap = {
     // 'STRIKETROUGH': {
