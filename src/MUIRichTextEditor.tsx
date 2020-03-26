@@ -138,7 +138,7 @@ const blockRenderMap = Immutable.Map({
         wrapper: <Blockquote />
     },
     'code-block': {
-        element: "pre",
+        element: "span",
         wrapper: <CodeBlock />
     }
 })

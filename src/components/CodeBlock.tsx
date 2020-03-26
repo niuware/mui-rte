@@ -14,9 +14,12 @@ interface IBlockquoteProps extends WithStyles<typeof styles> {
 }
 
 const CodeBlock: React.FC<IBlockquoteProps> = (props: IBlockquoteProps) => {
+    console.log(props);
     return (
         <div className={props.classes.root}>
-            {props.children}
+            <pre style={{whiteSpace: 'pre-wrap'}}>
+                {props.children}
+            </pre>
         </div>
     )
 }
