@@ -108,6 +108,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     onFocus?: () => void
+    onBlur?: () => void
 }
 
 type IMUIRichTextEditorState = {
@@ -335,6 +336,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleBlur = () => {
+        if (props.onBlur) {
+            props.onBlur()
+        }
         setFocus(false)
         if (!state.anchorUrlPopover) {
             setState({
