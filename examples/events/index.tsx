@@ -6,6 +6,10 @@ const save = (data: string) => {
     console.log(data)
 }
 
+const focus = () => {
+    console.log('Focus on MUIRichTextEditor');
+}
+
 const change = (state: EditorState) => {
     // More info about EditorState object at
     // https://draftjs.org/docs/api-reference-editor-state
@@ -28,6 +32,7 @@ const Events = () => {
             label="Open the console to see the event callback as you type..."
             onSave={save}
             onChange={change}
+            onFocus={focus}
         />
     )
 }
