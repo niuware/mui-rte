@@ -10,6 +10,10 @@ const focus = () => {
     console.log('Focus on MUIRichTextEditor');
 }
 
+const blur = () => {
+    console.log('Focus lost on MUIRichTextEditor');
+}
+
 const change = (state: EditorState) => {
     // More info about EditorState object at
     // https://draftjs.org/docs/api-reference-editor-state
@@ -33,6 +37,7 @@ const Events = () => {
             onSave={save}
             onChange={change}
             onFocus={focus}
+            onBlur={blur}
         />
     )
 }
