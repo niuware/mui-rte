@@ -107,6 +107,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    onFocus?: () => void
 }
 
 type IMUIRichTextEditorState = {
@@ -326,6 +327,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleFocus = () => {
+        if (props.onFocus) {
+            props.onFocus()
+        }
         setFocus(true)
         setTimeout(() => (editorRef.current as any).focus(), 0)
     }
