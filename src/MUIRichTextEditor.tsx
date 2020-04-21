@@ -322,7 +322,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handleBeforeInput = (): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGte(currentLength, props.maxLength) ? "handled" : "not-handled"
+        return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleFocus = () => {
@@ -497,7 +497,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGte(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGt(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
