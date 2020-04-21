@@ -82,11 +82,11 @@ const atomicBlockExists = (name: string, controls?: TCustomControl[]) => {
         control.atomicComponent !== undefined)
 }
 
-const isGte = (value: number, maxValue?: number): boolean => {
+const isGt = (value: number, maxValue?: number): boolean => {
     if (!maxValue) {
         return false
     }
     return value > maxValue
 }
 
-export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGte }
+export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt }
