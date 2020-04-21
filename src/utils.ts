@@ -86,7 +86,7 @@ const isGte = (value: number, maxValue?: number): boolean => {
     if (!maxValue) {
         return false
     }
-    return value >= maxValue
+    return value > maxValue
 }
 
 export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGte }
