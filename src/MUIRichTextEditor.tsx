@@ -16,7 +16,7 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGte } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
