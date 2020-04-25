@@ -22,7 +22,10 @@ Object.assign(defaultTheme, {
             },
             editor: {
                 backgroundColor: "#ebebeb",
-                padding: "0 20px"
+                padding: "20px",
+                height: "200px",
+                maxHeight: "200px",
+                overflow: "auto"
             },
             toolbar: {
                 borderTop: "1px solid gray",
@@ -31,7 +34,9 @@ Object.assign(defaultTheme, {
             placeHolder: {
                 backgroundColor: "#ebebeb",
                 paddingLeft: 20,
-                width: "inherit"
+                width: "inherit",
+                position: "absolute",
+                top: "20px"
             }
         }
     }
