@@ -23,6 +23,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     container: {
         margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
+        position: "relative",
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
         '& figure': {
@@ -50,7 +51,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         display: "none"
     },
     placeHolder: {
-        color: palette.grey[600]
+        color: palette.grey[600],
+        position: "absolute"
     },
     linkPopover: {
         padding: getCompatibleSpacing(spacing, 2, 2, 2, 2)
