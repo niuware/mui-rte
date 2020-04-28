@@ -89,4 +89,11 @@ const isGt = (value: number, maxValue?: number): boolean => {
     return value > maxValue
 }
 
-export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt }
+const clearInlineStyles = (editorState: EditorState): ContentState => {
+    const styles = ['BOLD', 'ITALIC', 'UNDERLINE', 'STRIKETHROUGH']
+    return styles.reduce((newContentState: ContentState, style: string) => (
+        Modifier.removeInlineStyle(newContentState, editorState.getSelection(), style)
+    ), editorState.getCurrentContent())
+}
+
+export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles }
