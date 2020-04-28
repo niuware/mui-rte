@@ -12,11 +12,10 @@ import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
 import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft'
 import FormatAlignRight from '@material-ui/icons/FormatAlignRight'
-import { getCompatibleSpacing } from '../utils'
 
 const styles = ({ spacing }: Theme) => createStyles({
     linkPopover: {
-        padding: getCompatibleSpacing(spacing, 2, 2, 2, 2),
+        padding: spacing(2, 2, 2, 2),
         maxWidth: 250
     },
     linkTextField: {
