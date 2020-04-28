@@ -36,21 +36,6 @@ const getSelectionInfo = (editorState: EditorState): TSelectionInfo => {
 }
 
 /**
- * Spacing compatible for material-ui v3.2.x ~ v.4.x.x
- */
-const getCompatibleSpacing = (spacing: any, 
-    top: number, 
-    right: number, 
-    bottom: number, 
-    left: number) => {
-    if (typeof spacing === "function") {
-        return spacing(top, right, bottom, left)
-    }
-    const unit = (spacing as any).unit
-    return `${top * unit}px ${right * unit}px ${bottom * unit}px ${left * unit}px`
-}
-
-/**
  * Remove a block from the ContentState
  */
 const removeBlockFromMap = (editorState: EditorState, block: ContentBlock): ContentState => {
@@ -96,4 +81,4 @@ const clearInlineStyles = (editorState: EditorState): ContentState => {
     ), editorState.getCurrentContent())
 }
 
-export { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles }
+export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles }

@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
-import { getCompatibleSpacing } from '../utils'
 
 const styles = ({ spacing, palette }: Theme) => createStyles({
     root: {
         backgroundColor: palette.grey[200],
-        padding: getCompatibleSpacing(spacing, 1, 2, 1, 2)
+        padding: spacing(1, 2, 1, 2)
     }
 })
 
