@@ -16,13 +16,13 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles } from './utils'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
     },
     container: {
-        margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
+        margin: spacing(1, 0, 0, 0),
         position: "relative",
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
@@ -36,10 +36,10 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     editor: {
     },
     editorContainer: {
-        margin: getCompatibleSpacing(spacing, 1, 0, 0, 0),
+        margin: spacing(1, 0, 0, 0),
         cursor: "text",
         width: "100%",
-        padding: getCompatibleSpacing(spacing, 0, 0, 1, 0)
+        padding: spacing(0, 0, 1, 0)
     },
     editorReadOnly: {
         borderBottom: "none"
@@ -55,7 +55,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         position: "absolute"
     },
     linkPopover: {
-        padding: getCompatibleSpacing(spacing, 2, 2, 2, 2)
+        padding: spacing(2, 2, 2, 2)
     },
     linkTextField: {
         width: "100%"
