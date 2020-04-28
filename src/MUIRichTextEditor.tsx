@@ -16,7 +16,7 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt } from './utils'
+import { getSelectionInfo, getCompatibleSpacing, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -343,15 +343,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleClearFormat = () => {
+        const withoutStyles = clearInlineStyles(editorState)
         const selectionInfo = getSelectionInfo(editorState)
-        let newEditorState = editorState
-        selectionInfo.inlineStyle.forEach((effect) => {
-            if (effect) {
-                newEditorState = RichUtils.toggleInlineStyle(newEditorState, effect)
-            }
-        })
-        newEditorState = RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType)
-        setEditorState(newEditorState)
+        const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style');
+        setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
     }
 
     const handleSave = () => {
