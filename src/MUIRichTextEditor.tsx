@@ -71,6 +71,11 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         position: "absolute",
         padding: "5px",
         zIndex: 10
+    },
+    autocompleteContainer: {
+        position: "absolute",
+        zIndex: 10,
+        padding: "5px"
     }
 })
 
@@ -767,6 +772,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
+                {props.autocompleteComponent && autocompletePosition ?
+                    <Paper className={classes.autocompleteContainer} style={{
+                        top: autocompletePosition.top,
+                        left: autocompletePosition.left
+                    }}>
+                        <props.autocompleteComponent onClick={handleAutocompleteClick} />
+                    </Paper>
+                : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
                         top: state.toolbarPosition.top,
