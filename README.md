@@ -318,8 +318,9 @@ $ npm run serve
 
 ## Future plans
 
-- Add new features
 - Increase test coverage
+- Refactor code
+- Add new features
 
 ## Suggestions and issues
 
