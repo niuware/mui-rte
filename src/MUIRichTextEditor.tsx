@@ -285,6 +285,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handleMouseUp = (event: any) => {
         const nodeName = event.target.nodeName
+        setAutocompletePosition(undefined)
         if (nodeName === "IMG" || nodeName === "VIDEO"){
             return
         }
