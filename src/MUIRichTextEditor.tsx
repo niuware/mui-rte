@@ -370,6 +370,10 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleChange = (state: EditorState) => {
+        if (state.getLastChangeType() === "backspace-character"
+            || state.getLastChangeType() === "split-block") {
+            setAutocompletePosition(undefined)
+        }
         setEditorState(state)
         if (props.onChange) {
             props.onChange(state)
