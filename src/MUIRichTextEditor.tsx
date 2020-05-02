@@ -322,6 +322,23 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }, 1)
     }
 
+    const showAutocomplete = (chars: string) => {
+        let position = undefined
+        if (chars == ":") {
+            const editor: HTMLElement = (editorRef.current as any).editor
+            const selectionRect = getVisibleSelectionRect(window)
+            const editorRect = editor.getBoundingClientRect()
+            const top = selectionRect ? selectionRect.top : editorRect.top
+            const left = selectionRect ? selectionRect.left : editorRect.left
+            position = {
+                top: editor.offsetTop + (top - editorRect.top),
+                left: editor.offsetLeft + (left - editorRect.left)
+            }
+            acSelectionStateRef.current = editorStateRef.current!.getSelection()
+        }
+        setAutocompletePosition(position)
+    }
+
     const handleChange = (state: EditorState) => {
         setEditorState(state)
         if (props.onChange) {
@@ -329,7 +346,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
-    const handleBeforeInput = (): DraftHandleValue => {
+    const handleBeforeInput = (chars: string): DraftHandleValue => {
+        showAutocomplete(chars)
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
