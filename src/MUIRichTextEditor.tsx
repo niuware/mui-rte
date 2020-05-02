@@ -207,6 +207,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const { classes, controls, customControls } = props
     const [state, setState] = useState<IMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
+    const [autocompletePosition, setAutocompletePosition] = useState<TToolbarPosition | undefined>(undefined)
 
     const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
