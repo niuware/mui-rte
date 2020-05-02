@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
-    SelectionState, KeyBindingUtil, getDefaultKeyBinding
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
@@ -337,6 +337,30 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             acSelectionStateRef.current = editorStateRef.current!.getSelection()
         }
         setAutocompletePosition(position)
+    }
+
+    const handleAutocompleteClick = (event: React.MouseEvent) => {
+        const target = event.target
+        if (!target) {
+            return
+        }
+        const value = (target as HTMLElement).dataset.value
+        if (value) {
+            const currentSelection = acSelectionStateRef.current!
+            const newSelection = new SelectionState({
+                'focusKey': currentSelection.getFocusKey(),
+                'anchorKey': currentSelection.getAnchorKey(),
+                'anchorOffset': currentSelection.getAnchorOffset(),
+                'focusOffset': currentSelection.getFocusOffset() + 1
+            })
+            const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
+                                                      newSelection,
+                                                      value)
+            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
+            handleChange(newEditorState)
+        }
+        setAutocompletePosition(undefined)
+        refocus()
     }
 
     const handleChange = (state: EditorState) => {
