@@ -283,6 +283,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
+    useEffect(() => {
+        if (autocompletePosition === undefined) {
+            acSelectionStateRef.current = undefined
+        }
+    }, [autocompletePosition])
+
     const handleMouseUp = (event: any) => {
         const nodeName = event.target.nodeName
         setAutocompletePosition(undefined)
