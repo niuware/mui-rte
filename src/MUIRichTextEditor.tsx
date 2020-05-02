@@ -90,6 +90,10 @@ type TKeyCommand = {
     callback: (state: EditorState) => EditorState
 }
 
+export type TAutocompleteComponentProps = {
+    onClick: (event: any) => void
+}
+
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
@@ -109,6 +113,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    autocompleteComponent?: FunctionComponent<TAutocompleteComponentProps>
 }
 
 type IMUIRichTextEditorState = {
