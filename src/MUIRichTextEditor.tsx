@@ -288,10 +288,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }, [state.toolbarPosition])
 
     useEffect(() => {
-        if (autocompletePosition === undefined) {
+        if (searchTerm === "") {
+            autocompletePosition.current = undefined
             acSelectionStateRef.current = undefined
         }
-    }, [autocompletePosition])
+    }, [searchTerm])
 
     const handleMouseUp = (event: any) => {
         const nodeName = event.target.nodeName
