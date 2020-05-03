@@ -5,7 +5,7 @@ The Material-UI Rich Text Editor and Viewer
 
 <img src="http://niuware.github.io/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui` based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
+**mui-rte** is a complete text editor and viewer for `material-ui` based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, autocomplete strategies, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
 
 ## Installation
 
@@ -140,6 +140,49 @@ import { EditorState } from 'draft-js'
 />
 ```
 
+## Autocomplete strategies
+
+You can define autocomplete strategies to present suggested content lists based on the text input. Just set your trigger character, add some search keys and the content to insert and the editor will do everything for you. You can navigate through suggestions using the keyboard arrows and finally press 'Enter' to insert your content into the editor.
+
+### Emoji strategy example
+
+This is a simple example to present emoji suggestions when the user start typing a text like ':face', ':joy', or ':grin':
+
+```js
+import MUIRichTextEditor from 'mui-rte'
+
+const emojis = [
+    {
+        keys: ["face", "grin"],
+        value: "😀;",
+        content: "😀",
+    },
+    {
+        keys: ["face", "joy"],
+        value: "😂",
+        content: "😂",
+    },
+    {
+        keys: ["face", "sweat"],
+        value: "😅",
+        content: "😅",
+    }
+]
+
+<MUIRichTextEditor 
+    autocomplete={{
+        strategies: [
+            {
+                items: emojis,
+                triggerChar: ":"
+            }
+        ]
+    }}
+/>
+```
+
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/autocomplete/index.tsx) that shows how to add multiple autocomplete strategies.
+
 ## Custom Decorators
 
 You can define custom decorators to apply styles and/or functionality based on a provided regular expression. 
@@ -244,6 +287,7 @@ Object.assign(defaultTheme, {
 |keyCommands|`TKeyCommand[]`|optional|Defines an array of `TKeyCommand` objects for adding key bindings to the editor.|
 |draftEditorProps|`TDraftEditorProps`|optional|Defines an object containing specific `draft-js` `Editor` properties.|
 |maxLength|`number`|optional|Sets the maximum characters count that can be input into the editor.|
+|autocomplete|`TAutocomplete`|optional|Sets autocomplete strategies to present suggestion lists as the user types into the editor.|
    
 
 <br />
@@ -300,6 +344,34 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |spellCheck|`boolean`|optional|Use browser spelling check.|
 |stripPastedStyles|`boolean`|optional|Remove styles when pasting text into the editor.|   
+
+<br />
+
+`TAutocomplete`
+
+|Property|Type||description|
+|---|---|---|---|
+|strategies|`TAutocompleteStrategy[]`|required|Array of autocomplete strategies.|
+|suggestLimit|`number`|optional|Defines the amount of suggestions to present to the user. Default is `5`.|   
+
+<br />
+
+`TAutocompleteStrategy`
+
+|Property|Type||description|
+|---|---|---|---|
+|triggerChar|`string`|required|A single character that triggers the autocomplete strategy.|
+|items|`TAutocompleteItem[]`|required|List of autocomplete suggestion items.|   
+
+<br />
+
+`TAutocompleteItem`
+
+|Property|Type||description|
+|---|---|---|---|
+|keys|`string[]`|required|The list of keys that the user needs to type to reveal this item suggestion.|
+|value|`string`|required|The value to insert into the editor when the item is selected.|
+|content|`string`|required|The content presented in the autocomplete suggestion list for this item.|   
 
 <br />
 
