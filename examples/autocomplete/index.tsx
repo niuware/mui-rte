@@ -23,17 +23,17 @@ const emojis: TAutocompleteItem[] = [
         content: "😂",
     },
     {
-        keys: ["grin", "big"],
+        keys: ["face", "grin", "big"],
         value: "😃",
         content: "😃",
     },
     {
-        keys: ["grin", "smile"],
+        keys: ["face", "grin", "smile"],
         value: "😄",
         content: "😄",
     },
     {
-        keys: ["sweat"],
+        keys: ["face", "sweat"],
         value: "😅",
         content: "😅",
     }
@@ -67,16 +67,19 @@ const Autocomplete = () => {
         <MUIRichTextEditor 
             label="Try typing ':grin' or '/mexico'..."
             onSave={save}
-            autocomplete={[
-                {
-                    items: emojis,
-                    triggerChar: ":"
-                },
-                {
-                    items: cities,
-                    triggerChar: "/"
-                }
-            ]}
+            autocomplete={{
+                suggestLimit: 4,
+                strategies: [
+                    {
+                        items: emojis,
+                        triggerChar: ":"
+                    },
+                    {
+                        items: cities,
+                        triggerChar: "/"
+                    }
+                ]
+            }}
         />
     )
 }
