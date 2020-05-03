@@ -381,7 +381,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (state.getLastChangeType() === "backspace-character"
             || state.getLastChangeType() === "split-block") {
             setAutocompletePosition(undefined)
+    const getAutocompleteItems = (): TAutocompleteItem[] => {
+        if (searchTerm.length < 2) {
+            return []
         }
+        return props.autocomplete!.items
+                .filter(item => (item.key.includes(searchTerm)))
+                .splice(0, autocompleteLimit)
+    }
         setEditorState(state)
         if (props.onChange) {
             props.onChange(state)
