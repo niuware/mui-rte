@@ -43,7 +43,7 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
             <List dense={true}>
                 {props.items.map((item, index) => (
                     <ListItem
-                        key={item.key}
+                        key={`${item.key}-${index}`}
                         className={classes.item}
                         selected={index === props.selectedIndex}
                         onClick={() => props.onClick(index)}
