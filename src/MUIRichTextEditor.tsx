@@ -91,9 +91,14 @@ type TKeyCommand = {
     callback: (state: EditorState) => EditorState
 }
 
-export type TAutocomplete = {
+export type TAutocompleteStrategy = {
     triggerChar: string
     items: TAutocompleteItem[]
+}
+
+export type TAutocomplete = {
+    strategies: TAutocompleteStrategy[]
+    suggestLimit: number
 }
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
@@ -115,7 +120,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
-    autocomplete?: TAutocomplete[]
+    autocomplete?: TAutocomplete
 }
 
 type IMUIRichTextEditorState = {
@@ -225,7 +230,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     })
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
-    const currentAutocompleteRef = useRef<TAutocomplete | undefined>(undefined)
+    const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
     const autocompleteLimit = 3
@@ -337,7 +342,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!props.autocomplete) {
             return false
         }
-        const acArray = props.autocomplete.filter(ac => ac.triggerChar === chars)
+        const acArray = props.autocomplete.strategies.filter(ac => ac.triggerChar === chars)
         if (acArray.length) {
             currentAutocompleteRef.current = acArray[0]
             return true
