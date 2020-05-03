@@ -289,6 +289,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
+    useEffect(() => {
+        if (searchTerm.length < autocompleteMinSearchCharCount) {
+            setSelectedIndex(0)
+        }
+    }, [searchTerm])
+
     const clearSearch = () => {
         setSearchTerm("")
         autocompletePosition.current = undefined
