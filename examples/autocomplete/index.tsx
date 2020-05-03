@@ -9,7 +9,7 @@ const save = (data: string) => {
 const emojis: TAutocompleteItem[] = [
     {
         keys: ["face", "grin"],
-        value: "😀;",
+        value: "😀",
         content: "😀",
     },
     {
