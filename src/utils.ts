@@ -89,3 +89,9 @@ const getRects = (editor: HTMLElement) => {
     }
 }
 
+const getLine = (editorState: EditorState) => {
+    const currentBlockKey = editorState.getSelection().getStartKey()
+    return editorState.getCurrentContent().getBlockMap()
+        .keySeq().findIndex(k => k === currentBlockKey)
+}
+
