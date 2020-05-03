@@ -115,7 +115,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     maxLength?: number
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
-    autocomplete?: TAutocomplete
+    autocomplete?: TAutocomplete[]
 }
 
 type IMUIRichTextEditorState = {
