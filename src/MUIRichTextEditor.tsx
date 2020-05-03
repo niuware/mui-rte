@@ -405,7 +405,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
-        showAutocomplete(chars)
+        if (chars === " " && searchTerm.length) {
+            setSearchTerm("")
+        } else if (acSelectionStateRef.current) {
+            setSearchTerm(searchTerm + chars)
+        } else if (usesAutoComplete(chars)) {
+            updateAutocompletePosition()
+        }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
