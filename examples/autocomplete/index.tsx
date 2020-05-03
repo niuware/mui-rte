@@ -8,32 +8,32 @@ const save = (data: string) => {
 
 const emojis: TAutocompleteItem[] = [
     {
-        key: "grin",
+        keys: ["face", "grin"],
         value: "😀;",
         content: "😀",
     },
     {
-        key: "beaming",
+        keys: ["face", "beaming"],
         value: "😁",
         content: "😁",
     },
     {
-        key: "joy",
+        keys: ["face", "joy"],
         value: "😂",
         content: "😂",
     },
     {
-        key: "grinbig",
+        keys: ["grin", "big"],
         value: "😃",
         content: "😃",
     },
     {
-        key: "grinsmile",
+        keys: ["grin", "smile"],
         value: "😄",
         content: "😄",
     },
     {
-        key: "sweat",
+        keys: ["sweat"],
         value: "😅",
         content: "😅",
     }
@@ -41,22 +41,22 @@ const emojis: TAutocompleteItem[] = [
 
 const cities: TAutocompleteItem[] = [
     {
-        key: "mexico",
+        keys: ["mexico"],
         value: "Mexico City",
         content: "Mexico City",
     },
     {
-        key: "mexico",
+        keys: ["mexico", "beach"],
         value: "Cancun",
         content: "Cancun",
     },
     {
-        key: "japan",
+        keys: ["japan", "olympics"],
         value: "Tokyo",
         content: "Tokyo",
     },
     {
-        key: "japan",
+        keys: ["japan"],
         value: "Osaka",
         content: "Osaka",
     }
