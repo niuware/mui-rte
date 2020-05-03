@@ -791,7 +791,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const itemsLength = getAutocompleteItems().length
             const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
             if (e.key === "ArrowDown") {
-                if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === autocompleteLimit)) {
+                if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
                     setSelectedIndex(0)
                 } else {
                     setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
