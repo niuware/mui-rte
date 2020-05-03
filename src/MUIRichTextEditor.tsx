@@ -233,7 +233,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
-    const autocompleteLimit = 3
+    const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit : 3
     const lineHeight = 26
     const editorId = props.id || "mui-rte"
 
