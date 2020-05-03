@@ -214,8 +214,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const { classes, controls, customControls } = props
     const [state, setState] = useState<IMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
-    const [autocompletePosition, setAutocompletePosition] = useState<TToolbarPosition | undefined>(undefined)
-
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
@@ -231,7 +231,9 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
-
+    const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
+    const autocompleteLimit = 3
+    const lineHeight = 26
     const editorId = props.id || "mui-rte"
 
     /**
@@ -336,44 +338,53 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }, 1)
     }
 
-    const showAutocomplete = (chars: string) => {
-        let position = undefined
-        if (chars == ":") {
-            const editor: HTMLElement = (editorRef.current as any).editor
-            const selectionRect = getVisibleSelectionRect(window)
-            const editorRect = editor.getBoundingClientRect()
-            const top = selectionRect ? selectionRect.top : editorRect.top
-            const left = selectionRect ? selectionRect.left : editorRect.left
-            position = {
-                top: editor.offsetTop + (top - editorRect.top),
-                left: editor.offsetLeft + (left - editorRect.left)
-            }
-            acSelectionStateRef.current = editorStateRef.current!.getSelection()
+    const usesAutoComplete = (chars: string): boolean => {
+        if (!props.autocomplete) {
+            return false
         }
-        setAutocompletePosition(position)
+        return props.autocomplete.triggerChar === chars
     }
 
-    const handleAutocompleteClick = (event: React.MouseEvent) => {
-        const target = event.target
-        if (!target) {
-            return
+    const updateAutocompletePosition = () => {
+        const editor: HTMLElement = (editorRef.current as any).editor
+        const { editorRect, selectionRect } = getRects(editor)
+        const line = getLine(editorState)
+        const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
+        const left = selectionRect ? selectionRect.left : editorRect.left
+        const position = {
+            top: editor.offsetTop + (top - editorRect.top) + lineHeight,
+            left: editor.offsetLeft + (left - editorRect.left)
         }
-        const value = (target as HTMLElement).dataset.value
-        if (value) {
+        if (!acSelectionStateRef.current) {
+            acSelectionStateRef.current = editorStateRef.current!.getSelection()
+        }
+        autocompletePosition.current = position
+    }
+
+    const handleAutocompleteSelected = (index?: number) => {
+        const itemIndex = index || selectedIndex
+        const items = getAutocompleteItems()
+        if (items.length > itemIndex) {
+            const content = items[itemIndex].content
             const currentSelection = acSelectionStateRef.current!
             const newSelection = new SelectionState({
                 'focusKey': currentSelection.getFocusKey(),
                 'anchorKey': currentSelection.getAnchorKey(),
                 'anchorOffset': currentSelection.getAnchorOffset(),
-                'focusOffset': currentSelection.getFocusOffset() + 1
+                'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
             const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
-                                                      newSelection,
-                                                      value)
+                                                        newSelection,
+                                                        content)
             const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
             handleChange(newEditorState)
         }
-        setAutocompletePosition(undefined)
+        handleAutocompleteClosed()
+    }
+
+    const handleAutocompleteClosed = () => {
+        setSearchTerm("")
+        setSelectedIndex(0)
         refocus()
     }
 
