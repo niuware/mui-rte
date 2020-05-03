@@ -377,7 +377,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const itemIndex = index || selectedIndex
         const items = getAutocompleteItems()
         if (items.length > itemIndex) {
-            const content = items[itemIndex].content
+            const item = items[itemIndex]
             const currentSelection = acSelectionStateRef.current!
             const newSelection = new SelectionState({
                 'focusKey': currentSelection.getFocusKey(),
@@ -387,7 +387,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             })
             const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                         newSelection,
-                                                        content,
+                                                        item.value,
                                                         editorStateRef.current!.getCurrentInlineStyle())
             const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
             handleChange(newEditorState)
