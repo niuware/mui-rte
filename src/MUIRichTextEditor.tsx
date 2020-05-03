@@ -225,6 +225,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     })
     const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
+    const currentAutocompleteRef = useRef<TAutocomplete | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
     const autocompleteLimit = 3
