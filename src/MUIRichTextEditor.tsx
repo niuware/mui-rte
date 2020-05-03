@@ -234,6 +234,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit : 3
+    const autocompleteMinSearchCharCount = 2
     const lineHeight = 26
     const editorId = props.id || "mui-rte"
 
@@ -395,7 +396,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const getAutocompleteItems = (): TAutocompleteItem[] => {
-        if (searchTerm.length < 2) {
+        if (searchTerm.length < autocompleteMinSearchCharCount) {
             return []
         }
         return currentAutocompleteRef.current!.items
