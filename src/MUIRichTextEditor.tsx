@@ -338,7 +338,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!props.autocomplete) {
             return false
         }
-        return props.autocomplete.triggerChar === chars
+        const acArray = props.autocomplete.filter(ac => ac.triggerChar === chars)
+        if (acArray.length) {
+            currentAutocompleteRef.current = acArray[0]
+            return true
+        }
+        return false
     }
 
     const updateAutocompletePosition = () => {
