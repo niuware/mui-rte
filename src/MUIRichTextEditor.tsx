@@ -393,7 +393,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (searchTerm.length < 2) {
             return []
         }
-        return props.autocomplete!.items
+        return currentAutocompleteRef.current!.items
                 .filter(item => (item.key.includes(searchTerm)))
                 .splice(0, autocompleteLimit)
     }
