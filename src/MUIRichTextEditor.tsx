@@ -376,7 +376,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             })
             const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                         newSelection,
-                                                        content)
+                                                        content,
+                                                        editorStateRef.current!.getCurrentInlineStyle())
             const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
             handleChange(newEditorState)
         }
