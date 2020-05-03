@@ -1,35 +1,53 @@
-import React, { FunctionComponent } from 'react'
-import { Grid } from '@material-ui/core'
+import React from 'react'
 import MUIRichTextEditor from '../../'
-import { TAutocompleteComponentProps } from '../../src/MUIRichTextEditor'
+import { TAutocompleteItem } from '../../src/components/Autocomplete'
 
 const save = (data: string) => {
     console.log(data)
 }
 
-const EmojiAutocomplete: FunctionComponent<TAutocompleteComponentProps> = (props) => {
-    return (
-        <div style={{
-            padding: 10,
-        }} onClick={props.onClick}>
-            <Grid container>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F600;">&#x1F600;</Grid>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F601;">&#x1F601;</Grid>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F602;">&#x1F602;</Grid>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F603;">&#x1F603;</Grid>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F604;">&#x1F604;</Grid>
-                <Grid style={{cursor: 'pointer'}} item xs={3} data-value="&#x1F605;">&#x1F605;</Grid>
-            </Grid>
-        </div>
-    )
-}
+const emojis: TAutocompleteItem[] = [
+    {
+        key: "grin",
+        value: "😀;",
+        content: "😀",
+    },
+    {
+        key: "beaming",
+        value: "😁",
+        content: "😁",
+    },
+    {
+        key: "joy",
+        value: "😂",
+        content: "😂",
+    },
+    {
+        key: "grinbig",
+        value: "😃",
+        content: "😃",
+    },
+    {
+        key: "grinsmile",
+        value: "😄",
+        content: "😄",
+    },
+    {
+        key: "sweat",
+        value: "😅",
+        content: "😅",
+    }
+]
 
 const Autocomplete = () => {
     return (
         <MUIRichTextEditor 
-            label="Type something here..."
+            label="Try typing ':grin'..."
             onSave={save}
-            autocompleteComponent={EmojiAutocomplete}
+            autocomplete={{
+                items: emojis,
+                triggerChar: ":"
+            }}
         />
     )
 }
