@@ -17,6 +17,7 @@ import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles } from './utils'
+import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
