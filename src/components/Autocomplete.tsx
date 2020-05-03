@@ -22,7 +22,7 @@ const styles = () => createStyles({
     container: {
         minWidth: "200px",
         position: "absolute",
-        zIndex: 20
+        zIndex: 10
     },
     item: {
         cursor: "pointer"
