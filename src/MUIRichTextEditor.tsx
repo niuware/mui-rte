@@ -72,11 +72,6 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         position: "absolute",
         padding: "5px",
         zIndex: 10
-    },
-    autocompleteContainer: {
-        position: "absolute",
-        zIndex: 10,
-        padding: "5px"
     }
 })
 
