@@ -455,13 +455,22 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         updateStateForPopover(newEditorState)
     }
 
-    const handleKeyCommand = (command: DraftEditorCommand, editorState: EditorState): DraftHandleValue => {
+    const handleKeyCommand = (command: DraftEditorCommand | string, editorState: EditorState): DraftHandleValue => {
         const newState = RichUtils.handleKeyCommand(editorState, command)
         if (newState) {
             handleChange(newState)
             return "handled"
         }
         else {
+            if (command.includes("mui-autocomplete")) {
+                if (command === "mui-autocomplete-insert") {
+                    handleAutocompleteSelected()
+                }
+                if (command === "mui-autocomplete-end") {
+                    handleAutocompleteClosed()
+                }
+                return "handled"
+            }
             if (props.keyCommands) {
                 const keyCommand = props.keyCommands.find(comm => comm.name === command)
                 if (keyCommand) {
@@ -777,7 +786,49 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 return comm.name
             }
         }
-        return getDefaultKeyBinding(e)
+        if (searchTerm) {
+            const itemsLength = getAutocompleteItems().length
+            const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
+            if (e.key === "ArrowDown") {
+                if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === autocompleteLimit)) {
+                    setSelectedIndex(0)
+                } else {
+                    setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
+                }
+                return "mui-autocomplete-navigate"
+            }
+            if (e.key === "ArrowUp") {
+                if (selectedIndex) {
+                    setSelectedIndex(selectedIndex - 1)
+                } else {
+                    setSelectedIndex(limit - 1)
+                }
+                return "mui-autocomplete-navigate"
+            }
+            if (e.key === "Enter") {
+                return "mui-autocomplete-insert"
+            }
+            if (e.key === "Escape") {
+                return "mui-autocomplete-end"
+            }
+        }
+        const keyBinding = getDefaultKeyBinding(e)
+        const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
+
+        if (keyBinding === "backspace"
+            && text.substr(text.length - 1) === props.autocomplete?.triggerChar) {
+            setSearchTerm("")
+        } else if (autocompletePosition.current 
+            && keyBinding === "backspace"
+            && searchTerm.length) {
+            setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
+        } else if (!autocompletePosition.current && 
+            (keyBinding === "backspace"
+            || keyBinding === "split-block")) {
+            setSearchTerm("")
+        }
+
+        return keyBinding
     }
 
     const renderToolbar = props.toolbar === undefined || props.toolbar
