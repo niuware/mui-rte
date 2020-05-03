@@ -283,16 +283,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         toolbarPositionRef.current = state.toolbarPosition
     }, [state.toolbarPosition])
 
-    useEffect(() => {
-        if (searchTerm === "") {
-            autocompletePosition.current = undefined
-            acSelectionStateRef.current = undefined
-        }
-    }, [searchTerm])
+    const clearSearch = () => {
+        setSearchTerm("")
+        autocompletePosition.current = undefined
+        acSelectionStateRef.current = undefined
+    }
 
     const handleMouseUp = (event: any) => {
         const nodeName = event.target.nodeName
-        setSearchTerm("")
+        clearSearch()
         if (nodeName === "IMG" || nodeName === "VIDEO"){
             return
         }
@@ -385,7 +384,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleAutocompleteClosed = () => {
-        setSearchTerm("")
+        clearSearch()
         setSelectedIndex(0)
         refocus()
     }
@@ -408,7 +407,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
         if (chars === " " && searchTerm.length) {
-            setSearchTerm("")
+            clearSearch()
         } else if (acSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
         } else if (usesAutoComplete(chars)) {
@@ -819,7 +818,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
         if (keyBinding === "backspace"
             && text.substr(text.length - 1) === currentAutocompleteRef.current!.triggerChar) {
-            setSearchTerm("")
+            clearSearch()
         } else if (autocompletePosition.current 
             && keyBinding === "backspace"
             && searchTerm.length) {
@@ -827,7 +826,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         } else if (!autocompletePosition.current && 
             (keyBinding === "backspace"
             || keyBinding === "split-block")) {
-            setSearchTerm("")
+            clearSearch()
         }
 
         return keyBinding
