@@ -81,7 +81,6 @@ const clearInlineStyles = (editorState: EditorState): ContentState => {
     ), editorState.getCurrentContent())
 }
 
-export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles }
 const getRects = (editor: HTMLElement) => {
     return {
         selectionRect: getVisibleSelectionRect(window),
@@ -95,3 +94,4 @@ const getLine = (editorState: EditorState) => {
         .keySeq().findIndex(k => k === currentBlockKey)
 }
 
+export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine }
