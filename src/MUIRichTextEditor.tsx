@@ -817,7 +817,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
-            && text.substr(text.length - 1) === props.autocomplete?.triggerChar) {
+            && text.substr(text.length - 1) === currentAutocompleteRef.current!.triggerChar) {
             setSearchTerm("")
         } else if (autocompletePosition.current 
             && keyBinding === "backspace"
