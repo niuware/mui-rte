@@ -39,15 +39,44 @@ const emojis: TAutocompleteItem[] = [
     }
 ]
 
+const cities: TAutocompleteItem[] = [
+    {
+        key: "mexico",
+        value: "Mexico City",
+        content: "Mexico City",
+    },
+    {
+        key: "mexico",
+        value: "Cancun",
+        content: "Cancun",
+    },
+    {
+        key: "japan",
+        value: "Tokyo",
+        content: "Tokyo",
+    },
+    {
+        key: "japan",
+        value: "Osaka",
+        content: "Osaka",
+    }
+]
+
 const Autocomplete = () => {
     return (
         <MUIRichTextEditor 
-            label="Try typing ':grin'..."
+            label="Try typing ':grin' or '/mexico'..."
             onSave={save}
-            autocomplete={{
-                items: emojis,
-                triggerChar: ":"
-            }}
+            autocomplete={[
+                {
+                    items: emojis,
+                    triggerChar: ":"
+                },
+                {
+                    items: cities,
+                    triggerChar: "/"
+                }
+            ]}
         />
     )
 }
