@@ -5,7 +5,7 @@ import ListItem from '@material-ui/core/ListItem'
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles'
 
 export type TAutocompleteItem = {
-    key: string
+    keys: string[]
     value: string
     content: string
 }
@@ -43,7 +43,7 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
             <List dense={true}>
                 {props.items.map((item, index) => (
                     <ListItem
-                        key={`${item.key}-${index}`}
+                        key={index}
                         className={classes.item}
                         selected={index === props.selectedIndex}
                         onClick={() => props.onClick(index)}
