@@ -68,7 +68,6 @@ const Autocomplete = () => {
             label="Try typing ':grin' or '/mexico'..."
             onSave={save}
             autocomplete={{
-                suggestLimit: 4,
                 strategies: [
                     {
                         items: emojis,
