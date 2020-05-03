@@ -1,5 +1,5 @@
 import { EditorState, DraftBlockType, ContentBlock, ContentState, 
-    Modifier, SelectionState } from 'draft-js'
+    Modifier, SelectionState, getVisibleSelectionRect } from 'draft-js'
 import Immutable from 'immutable'
 import { TCustomControl } from './components/Toolbar'
 
@@ -82,3 +82,10 @@ const clearInlineStyles = (editorState: EditorState): ContentState => {
 }
 
 export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles }
+const getRects = (editor: HTMLElement) => {
+    return {
+        selectionRect: getVisibleSelectionRect(window),
+        editorRect: editor.getBoundingClientRect()
+    }
+}
+
