@@ -858,13 +858,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
-                {props.autocompleteComponent && autocompletePosition ?
-                    <Paper className={classes.autocompleteContainer} style={{
-                        top: autocompletePosition.top,
-                        left: autocompletePosition.left
-                    }}>
-                        <props.autocompleteComponent onClick={handleAutocompleteClick} />
-                    </Paper>
+                {props.autocomplete && autocompletePosition.current ?
+                        <Autocomplete 
+                            items={getAutocompleteItems()}
+                            top={autocompletePosition.current!.top}
+                            left={autocompletePosition.current!.left}
+                            onClick={handleAutocompleteSelected}
+                            selectedIndex={selectedIndex}
+                        />
                 : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
