@@ -142,6 +142,8 @@ import { EditorState } from 'draft-js'
 
 ## Autocomplete strategies
 
+<img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/ac-demo.gif" width="600" />
+
 You can define autocomplete strategies to present suggested content lists based on the text input. Just set your trigger character, add some search keys and the content to insert and the editor will do everything for you. You can navigate through suggestions using the keyboard arrows and finally press 'Enter' to insert your content into the editor.
 
 ### Emoji strategy example
