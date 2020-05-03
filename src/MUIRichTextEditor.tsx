@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect, 
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, 
     SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
@@ -16,8 +16,8 @@ import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles } from './utils'
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine } from './utils'
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
@@ -323,8 +323,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             }
 
             const editor: HTMLElement = (editorRef.current as any).editor
-            const selectionRect = getVisibleSelectionRect(window)
-            const editorRect = editor.getBoundingClientRect()
+            const { editorRect, selectionRect } = getRects(editor)
             if (!selectionRect) {
                 return
             }
