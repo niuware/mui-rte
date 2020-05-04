@@ -15,6 +15,7 @@ import AtomicCustomBlock from './atomic-custom-block'
 import KeyBindings from './key-bindings'
 import MaxLength from './max-length'
 import Autocomplete from './autocomplete'
+import AutocompleteAtomic from './autocomplete-atomic'
 
 const App = () => {
 
@@ -42,6 +43,7 @@ const App = () => {
             <button onClick={() => setSample(<KeyBindings />)}>Key Bindings</button>
             <button onClick={() => setSample(<MaxLength />)}>Max length</button>
             <button onClick={() => setSample(<Autocomplete />)}>Autocomplete</button>
+            <button onClick={() => setSample(<AutocompleteAtomic />)}>Autocomplete Atomic</button>
             <div style={{
                 margin: "20px 0"
             }}>
