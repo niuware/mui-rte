@@ -146,9 +146,9 @@ import { EditorState } from 'draft-js'
 
 You can define autocomplete strategies to present suggested content lists based on the text input. Just set your trigger character, add some search keys and the content to insert and the editor will do everything for you. You can navigate through suggestions using the keyboard arrows and finally press 'Enter' to insert your content into the editor.
 
-### Emoji strategy example
+### Simple strategy example
 
-This is a simple example to present emoji suggestions when the user start typing a text like ':face', ':joy', or ':grin':
+This is an example to show emoji suggestions when the user start typing a text like ':face', ':joy', or ':grin':
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
@@ -183,7 +183,11 @@ const emojis = [
 />
 ```
 
-Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/autocomplete/index.tsx) that shows how to add multiple autocomplete strategies.
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/autocomplete/index.tsx) that shows how to add multiple autocomplete strategies to a single editor.
+
+### Atomic strategy example
+
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/autocomplete/index.tsx) that shows how to combine atomic custom controls with the autocomplete strategy feature.
 
 ## Custom Decorators
 
@@ -365,6 +369,7 @@ Object.assign(defaultTheme, {
 |triggerChar|`string`|required|A single character that triggers the autocomplete strategy.|
 |items|`TAutocompleteItem[]`|required|List of autocomplete suggestion items.| 
 |insertSpaceAfter|`boolean`|optional|If `false` it won't add an space after inserting the content into the editor. Default is `true`.|   
+|atomicBlockName|`string`|optional|Use an *atomic* custom control type to add the content to the editor.|   
 
 <br />
 
@@ -373,7 +378,7 @@ Object.assign(defaultTheme, {
 |Property|Type||description|
 |---|---|---|---|
 |keys|`string[]`|required|The list of keys that the user needs to type to reveal this item suggestion.|
-|value|`string`|required|The value to insert into the editor when the item is selected.|
+|value|`any`|required|The value to insert into the editor when the item is selected.|
 |content|`string | JSX.Element`|required|The content presented in the autocomplete suggestion list for this item. Note that this content is render under a `ListItem` component.|   
 
 <br />
