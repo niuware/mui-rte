@@ -345,16 +345,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }, 1)
     }
 
-    const usesAutoComplete = (chars: string): boolean => {
+    const findAutocompleteStrategy = (chars: string): TAutocompleteStrategy | undefined => {
         if (!props.autocomplete) {
-            return false
+            return undefined
         }
         const acArray = props.autocomplete.strategies.filter(ac => ac.triggerChar === chars)
         if (acArray.length) {
-            currentAutocompleteRef.current = acArray[0]
-            return true
+            return acArray[0]
         }
-        return false
+        return undefined
     }
 
     const updateAutocompletePosition = () => {
@@ -422,8 +421,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             clearSearch()
         } else if (acSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
-        } else if (usesAutoComplete(chars)) {
-            updateAutocompletePosition()
+        } else {
+            const strategy = findAutocompleteStrategy(chars)
+            if (strategy) {
+                currentAutocompleteRef.current = strategy
+                updateAutocompletePosition()
+            }
         }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
