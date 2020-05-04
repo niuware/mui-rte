@@ -387,20 +387,37 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
             const currentContentState = editorState.getCurrentContent()
-            const entityKey = currentContentState.createEntity('AC_ITEM', 'IMMUTABLE').getLastCreatedEntityKey();
-            const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
-                                                        newSelection,
-                                                        item.value,
-                                                        editorStateRef.current!.getCurrentInlineStyle(),
-                                                        entityKey)
-            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-            if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
-                handleChange(newEditorState)
+            if (currentAutocompleteRef.current!.atomicBlockName) {
+                const name = currentAutocompleteRef.current!.atomicBlockName
+                const block = atomicBlockExists(name, props.customControls)
+                if (block) {
+                    const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
+                                                              newSelection,
+                                                              "forward")
+                    const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
+                    const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
+                        value: item.value
+                    }, { 
+                        selection: newEditorState.getCurrentContent().getSelectionAfter()
+                    })
+                    handleChange(withAtomicBlock)
+                }
             } else {
-                const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
-                                                    newEditorState.getSelection(), " ",
-                                                    newEditorState.getCurrentInlineStyle())
-                handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+                const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
+                const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
+                                                            newSelection,
+                                                            item.value,
+                                                            editorStateRef.current!.getCurrentInlineStyle(),
+                                                            entityKey)
+                const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+                if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+                    handleChange(newEditorState)
+                } else {
+                    const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                        newEditorState.getSelection(), " ",
+                                                        newEditorState.getCurrentInlineStyle())
+                    handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+                }
             }
         }
         handleAutocompleteClosed()
