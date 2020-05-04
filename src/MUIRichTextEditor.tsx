@@ -94,6 +94,7 @@ type TKeyCommand = {
 export type TAutocompleteStrategy = {
     triggerChar: string
     items: TAutocompleteItem[]
+    insertSpaceAfter?: boolean
 }
 
 export type TAutocomplete = {
@@ -392,10 +393,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                                                         editorStateRef.current!.getCurrentInlineStyle(),
                                                         entityKey)
             const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-            const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
-                                                 newEditorState.getSelection(), " ",
-                                                 newEditorState.getCurrentInlineStyle())
-            handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+            if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+                handleChange(newEditorState)
+            } else {
+                const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                    newEditorState.getSelection(), " ",
+                                                    newEditorState.getCurrentInlineStyle())
+                handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+            }
         }
         handleAutocompleteClosed()
     }
