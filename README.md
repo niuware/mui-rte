@@ -363,7 +363,8 @@ Object.assign(defaultTheme, {
 |Property|Type||description|
 |---|---|---|---|
 |triggerChar|`string`|required|A single character that triggers the autocomplete strategy.|
-|items|`TAutocompleteItem[]`|required|List of autocomplete suggestion items.|   
+|items|`TAutocompleteItem[]`|required|List of autocomplete suggestion items.| 
+|insertSpaceAfter|`boolean`|optional|If `false` it won't add an space after inserting the content into the editor. Default is `true`.|   
 
 <br />
 
@@ -373,7 +374,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |keys|`string[]`|required|The list of keys that the user needs to type to reveal this item suggestion.|
 |value|`string`|required|The value to insert into the editor when the item is selected.|
-|content|`string`|required|The content presented in the autocomplete suggestion list for this item.|   
+|content|`string | JSX.Element`|required|The content presented in the autocomplete suggestion list for this item. Note that this content is render under a `ListItem` component.|   
 
 <br />
 
