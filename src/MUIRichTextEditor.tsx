@@ -95,6 +95,7 @@ export type TAutocompleteStrategy = {
     triggerChar: string
     items: TAutocompleteItem[]
     insertSpaceAfter?: boolean
+    atomicBlockName?: string
 }
 
 export type TAutocomplete = {
