@@ -477,7 +477,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!block) {
             return
         }
-        const newEditorState = insertAtomicBlock(block.name.toUpperCase(), data, { 
+        const newEditorState = insertAtomicBlock(editorState, block.name.toUpperCase(), data, { 
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
@@ -712,7 +712,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         else {
-            const newEditorState = insertAtomicBlock("IMAGE", data)
+            const newEditorState = insertAtomicBlock(editorState, "IMAGE", data)
             updateStateForPopover(EditorState.forceSelection(newEditorState, newEditorState.getCurrentContent().getSelectionAfter()))
         }
         setFocusMediaKey("")
@@ -795,7 +795,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return null
     }
 
-    const insertAtomicBlock = (type: string, data: any, options?: any) => {
+    const insertAtomicBlock = (editorState: EditorState, type: string, data: any, options?: any) => {
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
