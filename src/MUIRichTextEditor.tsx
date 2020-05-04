@@ -764,8 +764,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             focusKey: focusMediaKey
                         }
                     }
-                }
-                else {
+                } else {
                     const block = atomicBlockExists(type.toLowerCase(), props.customControls)
                     if (!block) {
                         return null
@@ -872,13 +871,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.autocomplete && autocompletePosition.current ?
-                        <Autocomplete 
-                            items={getAutocompleteItems()}
-                            top={autocompletePosition.current!.top}
-                            left={autocompletePosition.current!.left}
-                            onClick={handleAutocompleteSelected}
-                            selectedIndex={selectedIndex}
-                        />
+                    <Autocomplete
+                        items={getAutocompleteItems()}
+                        top={autocompletePosition.current!.top}
+                        left={autocompletePosition.current!.left}
+                        onClick={handleAutocompleteSelected}
+                        selectedIndex={selectedIndex}
+                    />
                 : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
