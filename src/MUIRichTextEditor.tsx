@@ -391,8 +391,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                                                         item.value,
                                                         editorStateRef.current!.getCurrentInlineStyle(),
                                                         entityKey)
-            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
-            handleChange(newEditorState)
+            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+            const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                 newEditorState.getSelection(), " ",
+                                                 newEditorState.getCurrentInlineStyle())
+            handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
         }
         handleAutocompleteClosed()
     }
