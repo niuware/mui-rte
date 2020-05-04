@@ -6,7 +6,7 @@ import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles'
 
 export type TAutocompleteItem = {
     keys: string[]
-    value: string
+    value: any
     content: string | JSX.Element
 }
 
