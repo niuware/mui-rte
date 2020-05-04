@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { ContentState } from 'draft-js'
 
 interface ILinkProps {
@@ -7,7 +7,7 @@ interface ILinkProps {
     entityKey: string
 }
 
-const Link: React.FC<ILinkProps> = (props: ILinkProps) => {
+const Link: FunctionComponent<ILinkProps> = (props: ILinkProps) => {
     const { url } = props.contentState.getEntity(props.entityKey).getData()
     return (
         <a 

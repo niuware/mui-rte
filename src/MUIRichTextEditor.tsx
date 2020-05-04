@@ -345,16 +345,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }, 1)
     }
 
-    const usesAutoComplete = (chars: string): boolean => {
+    const findAutocompleteStrategy = (chars: string): TAutocompleteStrategy | undefined => {
         if (!props.autocomplete) {
-            return false
+            return undefined
         }
         const acArray = props.autocomplete.strategies.filter(ac => ac.triggerChar === chars)
         if (acArray.length) {
-            currentAutocompleteRef.current = acArray[0]
-            return true
+            return acArray[0]
         }
-        return false
+        return undefined
     }
 
     const updateAutocompletePosition = () => {
@@ -385,12 +384,18 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
+            const currentContentState = editorState.getCurrentContent()
+            const entityKey = currentContentState.createEntity('AC_ITEM', 'IMMUTABLE').getLastCreatedEntityKey();
             const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                         newSelection,
                                                         item.value,
-                                                        editorStateRef.current!.getCurrentInlineStyle())
-            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
-            handleChange(newEditorState)
+                                                        editorStateRef.current!.getCurrentInlineStyle(),
+                                                        entityKey)
+            const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+            const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                 newEditorState.getSelection(), " ",
+                                                 newEditorState.getCurrentInlineStyle())
+            handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
         }
         handleAutocompleteClosed()
     }
@@ -422,8 +427,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             clearSearch()
         } else if (acSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
-        } else if (usesAutoComplete(chars)) {
-            updateAutocompletePosition()
+        } else {
+            const strategy = findAutocompleteStrategy(chars)
+            if (strategy) {
+                currentAutocompleteRef.current = strategy
+                updateAutocompletePosition()
+            }
         }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
@@ -764,8 +773,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                             focusKey: focusMediaKey
                         }
                     }
-                }
-                else {
+                } else {
                     const block = atomicBlockExists(type.toLowerCase(), props.customControls)
                     if (!block) {
                         return null
@@ -872,13 +880,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.autocomplete && autocompletePosition.current ?
-                        <Autocomplete 
-                            items={getAutocompleteItems()}
-                            top={autocompletePosition.current!.top}
-                            left={autocompletePosition.current!.left}
-                            onClick={handleAutocompleteSelected}
-                            selectedIndex={selectedIndex}
-                        />
+                    <Autocomplete
+                        items={getAutocompleteItems()}
+                        top={autocompletePosition.current!.top}
+                        left={autocompletePosition.current!.left}
+                        onClick={handleAutocompleteSelected}
+                        selectedIndex={selectedIndex}
+                    />
                 : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
