@@ -384,10 +384,13 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
+            const currentContentState = editorState.getCurrentContent()
+            const entityKey = currentContentState.createEntity('AC_ITEM', 'IMMUTABLE').getLastCreatedEntityKey();
             const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                         newSelection,
                                                         item.value,
-                                                        editorStateRef.current!.getCurrentInlineStyle())
+                                                        editorStateRef.current!.getCurrentInlineStyle(),
+                                                        entityKey)
             const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters");
             handleChange(newEditorState)
         }
