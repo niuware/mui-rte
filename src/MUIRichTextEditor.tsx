@@ -823,40 +823,35 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
     }
 
-    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
-        if (hasCommandModifier(e) && props.keyCommands) {
-            const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
-            if (comm) {
-                return comm.name
+    const getAutocompleteKeyEvent = (keyboardEvent: React.KeyboardEvent<{}>): string | null => {
+        const itemsLength = getAutocompleteItems().length
+        const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
+        if (keyboardEvent.key === "ArrowDown") {
+            if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
+                setSelectedIndex(0)
+            } else {
+                setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
             }
+            return "mui-autocomplete-navigate"
         }
-        if (searchTerm) {
-            const itemsLength = getAutocompleteItems().length
-            const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
-            if (e.key === "ArrowDown") {
-                if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
-                    setSelectedIndex(0)
-                } else {
-                    setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
-                }
-                return "mui-autocomplete-navigate"
+        if (keyboardEvent.key === "ArrowUp") {
+            if (selectedIndex) {
+                setSelectedIndex(selectedIndex - 1)
+            } else {
+                setSelectedIndex(limit - 1)
             }
-            if (e.key === "ArrowUp") {
-                if (selectedIndex) {
-                    setSelectedIndex(selectedIndex - 1)
-                } else {
-                    setSelectedIndex(limit - 1)
-                }
-                return "mui-autocomplete-navigate"
-            }
-            if (e.key === "Enter") {
-                return "mui-autocomplete-insert"
-            }
-            if (e.key === "Escape") {
-                return "mui-autocomplete-end"
-            }
+            return "mui-autocomplete-navigate"
         }
-        const keyBinding = getDefaultKeyBinding(e)
+        if (keyboardEvent.key === "Enter") {
+            return "mui-autocomplete-insert"
+        }
+        if (keyboardEvent.key === "Escape") {
+            return "mui-autocomplete-end"
+        }
+        return null
+    }
+
+    const updateSearchTermForKeyBinding = (keyBinding: DraftEditorCommand | null) => {
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
@@ -872,6 +867,23 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             || keyBinding === "split-block")) {
             clearSearch()
         }
+    }
+
+    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
+        if (hasCommandModifier(e) && props.keyCommands) {
+            const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
+            if (comm) {
+                return comm.name
+            }
+        }
+        if (searchTerm) {
+            const autocompleteEvent = getAutocompleteKeyEvent(e)
+            if (autocompleteEvent) {
+                return autocompleteEvent
+            }
+        }
+        const keyBinding = getDefaultKeyBinding(e)
+        updateSearchTermForKeyBinding(keyBinding)
 
         return keyBinding
     }
