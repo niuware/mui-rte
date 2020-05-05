@@ -374,6 +374,23 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         autocompletePosition.current = position
     }
 
+    const insertAutocompleteSuggestionAsAtomicBlock = (name: string, selection: SelectionState, value: any) => {
+        const block = atomicBlockExists(name, props.customControls)
+        if (!block) {
+            return
+        }
+        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
+                                                    selection,
+                                                    "forward")
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
+        const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
+            value: value
+        }, { 
+            selection: newEditorState.getCurrentContent().getSelectionAfter()
+        })
+        handleChange(withAtomicBlock)
+    }
+
     const handleAutocompleteSelected = (index?: number) => {
         const itemIndex = index || selectedIndex
         const items = getAutocompleteItems()
@@ -389,19 +406,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             const currentContentState = editorState.getCurrentContent()
             if (currentAutocompleteRef.current!.atomicBlockName) {
                 const name = currentAutocompleteRef.current!.atomicBlockName
-                const block = atomicBlockExists(name, props.customControls)
-                if (block) {
-                    const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
-                                                              newSelection,
-                                                              "forward")
-                    const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
-                    const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
-                        value: item.value
-                    }, { 
-                        selection: newEditorState.getCurrentContent().getSelectionAfter()
-                    })
-                    handleChange(withAtomicBlock)
-                }
+                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
             } else {
                 const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
                 const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
