@@ -168,6 +168,8 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
+const autocompleteMinSearchCharCount = 2
+const lineHeight = 26
 
 const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
     contentBlock.findEntityRanges(
@@ -236,8 +238,6 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
-    const autocompleteMinSearchCharCount = 2
-    const lineHeight = 26
     const editorId = props.id || "mui-rte"
 
     /**
