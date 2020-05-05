@@ -130,7 +130,7 @@ type IMUIRichTextEditorState = {
     urlKey?: string
     urlData?: TUrlData
     urlIsMedia?: boolean
-    toolbarPosition?: TToolbarPosition
+    toolbarPosition?: TPosition
 }
 
 type TStateOffset = {
@@ -138,7 +138,7 @@ type TStateOffset = {
     end: number
 }
 
-type TToolbarPosition = {
+type TPosition = {
     top: number
     left: number
 }
@@ -230,11 +230,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         start: 0,
         end: 0
     })
-    const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
+    const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
     const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
-    const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
+    const autocompletePosition = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const autocompleteMinSearchCharCount = 2
     const lineHeight = 26
