@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { FunctionComponent } from 'react'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 
 const styles = ({ spacing, palette }: Theme) => createStyles({
@@ -12,7 +12,7 @@ interface IBlockquoteProps extends WithStyles<typeof styles> {
     children?: React.ReactNode
 }
 
-const CodeBlock: React.FC<IBlockquoteProps> = (props: IBlockquoteProps) => {
+const CodeBlock: FunctionComponent<IBlockquoteProps> = (props) => {
     return (
         <div className={props.classes.root}>
             {props.children}
