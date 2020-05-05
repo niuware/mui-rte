@@ -170,6 +170,7 @@ const styleRenderMap: DraftStyleMap = {
 const { hasCommandModifier } = KeyBindingUtil
 const autocompleteMinSearchCharCount = 2
 const lineHeight = 26
+const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
 const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
     contentBlock.findEntityRanges(
@@ -897,7 +898,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const renderToolbar = props.toolbar === undefined || props.toolbar
-    const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
+    const inlineToolbarControls = props.inlineToolbarControls || defaultInlineToolbarControls
     const editable = props.readOnly === undefined || !props.readOnly
     let className = ""
     let placeholder: React.ReactElement | null = null
