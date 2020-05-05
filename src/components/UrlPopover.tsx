@@ -13,16 +13,6 @@ import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
 import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft'
 import FormatAlignRight from '@material-ui/icons/FormatAlignRight'
 
-const styles = ({ spacing }: Theme) => createStyles({
-    linkPopover: {
-        padding: spacing(2, 2, 2, 2),
-        maxWidth: 250
-    },
-    linkTextField: {
-        width: "100%"
-    }
-})
-
 export type TAlignment = "left" | "center" | "right"
 
 export type TMediaType = "image" | "video"
@@ -41,6 +31,16 @@ interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
     isMedia?: boolean
     onConfirm: (isMedia?: boolean, ...args: any) => void
 }
+
+const styles = ({ spacing }: Theme) => createStyles({
+    linkPopover: {
+        padding: spacing(2, 2, 2, 2),
+        maxWidth: 250
+    },
+    linkTextField: {
+        width: "100%"
+    }
+})
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
     const [data, setData] = useState<TUrlData>(props.data || {
