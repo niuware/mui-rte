@@ -59,6 +59,18 @@ type TStyleType = {
     clickFnName?: string
 }
 
+type TToolbarProps = {
+    id: string
+    editorState: EditorState
+    controls?: Array<TToolbarControl>
+    customControls?: TCustomControl[]
+    onClick: (style: string, type: string, id: string, inlineMode?: boolean) => void
+    inlineMode?: boolean
+    className?: string
+    disabled?: boolean
+    size?: TToolbarButtonSize
+}
+
 const STYLE_TYPES: TStyleType[] = [
     {
         label: 'H2',
@@ -175,18 +187,6 @@ const STYLE_TYPES: TStyleType[] = [
         type: "callback"
     }
 ]
-
-type TToolbarProps = {
-    id: string
-    editorState: EditorState
-    controls?: Array<TToolbarControl>
-    customControls?: TCustomControl[]
-    onClick: (style: string, type: string, id: string, inlineMode?: boolean) => void
-    inlineMode?: boolean
-    className?: string
-    disabled?: boolean
-    size?: TToolbarButtonSize
-}
 
 const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
     const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)

@@ -3,6 +3,13 @@ import classNames from 'classnames'
 import { ContentState, ContentBlock } from 'draft-js'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 
+interface IMediaProps extends WithStyles<typeof styles> {
+    block: ContentBlock
+    contentState: ContentState
+    blockProps: any
+    onClick: (block: ContentBlock) => void
+}
+
 const styles = ({ shadows }: Theme) => createStyles({
     root: {
         margin: "5px 0 1px",
@@ -27,13 +34,6 @@ const styles = ({ shadows }: Theme) => createStyles({
         textAlign: "right"
     }
 })
-
-interface IMediaProps extends WithStyles<typeof styles> {
-    block: ContentBlock
-    contentState: ContentState
-    blockProps: any
-    onClick: (block: ContentBlock) => void
-}
 
 const Media: FunctionComponent<IMediaProps> = (props) => {
     const { url, width, height, alignment, type } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()

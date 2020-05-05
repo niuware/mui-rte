@@ -1,8 +1,8 @@
 import React, { FunctionComponent, useState } from 'react'
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import Popover from "@material-ui/core/Popover";
-import TextField from "@material-ui/core/TextField";
+import Button from '@material-ui/core/Button'
+import Grid from '@material-ui/core/Grid'
+import Popover from '@material-ui/core/Popover'
+import TextField from '@material-ui/core/TextField'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import ButtonGroup from '@material-ui/core/ButtonGroup'
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
@@ -12,16 +12,6 @@ import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
 import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft'
 import FormatAlignRight from '@material-ui/icons/FormatAlignRight'
-
-const styles = ({ spacing }: Theme) => createStyles({
-    linkPopover: {
-        padding: spacing(2, 2, 2, 2),
-        maxWidth: 250
-    },
-    linkTextField: {
-        width: "100%"
-    }
-})
 
 export type TAlignment = "left" | "center" | "right"
 
@@ -41,6 +31,16 @@ interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
     isMedia?: boolean
     onConfirm: (isMedia?: boolean, ...args: any) => void
 }
+
+const styles = ({ spacing }: Theme) => createStyles({
+    linkPopover: {
+        padding: spacing(2, 2, 2, 2),
+        maxWidth: 250
+    },
+    linkTextField: {
+        width: "100%"
+    }
+})
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
     const [data, setData] = useState<TUrlData>(props.data || {

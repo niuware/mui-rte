@@ -19,6 +19,79 @@ import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPo
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
 import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine } from './utils'
 
+export type TDecorator = {
+    component: FunctionComponent
+    regex: RegExp
+}
+
+type TDraftEditorProps = {
+    spellCheck?: boolean
+    stripPastedStyles?: boolean
+}
+
+type TKeyCommand = {
+    key: number
+    name: string
+    callback: (state: EditorState) => EditorState
+}
+
+export type TAutocompleteStrategy = {
+    triggerChar: string
+    items: TAutocompleteItem[]
+    insertSpaceAfter?: boolean
+    atomicBlockName?: string
+}
+
+export type TAutocomplete = {
+    strategies: TAutocompleteStrategy[]
+    suggestLimit?: number
+}
+
+interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
+    id?: string
+    value?: any
+    label?: string,
+    readOnly?: boolean
+    inheritFontSize?: boolean
+    error?: boolean
+    controls?: Array<TToolbarControl>
+    customControls?: TCustomControl[]
+    decorators?: TDecorator[]
+    toolbar?: boolean
+    toolbarButtonSize?: TToolbarButtonSize
+    inlineToolbar?: boolean
+    inlineToolbarControls?: Array<TToolbarControl>
+    draftEditorProps?: TDraftEditorProps
+    keyCommands?: TKeyCommand[]
+    maxLength?: number
+    onSave?: (data: string) => void
+    onChange?: (state: EditorState) => void
+    autocomplete?: TAutocomplete
+}
+
+type IMUIRichTextEditorState = {
+    anchorUrlPopover?: HTMLElement
+    urlKey?: string
+    urlData?: TUrlData
+    urlIsMedia?: boolean
+    toolbarPosition?: TPosition
+}
+
+type TStateOffset = {
+    start: number,
+    end: number
+}
+
+type TPosition = {
+    top: number
+    left: number
+}
+
+type TCustomRenderers = {
+    style?: DraftStyleMap
+    block?: Immutable.Map<any, any>
+}
+
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
     },
@@ -75,79 +148,6 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     }
 })
 
-export type TDecorator = {
-    component: FunctionComponent
-    regex: RegExp
-}
-
-type TDraftEditorProps = {
-    spellCheck?: boolean
-    stripPastedStyles?: boolean
-}
-
-type TKeyCommand = {
-    key: number
-    name: string
-    callback: (state: EditorState) => EditorState
-}
-
-export type TAutocompleteStrategy = {
-    triggerChar: string
-    items: TAutocompleteItem[]
-    insertSpaceAfter?: boolean
-    atomicBlockName?: string
-}
-
-export type TAutocomplete = {
-    strategies: TAutocompleteStrategy[]
-    suggestLimit?: number
-}
-
-interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
-    id?: string
-    value?: any
-    label?: string,
-    readOnly?: boolean
-    inheritFontSize?: boolean
-    error?: boolean
-    controls?: Array<TToolbarControl>
-    customControls?: TCustomControl[]
-    decorators?: TDecorator[]
-    toolbar?: boolean
-    toolbarButtonSize?: TToolbarButtonSize
-    inlineToolbar?: boolean
-    inlineToolbarControls?: Array<TToolbarControl>
-    draftEditorProps?: TDraftEditorProps
-    keyCommands?: TKeyCommand[]
-    maxLength?: number
-    onSave?: (data: string) => void
-    onChange?: (state: EditorState) => void
-    autocomplete?: TAutocomplete
-}
-
-type IMUIRichTextEditorState = {
-    anchorUrlPopover?: HTMLElement
-    urlKey?: string
-    urlData?: TUrlData
-    urlIsMedia?: boolean
-    toolbarPosition?: TToolbarPosition
-}
-
-type TStateOffset = {
-    start: number,
-    end: number
-}
-
-type TToolbarPosition = {
-    top: number
-    left: number
-}
-
-type TCustomRenderers = {
-    style?: DraftStyleMap
-    block?: Immutable.Map<any, any>
-}
-
 const blockRenderMap = Immutable.Map({
     'blockquote': {
         element: "blockquote",
@@ -168,6 +168,9 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
+const autocompleteMinSearchCharCount = 2
+const lineHeight = 26
+const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
 const findLinkEntities = (contentBlock: any, callback: any, contentState: any) => {
     contentBlock.findEntityRanges(
@@ -230,14 +233,12 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         start: 0,
         end: 0
     })
-    const toolbarPositionRef = useRef<TToolbarPosition | undefined>(undefined)
+    const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
     const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
-    const autocompletePosition = useRef<TToolbarPosition | undefined>(undefined)
+    const autocompletePosition = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
-    const autocompleteMinSearchCharCount = 2
-    const lineHeight = 26
     const editorId = props.id || "mui-rte"
 
     /**
@@ -374,6 +375,42 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         autocompletePosition.current = position
     }
 
+    const insertAutocompleteSuggestionAsAtomicBlock = (name: string, selection: SelectionState, value: any) => {
+        const block = atomicBlockExists(name, props.customControls)
+        if (!block) {
+            return
+        }
+        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
+                                                    selection,
+                                                    "forward")
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
+        const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
+            value: value
+        }, { 
+            selection: newEditorState.getCurrentContent().getSelectionAfter()
+        })
+        handleChange(withAtomicBlock)
+    }
+
+    const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
+        const currentContentState = editorState.getCurrentContent()
+        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
+        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
+                                                    selection,
+                                                    value,
+                                                    editorStateRef.current!.getCurrentInlineStyle(),
+                                                    entityKey)
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+        if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+            handleChange(newEditorState)
+        } else {
+            const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                newEditorState.getSelection(), " ",
+                                                newEditorState.getCurrentInlineStyle())
+            handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+        }
+    }
+
     const handleAutocompleteSelected = (index?: number) => {
         const itemIndex = index || selectedIndex
         const items = getAutocompleteItems()
@@ -386,38 +423,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
-            const currentContentState = editorState.getCurrentContent()
             if (currentAutocompleteRef.current!.atomicBlockName) {
                 const name = currentAutocompleteRef.current!.atomicBlockName
-                const block = atomicBlockExists(name, props.customControls)
-                if (block) {
-                    const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
-                                                              newSelection,
-                                                              "forward")
-                    const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
-                    const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
-                        value: item.value
-                    }, { 
-                        selection: newEditorState.getCurrentContent().getSelectionAfter()
-                    })
-                    handleChange(withAtomicBlock)
-                }
+                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
             } else {
-                const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
-                const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
-                                                            newSelection,
-                                                            item.value,
-                                                            editorStateRef.current!.getCurrentInlineStyle(),
-                                                            entityKey)
-                const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-                if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
-                    handleChange(newEditorState)
-                } else {
-                    const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
-                                                        newEditorState.getSelection(), " ",
-                                                        newEditorState.getCurrentInlineStyle())
-                    handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
-                }
+                insertAutocompleteSuggestionAsText(newSelection, item.value)
             }
         }
         handleAutocompleteClosed()
@@ -823,40 +833,34 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
     }
 
-    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
-        if (hasCommandModifier(e) && props.keyCommands) {
-            const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
-            if (comm) {
-                return comm.name
-            }
-        }
-        if (searchTerm) {
-            const itemsLength = getAutocompleteItems().length
-            const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
-            if (e.key === "ArrowDown") {
+    const getAutocompleteKeyEvent = (keyboardEvent: React.KeyboardEvent<{}>): string | null => {
+        const itemsLength = getAutocompleteItems().length
+        const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
+        switch (keyboardEvent.key) {
+            case "ArrowDown":
                 if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
                     setSelectedIndex(0)
                 } else {
                     setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
                 }
                 return "mui-autocomplete-navigate"
-            }
-            if (e.key === "ArrowUp") {
+            case "ArrowUp":
                 if (selectedIndex) {
                     setSelectedIndex(selectedIndex - 1)
                 } else {
                     setSelectedIndex(limit - 1)
                 }
                 return "mui-autocomplete-navigate"
-            }
-            if (e.key === "Enter") {
+            case "Enter":
                 return "mui-autocomplete-insert"
-            }
-            if (e.key === "Escape") {
+            case "Escape":
                 return "mui-autocomplete-end"
-            }
+            default:
+                return null
         }
-        const keyBinding = getDefaultKeyBinding(e)
+    }
+
+    const updateSearchTermForKeyBinding = (keyBinding: DraftEditorCommand | null) => {
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
@@ -872,12 +876,29 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             || keyBinding === "split-block")) {
             clearSearch()
         }
+    }
+
+    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
+        if (hasCommandModifier(e) && props.keyCommands) {
+            const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
+            if (comm) {
+                return comm.name
+            }
+        }
+        if (searchTerm) {
+            const autocompleteEvent = getAutocompleteKeyEvent(e)
+            if (autocompleteEvent) {
+                return autocompleteEvent
+            }
+        }
+        const keyBinding = getDefaultKeyBinding(e)
+        updateSearchTermForKeyBinding(keyBinding)
 
         return keyBinding
     }
 
     const renderToolbar = props.toolbar === undefined || props.toolbar
-    const inlineToolbarControls = props.inlineToolbarControls || ["bold", "italic", "underline", "clear"]
+    const inlineToolbarControls = props.inlineToolbarControls || defaultInlineToolbarControls
     const editable = props.readOnly === undefined || !props.readOnly
     let className = ""
     let placeholder: React.ReactElement | null = null
