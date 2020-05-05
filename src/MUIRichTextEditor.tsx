@@ -826,29 +826,28 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const getAutocompleteKeyEvent = (keyboardEvent: React.KeyboardEvent<{}>): string | null => {
         const itemsLength = getAutocompleteItems().length
         const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
-        if (keyboardEvent.key === "ArrowDown") {
-            if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
-                setSelectedIndex(0)
-            } else {
-                setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
-            }
-            return "mui-autocomplete-navigate"
+        switch (keyboardEvent.key) {
+            case "ArrowDown":
+                if ((selectedIndex === 0 && itemsLength === 1) || (selectedIndex + 1 === limit)) {
+                    setSelectedIndex(0)
+                } else {
+                    setSelectedIndex(selectedIndex + 1 < limit ? selectedIndex + 1 : selectedIndex)
+                }
+                return "mui-autocomplete-navigate"
+            case "ArrowUp":
+                if (selectedIndex) {
+                    setSelectedIndex(selectedIndex - 1)
+                } else {
+                    setSelectedIndex(limit - 1)
+                }
+                return "mui-autocomplete-navigate"
+            case "Enter":
+                return "mui-autocomplete-insert"
+            case "Escape":
+                return "mui-autocomplete-end"
+            default:
+                return null
         }
-        if (keyboardEvent.key === "ArrowUp") {
-            if (selectedIndex) {
-                setSelectedIndex(selectedIndex - 1)
-            } else {
-                setSelectedIndex(limit - 1)
-            }
-            return "mui-autocomplete-navigate"
-        }
-        if (keyboardEvent.key === "Enter") {
-            return "mui-autocomplete-insert"
-        }
-        if (keyboardEvent.key === "Escape") {
-            return "mui-autocomplete-end"
-        }
-        return null
     }
 
     const updateSearchTermForKeyBinding = (keyBinding: DraftEditorCommand | null) => {
