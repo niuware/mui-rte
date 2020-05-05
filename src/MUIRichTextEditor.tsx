@@ -487,7 +487,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     }
 
     const handleClearFormat = () => {
-        const withoutStyles = clearInlineStyles(editorState)
+        const withoutStyles = clearInlineStyles(editorState, customRenderers.style)
         const selectionInfo = getSelectionInfo(editorState)
         const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style');
         setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
