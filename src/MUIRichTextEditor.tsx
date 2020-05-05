@@ -19,62 +19,6 @@ import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPo
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
 import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine } from './utils'
 
-const styles = ({ spacing, typography, palette }: Theme) => createStyles({
-    root: {
-    },
-    container: {
-        margin: spacing(1, 0, 0, 0),
-        position: "relative",
-        fontFamily: typography.body1.fontFamily,
-        fontSize: typography.body1.fontSize,
-        '& figure': {
-            margin: 0
-        }
-    },
-    inheritFontSize: {
-        fontSize: "inherit"
-    },
-    editor: {
-    },
-    editorContainer: {
-        margin: spacing(1, 0, 0, 0),
-        cursor: "text",
-        width: "100%",
-        padding: spacing(0, 0, 1, 0)
-    },
-    editorReadOnly: {
-        borderBottom: "none"
-    },
-    error: {
-        borderBottom: "2px solid red"
-    },
-    hidePlaceholder: {
-        display: "none"
-    },
-    placeHolder: {
-        color: palette.grey[600],
-        position: "absolute"
-    },
-    linkPopover: {
-        padding: spacing(2, 2, 2, 2)
-    },
-    linkTextField: {
-        width: "100%"
-    },
-    anchorLink: {
-        textDecoration: "underline",
-        color: palette.secondary.main
-    },
-    toolbar: {
-    },
-    inlineToolbar: {
-        maxWidth: "180px",
-        position: "absolute",
-        padding: "5px",
-        zIndex: 10
-    }
-})
-
 export type TDecorator = {
     component: FunctionComponent
     regex: RegExp
@@ -147,6 +91,62 @@ type TCustomRenderers = {
     style?: DraftStyleMap
     block?: Immutable.Map<any, any>
 }
+
+const styles = ({ spacing, typography, palette }: Theme) => createStyles({
+    root: {
+    },
+    container: {
+        margin: spacing(1, 0, 0, 0),
+        position: "relative",
+        fontFamily: typography.body1.fontFamily,
+        fontSize: typography.body1.fontSize,
+        '& figure': {
+            margin: 0
+        }
+    },
+    inheritFontSize: {
+        fontSize: "inherit"
+    },
+    editor: {
+    },
+    editorContainer: {
+        margin: spacing(1, 0, 0, 0),
+        cursor: "text",
+        width: "100%",
+        padding: spacing(0, 0, 1, 0)
+    },
+    editorReadOnly: {
+        borderBottom: "none"
+    },
+    error: {
+        borderBottom: "2px solid red"
+    },
+    hidePlaceholder: {
+        display: "none"
+    },
+    placeHolder: {
+        color: palette.grey[600],
+        position: "absolute"
+    },
+    linkPopover: {
+        padding: spacing(2, 2, 2, 2)
+    },
+    linkTextField: {
+        width: "100%"
+    },
+    anchorLink: {
+        textDecoration: "underline",
+        color: palette.secondary.main
+    },
+    toolbar: {
+    },
+    inlineToolbar: {
+        maxWidth: "180px",
+        position: "absolute",
+        padding: "5px",
+        zIndex: 10
+    }
+})
 
 const blockRenderMap = Immutable.Map({
     'blockquote': {
