@@ -159,7 +159,7 @@ const blockRenderMap = Immutable.Map({
     }
 })
 const styleRenderMap: DraftStyleMap = {
-    'STRIKETROUGH': {
+    'STRIKETHROUGH': {
         textDecoration: "line-through"
     },
     'HIGHLIGHT': {
