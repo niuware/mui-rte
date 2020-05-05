@@ -391,6 +391,25 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         handleChange(withAtomicBlock)
     }
 
+    const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
+        const currentContentState = editorState.getCurrentContent()
+        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
+        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
+                                                    selection,
+                                                    value,
+                                                    editorStateRef.current!.getCurrentInlineStyle(),
+                                                    entityKey)
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+        if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+            handleChange(newEditorState)
+        } else {
+            const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
+                                                newEditorState.getSelection(), " ",
+                                                newEditorState.getCurrentInlineStyle())
+            handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
+        }
+    }
+
     const handleAutocompleteSelected = (index?: number) => {
         const itemIndex = index || selectedIndex
         const items = getAutocompleteItems()
@@ -403,26 +422,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
-            const currentContentState = editorState.getCurrentContent()
             if (currentAutocompleteRef.current!.atomicBlockName) {
                 const name = currentAutocompleteRef.current!.atomicBlockName
                 insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
             } else {
-                const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
-                const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
-                                                            newSelection,
-                                                            item.value,
-                                                            editorStateRef.current!.getCurrentInlineStyle(),
-                                                            entityKey)
-                const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-                if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
-                    handleChange(newEditorState)
-                } else {
-                    const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
-                                                        newEditorState.getSelection(), " ",
-                                                        newEditorState.getCurrentInlineStyle())
-                    handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
-                }
+                insertAutocompleteSuggestionAsText(newSelection, item.value)
             }
         }
         handleAutocompleteClosed()
