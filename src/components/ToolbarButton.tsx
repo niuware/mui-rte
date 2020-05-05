@@ -17,7 +17,7 @@ interface IToolbarButtonProps {
     component?: FunctionComponent<TToolbarComponentProps>
 }
 
-const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props: IToolbarButtonProps) => {
+const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props) => {
     const size = !props.inlineMode ? (props.size || "medium") : "small"
     const toolbarId = props.inlineMode ? "-toolbar" : ""
     const editorId = props.editorId || "mui-rte"
