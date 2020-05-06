@@ -217,32 +217,33 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
 
 const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
+
     const [state, setState] = useState<IMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
+    const [focusMediaKey, setFocusMediaKey] = useState("")
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
         block: undefined
     })
-    const [focusMediaKey, setFocusMediaKey] = useState("")
 
     const editorRef = useRef(null)
-    const selectionRef = useRef<TStateOffset>({
-        start: 0,
-        end: 0
-    })
+    const editorId = props.id || "mui-rte"
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
     const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
-    const editorId = props.id || "mui-rte"
+    const selectionRef = useRef<TStateOffset>({
+        start: 0,
+        end: 0
+    })
 
     /**
-     * Expose methods
+     * Exposed methods
      */
     useImperativeHandle(ref, () => ({
         focus: () => {
