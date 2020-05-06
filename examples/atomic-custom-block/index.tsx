@@ -1,5 +1,6 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
 import MUIRichTextEditor from '../..'
+import { TMUIRichTextEditorRef } from '../../src/MUIRichTextEditor'
 import { Card, CardHeader, Avatar, CardMedia, CardContent, 
     Typography, IconButton, CardActions, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
@@ -215,7 +216,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
 
 const AtomicCustomBlock: FunctionComponent = () => {
     
-    const ref = useRef()
+    const ref = useRef<TMUIRichTextEditorRef>(null)
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     return (
         <>
@@ -223,7 +224,7 @@ const AtomicCustomBlock: FunctionComponent = () => {
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert) {
-                        (ref as any).current.insertAtomicBlock("my-card", data)
+                        ref.current?.insertAtomicBlock("my-card", data)
                     }
                     setAnchor(null)
                 }}

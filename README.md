@@ -276,6 +276,7 @@ Object.assign(defaultTheme, {
 |Property|Type||description|
 |---|---|---|---|
 |id|`string`|optional|Base Id name for the component HTML elements.|
+|ref|`TMUIRichTextEditorRef`|optional|Sets a reference instance of the editor component.|
 |label|`string`|optional|String to show when there is no content.|
 |readOnly|`boolean`|optional|Read only mode. The toolbar is disabled by default.|
 |value|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
@@ -382,6 +383,16 @@ Object.assign(defaultTheme, {
 |content|`string | JSX.Element`|required|The content presented in the autocomplete suggestion list for this item. Note that this content is render under a `ListItem` component.|   
 
 <br />
+
+`TMUIRichTextEditorRef`
+
+|Property|Type||description|
+|---|---|---|---|
+|focus|`() => void`||Triggers the focus event on the editor.|
+|save|`() => void`||Triggers the save method on the editor.|
+|insertAtomicBlock|`(name: string, data: any)`||Inserts an atomic block named as `name` (if exists) with the provided `data` into the editor.|   
+
+<br />   
 
 ## Changelog
 

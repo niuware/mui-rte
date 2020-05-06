@@ -67,7 +67,7 @@ const atomicBlockExists = (name: string, controls?: TCustomControl[]) => {
         control.atomicComponent !== undefined)
 }
 
-const isGt = (value: number, maxValue?: number): boolean => {
+const isGreaterThan = (value: number, maxValue?: number): boolean => {
     if (!maxValue) {
         return false
     }
@@ -84,17 +84,17 @@ const clearInlineStyles = (editorState: EditorState, customStyles?: DraftStyleMa
     ), editorState.getCurrentContent())
 }
 
-const getRects = (editor: HTMLElement) => {
+const getEditorBounds = (editor: HTMLElement) => {
     return {
         selectionRect: getVisibleSelectionRect(window),
         editorRect: editor.getBoundingClientRect()
     }
 }
 
-const getLine = (editorState: EditorState) => {
+const getLineNumber = (editorState: EditorState) => {
     const currentBlockKey = editorState.getSelection().getStartKey()
     return editorState.getCurrentContent().getBlockMap()
         .keySeq().findIndex(k => k === currentBlockKey)
 }
 
-export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine }
+export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber }

@@ -17,22 +17,11 @@ import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
-import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLine } from './utils'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
 
 export type TDecorator = {
     component: FunctionComponent
     regex: RegExp
-}
-
-type TDraftEditorProps = {
-    spellCheck?: boolean
-    stripPastedStyles?: boolean
-}
-
-type TKeyCommand = {
-    key: number
-    name: string
-    callback: (state: EditorState) => EditorState
 }
 
 export type TAutocompleteStrategy = {
@@ -47,10 +36,27 @@ export type TAutocomplete = {
     suggestLimit?: number
 }
 
+export type TMUIRichTextEditorRef = {
+    focus: () => void
+    save: () => void
+    insertAtomicBlock: (name: string, data: any) => void
+}
+
+type TDraftEditorProps = {
+    spellCheck?: boolean
+    stripPastedStyles?: boolean
+}
+
+type TKeyCommand = {
+    key: number
+    name: string
+    callback: (state: EditorState) => EditorState
+}
+
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
-    label?: string,
+    label?: string
     readOnly?: boolean
     inheritFontSize?: boolean
     error?: boolean
@@ -69,7 +75,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     autocomplete?: TAutocomplete
 }
 
-type IMUIRichTextEditorState = {
+type TMUIRichTextEditorState = {
     anchorUrlPopover?: HTMLElement
     urlKey?: string
     urlData?: TUrlData
@@ -78,7 +84,7 @@ type IMUIRichTextEditorState = {
 }
 
 type TStateOffset = {
-    start: number,
+    start: number
     end: number
 }
 
@@ -215,34 +221,35 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         : EditorState.createEmpty(decorator)
 }
 
-const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
+const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
-    const [state, setState] = useState<IMUIRichTextEditorState>({})
+
+    const [state, setState] = useState<TMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
+    const [focusMediaKey, setFocusMediaKey] = useState("")
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
         block: undefined
     })
-    const [focusMediaKey, setFocusMediaKey] = useState("")
 
     const editorRef = useRef(null)
+    const editorId = props.id || "mui-rte"
+    const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
+    const editorStateRef = useRef<EditorState | null>(editorState)
+    const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
+    const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
+    const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
+    const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
     })
-    const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
-    const editorStateRef = useRef<EditorState | null>(editorState)
-    const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
-    const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
-    const autocompletePosition = useRef<TPosition | undefined>(undefined)
-    const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
-    const editorId = props.id || "mui-rte"
 
     /**
-     * Expose methods
+     * Exposed methods
      */
     useImperativeHandle(ref, () => ({
         focus: () => {
@@ -300,8 +307,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const clearSearch = () => {
         setSearchTerm("")
-        autocompletePosition.current = undefined
-        acSelectionStateRef.current = undefined
+        autocompletePositionRef.current = undefined
+        autocompleteSelectionStateRef.current = undefined
     }
 
     const handleMouseUp = (event: any) => {
@@ -333,7 +340,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             }
 
             const editor: HTMLElement = (editorRef.current as any).editor
-            const { editorRect, selectionRect } = getRects(editor)
+            const { editorRect, selectionRect } = getEditorBounds(editor)
             if (!selectionRect) {
                 return
             }
@@ -361,18 +368,18 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const updateAutocompletePosition = () => {
         const editor: HTMLElement = (editorRef.current as any).editor
-        const { editorRect, selectionRect } = getRects(editor)
-        const line = getLine(editorState)
+        const { editorRect, selectionRect } = getEditorBounds(editor)
+        const line = getLineNumber(editorState)
         const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
         const left = selectionRect ? selectionRect.left : editorRect.left
         const position = {
             top: editor.offsetTop + (top - editorRect.top) + lineHeight,
             left: editor.offsetLeft + (left - editorRect.left)
         }
-        if (!acSelectionStateRef.current) {
-            acSelectionStateRef.current = editorStateRef.current!.getSelection()
+        if (!autocompleteSelectionStateRef.current) {
+            autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
         }
-        autocompletePosition.current = position
+        autocompletePositionRef.current = position
     }
 
     const insertAutocompleteSuggestionAsAtomicBlock = (name: string, selection: SelectionState, value: any) => {
@@ -394,14 +401,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
         const currentContentState = editorState.getCurrentContent()
-        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
+        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey()
         const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                     selection,
                                                     value,
                                                     editorStateRef.current!.getCurrentInlineStyle(),
                                                     entityKey)
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-        if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+        if (autocompleteRef.current!.insertSpaceAfter === false) {
             handleChange(newEditorState)
         } else {
             const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
@@ -416,15 +423,15 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const items = getAutocompleteItems()
         if (items.length > itemIndex) {
             const item = items[itemIndex]
-            const currentSelection = acSelectionStateRef.current!
+            const currentSelection = autocompleteSelectionStateRef.current!
             const newSelection = new SelectionState({
                 'focusKey': currentSelection.getFocusKey(),
                 'anchorKey': currentSelection.getAnchorKey(),
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
-            if (currentAutocompleteRef.current!.atomicBlockName) {
-                const name = currentAutocompleteRef.current!.atomicBlockName
+            if (autocompleteRef.current!.atomicBlockName) {
+                const name = autocompleteRef.current!.atomicBlockName
                 insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
             } else {
                 insertAutocompleteSuggestionAsText(newSelection, item.value)
@@ -443,7 +450,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             return []
         }
-        return currentAutocompleteRef.current!.items
+        return autocompleteRef.current!.items
                 .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
                 .splice(0, autocompleteLimit)
     }
@@ -458,17 +465,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
         if (chars === " " && searchTerm.length) {
             clearSearch()
-        } else if (acSelectionStateRef.current) {
+        } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
         } else {
             const strategy = findAutocompleteStrategy(chars)
             if (strategy) {
-                currentAutocompleteRef.current = strategy
+                autocompleteRef.current = strategy
                 updateAutocompletePosition()
             }
         }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleFocus = () => {
@@ -489,7 +496,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const handleClearFormat = () => {
         const withoutStyles = clearInlineStyles(editorState, customRenderers.style)
         const selectionInfo = getSelectionInfo(editorState)
-        const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style');
+        const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style')
         setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
     }
 
@@ -647,7 +654,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGt(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -864,14 +871,14 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
-            && currentAutocompleteRef.current 
-            && text.substr(text.length - 1) === currentAutocompleteRef.current.triggerChar) {
+            && autocompleteRef.current 
+            && text.substr(text.length - 1) === autocompleteRef.current.triggerChar) {
             clearSearch()
-        } else if (autocompletePosition.current 
+        } else if (autocompletePositionRef.current 
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-        } else if (!autocompletePosition.current && 
+        } else if (!autocompletePositionRef.current && 
             (keyBinding === "backspace"
             || keyBinding === "split-block")) {
             clearSearch()
@@ -924,11 +931,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
-                {props.autocomplete && autocompletePosition.current ?
+                {props.autocomplete && autocompletePositionRef.current ?
                     <Autocomplete
                         items={getAutocompleteItems()}
-                        top={autocompletePosition.current!.top}
-                        left={autocompletePosition.current!.left}
+                        top={autocompletePositionRef.current!.top}
+                        left={autocompletePositionRef.current!.left}
                         onClick={handleAutocompleteSelected}
                         selectedIndex={selectedIndex}
                     />
