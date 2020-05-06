@@ -17,7 +17,7 @@ import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
-import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getRects, getLineNumber } from './utils'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
 
 export type TDecorator = {
     component: FunctionComponent
@@ -340,7 +340,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             }
 
             const editor: HTMLElement = (editorRef.current as any).editor
-            const { editorRect, selectionRect } = getRects(editor)
+            const { editorRect, selectionRect } = getEditorBounds(editor)
             if (!selectionRect) {
                 return
             }
@@ -368,7 +368,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const updateAutocompletePosition = () => {
         const editor: HTMLElement = (editorRef.current as any).editor
-        const { editorRect, selectionRect } = getRects(editor)
+        const { editorRect, selectionRect } = getEditorBounds(editor)
         const line = getLineNumber(editorState)
         const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
         const left = selectionRect ? selectionRect.left : editorRect.left
