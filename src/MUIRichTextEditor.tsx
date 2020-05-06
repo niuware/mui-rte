@@ -24,17 +24,6 @@ export type TDecorator = {
     regex: RegExp
 }
 
-type TDraftEditorProps = {
-    spellCheck?: boolean
-    stripPastedStyles?: boolean
-}
-
-type TKeyCommand = {
-    key: number
-    name: string
-    callback: (state: EditorState) => EditorState
-}
-
 export type TAutocompleteStrategy = {
     triggerChar: string
     items: TAutocompleteItem[]
@@ -45,6 +34,17 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
+}
+
+type TDraftEditorProps = {
+    spellCheck?: boolean
+    stripPastedStyles?: boolean
+}
+
+type TKeyCommand = {
+    key: number
+    name: string
+    callback: (state: EditorState) => EditorState
 }
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
