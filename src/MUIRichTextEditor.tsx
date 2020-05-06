@@ -69,7 +69,7 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     autocomplete?: TAutocomplete
 }
 
-type IMUIRichTextEditorState = {
+type TMUIRichTextEditorState = {
     anchorUrlPopover?: HTMLElement
     urlKey?: string
     urlData?: TUrlData
@@ -218,7 +218,7 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
 const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
 
-    const [state, setState] = useState<IMUIRichTextEditorState>({})
+    const [state, setState] = useState<TMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
