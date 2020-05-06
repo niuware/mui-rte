@@ -17,7 +17,7 @@ import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
-import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
 
 export type TDecorator = {
     component: FunctionComponent
@@ -475,7 +475,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             }
         }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGt(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleFocus = () => {
@@ -654,7 +654,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGt(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {

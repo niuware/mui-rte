@@ -67,7 +67,7 @@ const atomicBlockExists = (name: string, controls?: TCustomControl[]) => {
         control.atomicComponent !== undefined)
 }
 
-const isGt = (value: number, maxValue?: number): boolean => {
+const isGreaterThan = (value: number, maxValue?: number): boolean => {
     if (!maxValue) {
         return false
     }
@@ -97,4 +97,4 @@ const getLineNumber = (editorState: EditorState) => {
         .keySeq().findIndex(k => k === currentBlockKey)
 }
 
-export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGt, clearInlineStyles, getEditorBounds, getLineNumber }
+export { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber }
