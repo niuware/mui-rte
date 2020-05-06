@@ -50,7 +50,7 @@ type TKeyCommand = {
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
     value?: any
-    label?: string,
+    label?: string
     readOnly?: boolean
     inheritFontSize?: boolean
     error?: boolean
@@ -78,7 +78,7 @@ type IMUIRichTextEditorState = {
 }
 
 type TStateOffset = {
-    start: number,
+    start: number
     end: number
 }
 
@@ -395,7 +395,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
         const currentContentState = editorState.getCurrentContent()
-        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey();
+        const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey()
         const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
                                                     selection,
                                                     value,
@@ -490,7 +490,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const handleClearFormat = () => {
         const withoutStyles = clearInlineStyles(editorState, customRenderers.style)
         const selectionInfo = getSelectionInfo(editorState)
-        const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style');
+        const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style')
         setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
     }
 
