@@ -236,7 +236,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
     const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
-    const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
+    const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const editorId = props.id || "mui-rte"
@@ -301,7 +301,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const clearSearch = () => {
         setSearchTerm("")
         autocompletePosition.current = undefined
-        acSelectionStateRef.current = undefined
+        autocompleteSelectionStateRef.current = undefined
     }
 
     const handleMouseUp = (event: any) => {
@@ -369,8 +369,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             top: editor.offsetTop + (top - editorRect.top) + lineHeight,
             left: editor.offsetLeft + (left - editorRect.left)
         }
-        if (!acSelectionStateRef.current) {
-            acSelectionStateRef.current = editorStateRef.current!.getSelection()
+        if (!autocompleteSelectionStateRef.current) {
+            autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
         }
         autocompletePosition.current = position
     }
@@ -416,7 +416,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const items = getAutocompleteItems()
         if (items.length > itemIndex) {
             const item = items[itemIndex]
-            const currentSelection = acSelectionStateRef.current!
+            const currentSelection = autocompleteSelectionStateRef.current!
             const newSelection = new SelectionState({
                 'focusKey': currentSelection.getFocusKey(),
                 'anchorKey': currentSelection.getAnchorKey(),
@@ -458,7 +458,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
         if (chars === " " && searchTerm.length) {
             clearSearch()
-        } else if (acSelectionStateRef.current) {
+        } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
         } else {
             const strategy = findAutocompleteStrategy(chars)
