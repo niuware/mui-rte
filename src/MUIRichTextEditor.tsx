@@ -235,7 +235,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     })
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
-    const currentAutocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
+    const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const acSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePosition = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
@@ -401,7 +401,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                                                     editorStateRef.current!.getCurrentInlineStyle(),
                                                     entityKey)
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
-        if (currentAutocompleteRef.current!.insertSpaceAfter === false) {
+        if (autocompleteRef.current!.insertSpaceAfter === false) {
             handleChange(newEditorState)
         } else {
             const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
@@ -423,8 +423,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                 'anchorOffset': currentSelection.getAnchorOffset(),
                 'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
             })
-            if (currentAutocompleteRef.current!.atomicBlockName) {
-                const name = currentAutocompleteRef.current!.atomicBlockName
+            if (autocompleteRef.current!.atomicBlockName) {
+                const name = autocompleteRef.current!.atomicBlockName
                 insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
             } else {
                 insertAutocompleteSuggestionAsText(newSelection, item.value)
@@ -443,7 +443,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             return []
         }
-        return currentAutocompleteRef.current!.items
+        return autocompleteRef.current!.items
                 .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
                 .splice(0, autocompleteLimit)
     }
@@ -463,7 +463,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         } else {
             const strategy = findAutocompleteStrategy(chars)
             if (strategy) {
-                currentAutocompleteRef.current = strategy
+                autocompleteRef.current = strategy
                 updateAutocompletePosition()
             }
         }
@@ -864,8 +864,8 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
-            && currentAutocompleteRef.current 
-            && text.substr(text.length - 1) === currentAutocompleteRef.current.triggerChar) {
+            && autocompleteRef.current 
+            && text.substr(text.length - 1) === autocompleteRef.current.triggerChar) {
             clearSearch()
         } else if (autocompletePosition.current 
             && keyBinding === "backspace"
