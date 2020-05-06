@@ -237,7 +237,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
     const editorStateRef = useRef<EditorState | null>(editorState)
     const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
-    const autocompletePosition = useRef<TPosition | undefined>(undefined)
+    const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const editorId = props.id || "mui-rte"
 
@@ -300,7 +300,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
 
     const clearSearch = () => {
         setSearchTerm("")
-        autocompletePosition.current = undefined
+        autocompletePositionRef.current = undefined
         autocompleteSelectionStateRef.current = undefined
     }
 
@@ -372,7 +372,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         if (!autocompleteSelectionStateRef.current) {
             autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
         }
-        autocompletePosition.current = position
+        autocompletePositionRef.current = position
     }
 
     const insertAutocompleteSuggestionAsAtomicBlock = (name: string, selection: SelectionState, value: any) => {
@@ -867,11 +867,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             && autocompleteRef.current 
             && text.substr(text.length - 1) === autocompleteRef.current.triggerChar) {
             clearSearch()
-        } else if (autocompletePosition.current 
+        } else if (autocompletePositionRef.current 
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-        } else if (!autocompletePosition.current && 
+        } else if (!autocompletePositionRef.current && 
             (keyBinding === "backspace"
             || keyBinding === "split-block")) {
             clearSearch()
@@ -924,11 +924,11 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
-                {props.autocomplete && autocompletePosition.current ?
+                {props.autocomplete && autocompletePositionRef.current ?
                     <Autocomplete
                         items={getAutocompleteItems()}
-                        top={autocompletePosition.current!.top}
-                        left={autocompletePosition.current!.left}
+                        top={autocompletePositionRef.current!.top}
+                        left={autocompletePositionRef.current!.left}
                         onClick={handleAutocompleteSelected}
                         selectedIndex={selectedIndex}
                     />
