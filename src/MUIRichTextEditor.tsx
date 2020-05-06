@@ -36,6 +36,12 @@ export type TAutocomplete = {
     suggestLimit?: number
 }
 
+export type TMUIRichTextEditorRef = {
+    focus: () => void
+    save: () => void
+    insertAtomicBlock: (name: string, data: any) => void
+}
+
 type TDraftEditorProps = {
     spellCheck?: boolean
     stripPastedStyles?: boolean
@@ -215,7 +221,7 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         : EditorState.createEmpty(decorator)
 }
 
-const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = (props, ref) => {
+const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
 
     const [state, setState] = useState<TMUIRichTextEditorState>({})
