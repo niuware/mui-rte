@@ -432,17 +432,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (items.length > itemIndex) {
             const item = items[itemIndex]
             const currentSelection = autocompleteSelectionStateRef.current!
-            const newSelection = new SelectionState({
-                'focusKey': currentSelection.getFocusKey(),
-                'anchorKey': currentSelection.getAnchorKey(),
-                'anchorOffset': currentSelection.getAnchorOffset(),
-                'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
+            const offset = currentSelection.getFocusOffset() + searchTerm.length + 1
+            const newSelection = currentSelection.merge({
+                'focusOffset': offset
             })
             if (autocompleteRef.current!.atomicBlockName) {
                 const name = autocompleteRef.current!.atomicBlockName
-                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
+                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection as SelectionState, item.value)
             } else {
-                insertAutocompleteSuggestionAsText(newSelection, item.value)
+                insertAutocompleteSuggestionAsText(newSelection as SelectionState, item.value)
             }
         }
         handleAutocompleteClosed()
