@@ -267,6 +267,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             handleInsertAtomicBlock(name, data)
         },
         insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
+            handleInsertAsyncAtomicBlock(name, promise)
         }
     }))
 
@@ -522,6 +523,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
+    }
+
+    const handleInsertAsyncAtomicBlock = (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
     }
 
     const handleKeyCommand = (command: DraftEditorCommand | string, editorState: EditorState): DraftHandleValue => {
