@@ -36,10 +36,15 @@ export type TAutocomplete = {
     suggestLimit?: number
 }
 
+export type TAsyncAtomicBlockResponse = {
+    data: any
+}
+
 export type TMUIRichTextEditorRef = {
     focus: () => void
     save: () => void
     insertAtomicBlock: (name: string, data: any) => void
+    insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => void
 }
 
 type TDraftEditorProps = {
@@ -260,6 +265,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         },
         insertAtomicBlock: (name: string, data: any) => {
             handleInsertAtomicBlock(name, data)
+        },
+        insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
         }
     }))
 
