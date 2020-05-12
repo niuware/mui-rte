@@ -526,6 +526,37 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleInsertAsyncAtomicBlock = (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
+        const selection = insertAsyncAtomicBlockPlaceholder(name)
+        const offset = selection.getFocusOffset() + 1
+        const newSelection = selection.merge({
+            'focusOffset': offset
+        })
+
+        promise.then((response) => {
+            const newEditorState = insertAtomicBlock(editorStateRef.current!, name, response.data, {
+                selection: newSelection
+            })
+            handleChange(newEditorState)
+        }).catch(() => {
+            const newContentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
+                                                         newSelection as SelectionState, "forward")
+            handleChange(EditorState.push(editorStateRef.current!, newContentState, "remove-range"))
+        })
+    }
+
+    const insertAsyncAtomicBlockPlaceholder = (name: string): SelectionState => {
+        const currentContentState = editorStateRef.current!.getCurrentContent()
+        const entityKey = currentContentState.createEntity("ASYNC_ATOMICBLOCK", 'IMMUTABLE').getLastCreatedEntityKey()
+        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(), 
+                                                 currentContentState.getSelectionAfter(),
+                                                 name + "...",
+                                                 undefined,
+                                                 entityKey)
+        
+        const selection = currentContentState.getSelectionAfter()
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+        handleChange(newEditorState)
+        return selection
     }
 
     const handleKeyCommand = (command: DraftEditorCommand | string, editorState: EditorState): DraftHandleValue => {
