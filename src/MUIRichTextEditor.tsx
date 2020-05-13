@@ -64,7 +64,11 @@ type TKeyCommand = {
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
+    /**
+     * @deprecated Use `defaultValue` instead.
+     */
     value?: any
+    defaultValue?: any
     label?: string
     readOnly?: boolean
     inheritFontSize?: boolean
@@ -225,8 +229,9 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         }))
     }
     const decorator = new CompositeDecorator(decorators)
-    return (props.value)
-        ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
+    const defaultValue = props.defaultValue || props.value
+    return (defaultValue)
+        ? EditorState.createWithContent(convertFromRaw(JSON.parse(defaultValue)), decorator)
         : EditorState.createEmpty(decorator)
 }
 
@@ -304,7 +309,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return () => {
             toggleMouseUpListener()
         }
-    }, [props.value])
+    }, [props.value, props.defaultValue])
 
     useEffect(() => {
         editorStateRef.current = editorState
