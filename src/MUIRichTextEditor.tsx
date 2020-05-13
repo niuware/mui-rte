@@ -530,12 +530,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             'focusOffset': offset
         })
 
-        promise.then((response) => {
+        promise.then(response => {
             const newEditorState = insertAtomicBlock(editorStateRef.current!, name, response.data, {
                 selection: newSelection
             })
             handleChange(newEditorState)
-        }).catch(() => {
+        }).catch(error => {
+            if (error) {
+                return
+            }
             const newContentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
                                                          newSelection as SelectionState, "forward")
             handleChange(EditorState.push(editorStateRef.current!, newContentState, "remove-range"))
