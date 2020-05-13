@@ -13,6 +13,26 @@ import FavoriteIcon from '@material-ui/icons/Favorite'
 import DoneIcon from '@material-ui/icons/Done'
 import CloseIcon from '@material-ui/icons/Close'
 
+type TMyCardData = {
+    title?: string
+    name?: string
+    date?: Date
+    text?: string
+    image?: string
+}
+
+type TAnchor = HTMLElement | null
+
+interface IMyCardPopoverProps {
+    anchor: TAnchor
+    onSubmit: (data: TMyCardData, insert: boolean) => void
+}
+
+type TMyCardPopoverState = {
+    anchor: TAnchor
+    isCancelled: boolean
+}
+
 const cardPopverStyles = makeStyles({
     root: {
         padding: 10,
@@ -39,16 +59,6 @@ const cardStyles = makeStyles({
 const save = (data: string) => {
     console.log(data)
 }
-
-type TMyCardData = {
-    title?: string
-    name?: string
-    date?: Date
-    text?: string
-    image?: string
-}
-
-type TAnchor = HTMLElement | null
 
 const MyCard: FunctionComponent<any> = (props) => {
     const { blockProps } = props
@@ -98,16 +108,6 @@ const MyCard: FunctionComponent<any> = (props) => {
             </CardActions>
         </Card>
     )
-}
-
-interface IMyCardPopoverProps {
-    anchor: TAnchor
-    onSubmit: (data: TMyCardData, insert: boolean) => void
-}
-
-type TMyCardPopoverState = {
-    anchor: TAnchor
-    isCancelled: boolean
 }
 
 const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
@@ -185,7 +185,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
                 <Grid item xs={12}>
                     <TextField 
                         {...textFieldProps}
-                        label="Image"
+                        label="Image URL"
                         name="image"
                     />
                 </Grid>
@@ -230,10 +230,10 @@ const AtomicCustomBlock: FunctionComponent = () => {
                 }}
             />
             <MUIRichTextEditor
-                label="Type something here..."
+                label="Press the last icon in the toolbar to insert an atomic custom block...."
                 ref={ref}
                 onSave={save}
-                controls={["title", "bold", "underline", "add-card", "save"]}
+                controls={["title", "bold", "underline", "save", "add-card"]}
                 customControls={[
                     {
                         name: "my-card",
