@@ -1,5 +1,7 @@
 import React, { FunctionComponent } from 'react'
-import { ListItemAvatar, Avatar, ListItemText } from '@material-ui/core'
+import ListItemText from '@material-ui/core/ListItemText'
+import ListItemAvatar from '@material-ui/core/ListItemAvatar'
+import Avatar from '@material-ui/core/Avatar'
 import MUIRichTextEditor from '../../'
 import { TAutocompleteItem } from '../../src/components/Autocomplete'
 

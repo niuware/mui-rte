@@ -1,24 +1,20 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
 import MUIRichTextEditor from '../..'
-import { TMUIRichTextEditorRef } from '../../src/MUIRichTextEditor'
-import { Card, CardHeader, Avatar, CardMedia, CardContent, 
-    Typography, IconButton, CardActions, Grid } from '@material-ui/core'
+import { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse} from '../../src/MUIRichTextEditor'
 import { makeStyles } from '@material-ui/core/styles'
+import Card from '@material-ui/core/Card'
+import CardContent from '@material-ui/core/CardContent'
+import Typography from '@material-ui/core/Typography'
+import Grid from '@material-ui/core/Grid'
 import Popover from '@material-ui/core/Popover'
 import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
-import WebAssetIcon from '@material-ui/icons/WebAsset'
-import ShareIcon from '@material-ui/icons/Share'
-import FavoriteIcon from '@material-ui/icons/Favorite'
+import UpdateIcon from '@material-ui/icons/Update'
 import DoneIcon from '@material-ui/icons/Done'
 import CloseIcon from '@material-ui/icons/Close'
 
 type TMyCardData = {
-    title?: string
-    name?: string
-    date?: Date
-    text?: string
-    image?: string
+    searchTerm?: string
 }
 
 type TAnchor = HTMLElement | null
@@ -47,65 +43,51 @@ const cardStyles = makeStyles({
     root: {
         maxWidth: 345
     },
-    media: {
-        height: 0,
-        paddingTop: '56.25%'
-    },
-    avatar: {
-        backgroundColor: "tomato"
-    }
 })
 
-const save = (data: string) => {
-    console.log(data)
+const getDataFromCloudService = (searchTerm: string) => {
+    return new Promise(resolve => {
+        console.log(`Searching for ${searchTerm}...`)
+        setTimeout(() => {
+            resolve({
+                title: "Data from cloud",
+                subtitle: `You searched: ${searchTerm}`,
+                text: "Some description from the cloud.",
+            })
+        }, 2000)
+    })
+}
+
+const downloadData = (searchTerm: string) => {
+    return new Promise<TAsyncAtomicBlockResponse>(async (resolve, reject) => {
+        const data = await getDataFromCloudService(searchTerm)
+        if (!data) { // for this example this will never be rejected
+            reject()
+            return
+        }
+        resolve({
+            data: data
+        })
+    })
 }
 
 const MyCard: FunctionComponent<any> = (props) => {
     const { blockProps } = props
     const classes = cardStyles(props)
 
-    const handleLiked = () => {
-        alert("Favorited")
-    }
-
-    const handleShared = () => {
-        alert("Shared")
-    }
-
     return (
         <Card className={classes.root}>
-            <CardHeader
-                avatar={
-                    <Avatar aria-label="name" className={classes.avatar}>
-                        {blockProps.name && blockProps.name.substring(0, 1)}
-                    </Avatar>
-                }
-                title={blockProps.title}
-                subheader={blockProps.date && blockProps.date.toLocaleDateString()}
-            />
-            <CardMedia
-                className={classes.media}
-                image={blockProps.image || "default"}
-                title={blockProps.title}
-            />
             <CardContent>
+                <Typography gutterBottom variant="h5" component="h2">
+                    {blockProps.title}
+                </Typography>
+                <Typography gutterBottom component="h2">
+                    {blockProps.subtitle}
+                </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
                     {blockProps.text}
                 </Typography>
             </CardContent>
-            <CardActions disableSpacing>
-                <IconButton 
-                    aria-label="like card" 
-                    onClick={handleLiked}>
-                    <FavoriteIcon />
-                </IconButton>
-                <IconButton 
-                    aria-label="share"
-                    onClick={handleShared}
-                >
-                    <ShareIcon />
-                </IconButton>
-            </CardActions>
         </Card>
     )
 }
@@ -122,9 +104,6 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
         setState({
             anchor: props.anchor,
             isCancelled: false
-        })
-        setData({
-            date: new Date()
         })
     }, [props.anchor])
 
@@ -160,33 +139,13 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
             }}
         >
             <Grid container spacing={1} className={classes.root}>
-                <Grid item xs={6}>
+                <Grid item xs={12}>
                     <TextField 
                         {...textFieldProps}
                         autoFocus={true} 
-                        label="Title"
-                        name="title"
-                    />
-                </Grid>
-                <Grid item xs={6}>
-                    <TextField 
-                        {...textFieldProps}
-                        label="Name"
-                        name="name"
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField 
-                        {...textFieldProps}
-                        label="Text"
-                        name="text"
-                    />
-                </Grid>
-                <Grid item xs={12}>
-                    <TextField 
-                        {...textFieldProps}
-                        label="Image URL"
-                        name="image"
+                        label="Search term"
+                        name="searchTerm"
+                        placeholder="Type anything here..."
                     />
                 </Grid>
                 <Grid item container xs={12} justify="flex-end">
@@ -214,7 +173,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
     )
 }
 
-const AtomicCustomBlock: FunctionComponent = () => {
+const AsyncAtomicCustomBlock: FunctionComponent = () => {
     
     const ref = useRef<TMUIRichTextEditorRef>(null)
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
@@ -223,17 +182,16 @@ const AtomicCustomBlock: FunctionComponent = () => {
             <MyCardPopover 
                 anchor={anchor}
                 onSubmit={(data, insert) => {
-                    if (insert) {
-                        ref.current?.insertAtomicBlockSync("my-card", data)
+                    if (insert && data.searchTerm) {
+                        ref.current?.insertAtomicBlockAsync("my-card", downloadData(data.searchTerm), "Downloading data...")
                     }
                     setAnchor(null)
                 }}
             />
             <MUIRichTextEditor
-                label="Press the last icon in the toolbar to insert an atomic custom block...."
+                label="Press the last icon in the toolbar to insert an async atomic custom block..."
                 ref={ref}
-                onSave={save}
-                controls={["title", "bold", "underline", "save", "add-card"]}
+                controls={["title", "bold", "underline", "add-card"]}
                 customControls={[
                     {
                         name: "my-card",
@@ -242,7 +200,7 @@ const AtomicCustomBlock: FunctionComponent = () => {
                     },
                     {
                         name: "add-card",
-                        icon: <WebAssetIcon />,
+                        icon: <UpdateIcon />,
                         type: "callback",
                         onClick: (_editorState, _name, anchor) => {
                             setAnchor(anchor)
@@ -254,4 +212,4 @@ const AtomicCustomBlock: FunctionComponent = () => {
     )
 }
 
-export default AtomicCustomBlock
+export default AsyncAtomicCustomBlock

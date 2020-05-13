@@ -16,6 +16,8 @@ import KeyBindings from './key-bindings'
 import MaxLength from './max-length'
 import Autocomplete from './autocomplete'
 import AutocompleteAtomic from './autocomplete-atomic'
+import AsyncImageUpload from './async-image-upload'
+import AsyncAtomicCustomBlock from './async-atomic-custom-block'
 
 const App = () => {
 
@@ -36,6 +38,8 @@ const App = () => {
             <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
             <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
             <button onClick={() => setSample(<AtomicCustomBlock />)}>Atomic Custom Block</button>
+            <button onClick={() => setSample(<AsyncAtomicCustomBlock />)}>Async Atomic Custom Block</button>
+            <button onClick={() => setSample(<AsyncImageUpload />)}>Async image upload</button>
             <button onClick={() => setSample(<ReadOnly />)}>Read Only</button> 
             <button onClick={() => setSample(<Events />)}>Events</button>
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>

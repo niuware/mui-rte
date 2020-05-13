@@ -20,7 +20,7 @@ describe('<MUIRichTextEditor />', () => {
 
     it('should load content', () => {
         const expected = '{"blocks":[{"key":"4a8q0","text":"bold text and normal","type":"unstyled","depth":0,"inlineStyleRanges":[{"offset":0,"length":9,"style":"BOLD"}],"entityRanges":[],"data":{}}],"entityMap":{}}'
-        const wrapper = mount(<MUIRichTextEditor value={expected} />)
+        const wrapper = mount(<MUIRichTextEditor defaultValue={expected} />)
         const editor = wrapper.find(Editor)
         expect(editor.prop("editorState").getCurrentContent()).to.deep.equal(convertFromRaw(JSON.parse(expected)))
     })

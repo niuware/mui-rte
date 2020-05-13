@@ -36,10 +36,19 @@ export type TAutocomplete = {
     suggestLimit?: number
 }
 
+export type TAsyncAtomicBlockResponse = {
+    data: any
+}
+
 export type TMUIRichTextEditorRef = {
     focus: () => void
     save: () => void
+    /**
+     * @deprecated Use `insertAtomicBlockSync` instead.
+     */
     insertAtomicBlock: (name: string, data: any) => void
+    insertAtomicBlockSync: (name: string, data: any) => void
+    insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
 }
 
 type TDraftEditorProps = {
@@ -55,7 +64,11 @@ type TKeyCommand = {
 
 interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     id?: string
+    /**
+     * @deprecated Use `defaultValue` instead.
+     */
     value?: any
+    defaultValue?: any
     label?: string
     readOnly?: boolean
     inheritFontSize?: boolean
@@ -216,8 +229,9 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         }))
     }
     const decorator = new CompositeDecorator(decorators)
-    return (props.value)
-        ? EditorState.createWithContent(convertFromRaw(JSON.parse(props.value)), decorator)
+    const defaultValue = props.defaultValue || props.value
+    return (defaultValue)
+        ? EditorState.createWithContent(convertFromRaw(JSON.parse(defaultValue)), decorator)
         : EditorState.createEmpty(decorator)
 }
 
@@ -259,7 +273,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             handleSave()
         },
         insertAtomicBlock: (name: string, data: any) => {
-            handleInsertAtomicBlock(name, data)
+            handleInsertAtomicBlockSync(name, data)
+        },
+        insertAtomicBlockSync: (name: string, data: any) => {
+            handleInsertAtomicBlockSync(name, data)
+        },
+        insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+            handleInsertAtomicBlockAsync(name, promise, placeholder)
         }
     }))
 
@@ -289,7 +309,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return () => {
             toggleMouseUpListener()
         }
-    }, [props.value])
+    }, [props.value, props.defaultValue])
 
     useEffect(() => {
         editorStateRef.current = editorState
@@ -424,17 +444,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (items.length > itemIndex) {
             const item = items[itemIndex]
             const currentSelection = autocompleteSelectionStateRef.current!
-            const newSelection = new SelectionState({
-                'focusKey': currentSelection.getFocusKey(),
-                'anchorKey': currentSelection.getAnchorKey(),
-                'anchorOffset': currentSelection.getAnchorOffset(),
-                'focusOffset': currentSelection.getFocusOffset() + searchTerm.length + 1
+            const offset = currentSelection.getFocusOffset() + searchTerm.length + 1
+            const newSelection = currentSelection.merge({
+                'focusOffset': offset
             })
             if (autocompleteRef.current!.atomicBlockName) {
                 const name = autocompleteRef.current!.atomicBlockName
-                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection, item.value)
+                insertAutocompleteSuggestionAsAtomicBlock(name, newSelection as SelectionState, item.value)
             } else {
-                insertAutocompleteSuggestionAsText(newSelection, item.value)
+                insertAutocompleteSuggestionAsText(newSelection as SelectionState, item.value)
             }
         }
         handleAutocompleteClosed()
@@ -506,7 +524,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }
 
-    const handleInsertAtomicBlock = (name: string, data: any) => {
+    const handleInsertAtomicBlockSync = (name: string, data: any) => {
         const block = atomicBlockExists(name, props.customControls)
         if (!block) {
             return
@@ -515,6 +533,44 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
+    }
+
+    const handleInsertAtomicBlockAsync = (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+        const selection = insertAsyncAtomicBlockPlaceholder(name, placeholder)
+        const offset = selection.getFocusOffset() + 1
+        const newSelection = selection.merge({
+            'focusOffset': offset
+        })
+
+        promise.then(response => {
+            const newEditorState = insertAtomicBlock(editorStateRef.current!, name, response.data, {
+                selection: newSelection
+            })
+            handleChange(newEditorState)
+        }).catch(error => {
+            if (error) {
+                return
+            }
+            const newContentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
+                                                         newSelection as SelectionState, "forward")
+            handleChange(EditorState.push(editorStateRef.current!, newContentState, "remove-range"))
+        })
+    }
+
+    const insertAsyncAtomicBlockPlaceholder = (name: string, placeholder?: string): SelectionState => {
+        const placeholderName = placeholder || name + "..."
+        const currentContentState = editorStateRef.current!.getCurrentContent()
+        const entityKey = currentContentState.createEntity("ASYNC_ATOMICBLOCK", 'IMMUTABLE').getLastCreatedEntityKey()
+        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(), 
+                                                 currentContentState.getSelectionAfter(),
+                                                 placeholderName,
+                                                 undefined,
+                                                 entityKey)
+        
+        const selection = currentContentState.getSelectionAfter()
+        const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
+        handleChange(newEditorState)
+        return selection
     }
 
     const handleKeyCommand = (command: DraftEditorCommand | string, editorState: EditorState): DraftHandleValue => {

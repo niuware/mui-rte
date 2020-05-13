@@ -3,9 +3,9 @@
 
 The Material-UI Rich Text Editor and Viewer
 
-<img src="http://niuware.github.io/public/assets/mui-rte/editor-1-9-0.png" width="600" />
+<img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui` based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, autocomplete strategies, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
+**mui-rte** is a complete text editor and viewer for `material-ui` based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, autocomplete strategies, async/sync custom atomic blocks, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
 
 ## Installation
 
@@ -39,7 +39,7 @@ const data = getContentStateAsStringFromSomewhere()
 
 ReactDOM.render(
     <MUIRichTextEditor 
-        value={data}
+        defaultValue={data}
         label="Start typing..." 
     />, 
     document.getElementById("root")
@@ -111,7 +111,15 @@ const MyBlock = (props) => {
 />
 ```
 
-### Adding a custom atomic block
+### Adding a custom atomic block (Async)
+
+<img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/async-upload-demo.gif" width="600" />
+
+It is possible to insert custom blocks based on asynchronous behavior using the `insertAtomicBlockAsync` API. The above example shows an [example](https://github.com/niuware/mui-rte/blob/master/examples/async-image-upload/index.tsx) on how to upload an image and use the `MUIRichTextEditor` default image control for further edition.
+
+Check this [other sample](https://github.com/niuware/mui-rte/blob/master/examples/async-atomic-custom-block/index.tsx) that shows how to add a `@material-ui/core` Card with asynchronous downloaded content.
+
+### Adding a custom atomic block (Sync)
 
 Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@material-ui/core` Card component to the editor.
 
@@ -279,7 +287,8 @@ Object.assign(defaultTheme, {
 |ref|`TMUIRichTextEditorRef`|optional|Sets a reference instance of the editor component.|
 |label|`string`|optional|String to show when there is no content.|
 |readOnly|`boolean`|optional|Read only mode. The toolbar is disabled by default.|
-|value|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
+|value|`string`|deprecated|Use `defaultValue` instead.|
+|defaultValue|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
 |inheritFontSize|`boolean`|optional|Inherit font size from parent. Useful for read only mode.|
 |error|`boolean`|optional|Renders the editor with an error style.|
 |onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
@@ -390,7 +399,17 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |focus|`() => void`||Triggers the focus event on the editor.|
 |save|`() => void`||Triggers the save method on the editor.|
-|insertAtomicBlock|`(name: string, data: any)`||Inserts an atomic block named as `name` (if exists) with the provided `data` into the editor.|   
+|insertAtomicBlock|`(name: string, data: any)`|deprecated|Use `insertAtomicBlockSync` instead.|
+|insertAtomicBlockSync|`(name: string, data: any)`||Inserts an atomic block named as `name` (if exists) with the provided `data` into the editor.|
+|insertAtomicBlockAsync|`(name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void`||Inserts an atomic block named as `name` (if exists) asynchronously with the provided `data` into the editor. The `placeholder` text will be shown on the editor until the promise is resolved.|   
+
+<br />   
+
+`TAsyncAtomicBlockResponse`
+
+|Property|Type||description|
+|---|---|---|---|
+|data|`any`|required|The data assigned to the entity added into the editor.|    
 
 <br />   
 
