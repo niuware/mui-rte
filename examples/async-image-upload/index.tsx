@@ -163,7 +163,7 @@ const AsyncImageUpload: FunctionComponent = () => {
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert && data.file) {
-                        ref.current?.insertAsyncAtomicBlock("IMAGE", uploadImage(data.file), "Uploading now...")
+                        ref.current?.insertAtomicBlockAsync("IMAGE", uploadImage(data.file), "Uploading now...")
                     }
                     setAnchor(null)
                 }}

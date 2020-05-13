@@ -183,7 +183,7 @@ const AsyncAtomicCustomBlock: FunctionComponent = () => {
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert && data.searchTerm) {
-                        ref.current?.insertAsyncAtomicBlock("my-card", downloadData(data.searchTerm), "Downloading data...")
+                        ref.current?.insertAtomicBlockAsync("my-card", downloadData(data.searchTerm), "Downloading data...")
                     }
                     setAnchor(null)
                 }}

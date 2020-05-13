@@ -48,7 +48,7 @@ export type TMUIRichTextEditorRef = {
      */
     insertAtomicBlock: (name: string, data: any) => void
     insertAtomicBlockSync: (name: string, data: any) => void
-    insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
+    insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
 }
 
 type TDraftEditorProps = {
@@ -273,8 +273,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         insertAtomicBlockSync: (name: string, data: any) => {
             handleInsertAtomicBlockSync(name, data)
         },
-        insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
-            handleInsertAsyncAtomicBlock(name, promise, placeholder)
+        insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+            handleInsertAtomicBlockAsync(name, promise, placeholder)
         }
     }))
 
@@ -530,7 +530,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         updateStateForPopover(newEditorState)
     }
 
-    const handleInsertAsyncAtomicBlock = (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+    const handleInsertAtomicBlockAsync = (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
         const selection = insertAsyncAtomicBlockPlaceholder(name, placeholder)
         const offset = selection.getFocusOffset() + 1
         const newSelection = selection.merge({
