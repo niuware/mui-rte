@@ -164,7 +164,7 @@ import MUIRichTextEditor from 'mui-rte'
 const emojis = [
     {
         keys: ["face", "grin"],
-        value: "😀;",
+        value: "😀",
         content: "😀",
     },
     {
