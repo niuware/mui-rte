@@ -44,7 +44,7 @@ export type TMUIRichTextEditorRef = {
     focus: () => void
     save: () => void
     insertAtomicBlock: (name: string, data: any) => void
-    insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => void
+    insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
 }
 
 type TDraftEditorProps = {
@@ -266,8 +266,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         insertAtomicBlock: (name: string, data: any) => {
             handleInsertAtomicBlock(name, data)
         },
-        insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
-            handleInsertAsyncAtomicBlock(name, promise)
+        insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+            handleInsertAsyncAtomicBlock(name, promise, placeholder)
         }
     }))
 
@@ -523,8 +523,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         updateStateForPopover(newEditorState)
     }
 
-    const handleInsertAsyncAtomicBlock = (name: string, promise: Promise<TAsyncAtomicBlockResponse>) => {
-        const selection = insertAsyncAtomicBlockPlaceholder(name)
+    const handleInsertAsyncAtomicBlock = (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
+        const selection = insertAsyncAtomicBlockPlaceholder(name, placeholder)
         const offset = selection.getFocusOffset() + 1
         const newSelection = selection.merge({
             'focusOffset': offset
@@ -542,12 +542,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         })
     }
 
-    const insertAsyncAtomicBlockPlaceholder = (name: string): SelectionState => {
+    const insertAsyncAtomicBlockPlaceholder = (name: string, placeholder?: string): SelectionState => {
+        const placeholderName = placeholder || name + "..."
         const currentContentState = editorStateRef.current!.getCurrentContent()
         const entityKey = currentContentState.createEntity("ASYNC_ATOMICBLOCK", 'IMMUTABLE').getLastCreatedEntityKey()
         const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(), 
                                                  currentContentState.getSelectionAfter(),
-                                                 name + "...",
+                                                 placeholderName,
                                                  undefined,
                                                  entityKey)
         
