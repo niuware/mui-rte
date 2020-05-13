@@ -324,10 +324,10 @@ Object.assign(defaultTheme, {
 
 <br />
 
-`TToolbarComponentProps`
+`TToolbarComponentProps`  
 
-|Property|Type|description|
-|---|---|---|---|
+|Property|Type|description|  
+|---|---|---|  
 |id|string|The id for the component.|
 |onMouseDown|(e: React.MouseEvent) => void|The `mousedown` handler.|
 |active|boolean|Defines if the block or inline type is active for the current editor selection.|
