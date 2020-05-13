@@ -224,7 +224,7 @@ const AtomicCustomBlock: FunctionComponent = () => {
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert) {
-                        ref.current?.insertAtomicBlock("my-card", data)
+                        ref.current?.insertAtomicBlockSync("my-card", data)
                     }
                     setAnchor(null)
                 }}

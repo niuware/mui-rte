@@ -43,7 +43,11 @@ export type TAsyncAtomicBlockResponse = {
 export type TMUIRichTextEditorRef = {
     focus: () => void
     save: () => void
+    /**
+     * @deprecated Use `insertAtomicBlockSync` instead.
+     */
     insertAtomicBlock: (name: string, data: any) => void
+    insertAtomicBlockSync: (name: string, data: any) => void
     insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
 }
 
@@ -264,7 +268,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             handleSave()
         },
         insertAtomicBlock: (name: string, data: any) => {
-            handleInsertAtomicBlock(name, data)
+            handleInsertAtomicBlockSync(name, data)
+        },
+        insertAtomicBlockSync: (name: string, data: any) => {
+            handleInsertAtomicBlockSync(name, data)
         },
         insertAsyncAtomicBlock: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
             handleInsertAsyncAtomicBlock(name, promise, placeholder)
@@ -512,7 +519,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }
 
-    const handleInsertAtomicBlock = (name: string, data: any) => {
+    const handleInsertAtomicBlockSync = (name: string, data: any) => {
         const block = atomicBlockExists(name, props.customControls)
         if (!block) {
             return
