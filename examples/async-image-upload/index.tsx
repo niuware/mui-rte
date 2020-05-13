@@ -60,7 +60,11 @@ const uploadImage = (file: File) => {
         }
         resolve({
             data: {
-                url: url
+                url: url,
+                width: 300,
+                height: 200,
+                alignment: "left", // or "center", "right"
+                type: "image" // or "video"
             }
         })
     })
