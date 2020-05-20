@@ -320,7 +320,7 @@ Object.assign(defaultTheme, {
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
 |blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
 |atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
-|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => EditorState | void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
+|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement \| null) => EditorState \| void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
 
 <br />
 
