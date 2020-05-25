@@ -115,7 +115,7 @@ const MyBlock = (props) => {
 
 <img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/async-upload-demo.gif" width="600" />
 
-It is possible to insert custom blocks based on asynchronous behavior using the `insertAtomicBlockAsync` API. The above example shows an [example](https://github.com/niuware/mui-rte/blob/master/examples/async-image-upload/index.tsx) on how to upload an image and use the `MUIRichTextEditor` default image control for further edition.
+It is possible to insert custom blocks based on asynchronous behavior using the `insertAtomicBlockAsync` API. The above example shows an [example](https://github.com/niuware/mui-rte/blob/master/examples/async-image-upload/index.tsx) on how to upload an image and use the `MUIRichTextEditor` default image control for further edition. You can use this behavior to upload a file when dropping it inside the editor and render it as an image entity after upload.
 
 Check this [other sample](https://github.com/niuware/mui-rte/blob/master/examples/async-atomic-custom-block/index.tsx) that shows how to add a `@material-ui/core` Card with asynchronous downloaded content.
 
@@ -279,7 +279,7 @@ Object.assign(defaultTheme, {
 
 ## API
 
-`<MUIRichTextEditor />`
+`<MUIRichTextEditor /> (TMUIRichTextEditorProps)`
 
 |Property|Type||description|
 |---|---|---|---|
@@ -291,8 +291,6 @@ Object.assign(defaultTheme, {
 |defaultValue|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
 |inheritFontSize|`boolean`|optional|Inherit font size from parent. Useful for read only mode.|
 |error|`boolean`|optional|Renders the editor with an error style.|
-|onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
-|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.
 |controls|`string[]`|optional|List of controls to display in the main toolbar. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "media", "numberList", "bulletList", "quote", "code", "clear", "save".|
 |customControls|`TCustomControl[]`|optional|Defines an array of user custom inline styles, blocks and callbacks. See more information in 'Custom Controls' below.|
 |decorators|`TDecorator[]`|optional|Defines an array of user custom decorators. See more information in 'Custom Decorators'.|
@@ -304,7 +302,8 @@ Object.assign(defaultTheme, {
 |draftEditorProps|`TDraftEditorProps`|optional|Defines an object containing specific `draft-js` `Editor` properties.|
 |maxLength|`number`|optional|Sets the maximum characters count that can be input into the editor.|
 |autocomplete|`TAutocomplete`|optional|Sets autocomplete strategies to present suggestion lists as the user types into the editor.|
-   
+|onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
+|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.|
 
 <br />
 
@@ -320,7 +319,7 @@ Object.assign(defaultTheme, {
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
 |blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
 |atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
-|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement \| null) => EditorState \| void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
+|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => EditorState | void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
 
 <br />
 
