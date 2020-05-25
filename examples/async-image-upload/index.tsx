@@ -43,10 +43,10 @@ const cardPopverStyles = makeStyles({
 
 const uploadImageToServer = (file: File) => {
     return new Promise(resolve => {
-        console.log(`Uploading image ${file.name}...`)
+        console.log(`Uploading image ${file.name} ...`)
         setTimeout(() => {
-            console.log("Uploaded successful")
-            resolve("https://return_uploaded_image_url")
+            console.log("Upload successful")
+            resolve(`https://return_uploaded_image_url/${file.name}`)
         }, 2000)
     })
 }
@@ -158,22 +158,26 @@ const UploadImagePopover: FunctionComponent<IUploadImagePopoverProps> = (props) 
 }
 
 const AsyncImageUpload: FunctionComponent = () => {
-    
     const ref = useRef<TMUIRichTextEditorRef>(null)
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+
+    const handleFileUpload = (file: File) => {
+        ref.current?.insertAtomicBlockAsync("IMAGE", uploadImage(file), "Uploading now...")
+    }
+
     return (
         <>
             <UploadImagePopover 
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert && data.file) {
-                        ref.current?.insertAtomicBlockAsync("IMAGE", uploadImage(data.file), "Uploading now...")
+                        handleFileUpload(data.file)
                     }
                     setAnchor(null)
                 }}
             />
             <MUIRichTextEditor
-                label="Press the last icon in the toolbar to simulate uploading an image...."
+                label="Drop a file inside the editor or press the last icon in the toolbar to simulate uploading an image...."
                 ref={ref}
                 controls={["title", "bold", "underline", "media", "upload-image"]}
                 customControls={[
@@ -186,6 +190,15 @@ const AsyncImageUpload: FunctionComponent = () => {
                         }
                     }
                 ]}
+                draftEditorProps={{
+                    handleDroppedFiles: (_selectionState, files) => {
+                        if (files.length && (files[0] as File).name !== undefined) {
+                            handleFileUpload(files[0] as File)
+                            return "handled"
+                        }
+                        return "not-handled"
+                    }
+                }}
             />
         </>
     )
