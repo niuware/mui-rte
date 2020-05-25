@@ -83,9 +83,9 @@ export type TMUIRichTextEditorProps = {
     draftEditorProps?: TDraftEditorProps
     keyCommands?: TKeyCommand[]
     maxLength?: number
+    autocomplete?: TAutocomplete
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
-    autocomplete?: TAutocomplete
 }
 
 interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
