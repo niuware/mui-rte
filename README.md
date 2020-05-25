@@ -303,7 +303,7 @@ Object.assign(defaultTheme, {
 |maxLength|`number`|optional|Sets the maximum characters count that can be input into the editor.|
 |autocomplete|`TAutocomplete`|optional|Sets autocomplete strategies to present suggestion lists as the user types into the editor.|
 |onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
-|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.|
+|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.|   
 
 <br />
 
@@ -330,7 +330,7 @@ Object.assign(defaultTheme, {
 |id|string|The id for the component.|
 |onMouseDown|(e: React.MouseEvent) => void|The `mousedown` handler.|
 |active|boolean|Defines if the block or inline type is active for the current editor selection.|
-|disabled|boolean|Sets if the toolbar is disabled.|
+|disabled|boolean|Sets if the toolbar is disabled.|   
 
 <br />
 
@@ -349,7 +349,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |key|`number`|required|The code of the key to bind.|
 |name|`string`|required|The name of the command.|
-|callback|`(state: EditorState) => EditorState`|required|The callback function to execute when the key binding is matched. It should return the `EditorState` to set.|
+|callback|`(state: EditorState) => EditorState`|required|The callback function to execute when the key binding is matched. It should return the `EditorState` to set.|   
 
 <br />
 
@@ -358,7 +358,8 @@ Object.assign(defaultTheme, {
 |Property|Type||description|
 |---|---|---|---|
 |spellCheck|`boolean`|optional|Use browser spelling check.|
-|stripPastedStyles|`boolean`|optional|Remove styles when pasting text into the editor.|   
+|stripPastedStyles|`boolean`|optional|Remove styles when pasting text into the editor.|  
+|handleDroppedFiles|`(selectionState: SelectionState, files: Blob[]) => DraftHandleValue`|optional|Handle files that have been dropped into the editor.|   
 
 <br />
 
