@@ -51,18 +51,19 @@ export type TMUIRichTextEditorRef = {
     insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => void
 }
 
-type TDraftEditorProps = {
+export type TDraftEditorProps = {
     spellCheck?: boolean
     stripPastedStyles?: boolean
+    handleDroppedFiles?: (selectionState: SelectionState, files: Blob[]) => DraftHandleValue
 }
 
-type TKeyCommand = {
+export type TKeyCommand = {
     key: number
     name: string
     callback: (state: EditorState) => EditorState
 }
 
-interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
+export type TMUIRichTextEditorProps = {
     id?: string
     /**
      * @deprecated Use `defaultValue` instead.
@@ -83,10 +84,12 @@ interface IMUIRichTextEditorProps extends WithStyles<typeof styles> {
     draftEditorProps?: TDraftEditorProps
     keyCommands?: TKeyCommand[]
     maxLength?: number
+    autocomplete?: TAutocomplete
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
-    autocomplete?: TAutocomplete
 }
+
+interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
 
 type TMUIRichTextEditorState = {
     anchorUrlPopover?: HTMLElement
