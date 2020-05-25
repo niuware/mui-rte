@@ -54,6 +54,7 @@ export type TMUIRichTextEditorRef = {
 export type TDraftEditorProps = {
     spellCheck?: boolean
     stripPastedStyles?: boolean
+    handleDroppedFiles?: (selectionState: SelectionState, files: Blob[]) => DraftHandleValue
 }
 
 export type TKeyCommand = {
