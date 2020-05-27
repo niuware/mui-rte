@@ -87,6 +87,8 @@ export type TMUIRichTextEditorProps = {
     autocomplete?: TAutocomplete
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
+    onFocus?: () => void
+    onBlur?: () => void
 }
 
 interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
@@ -502,10 +504,17 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const handleFocus = () => {
         setFocus(true)
         setTimeout(() => (editorRef.current as any).focus(), 0)
+        if (props.onFocus) {
+            props.onFocus()
+        }
     }
 
     const handleBlur = () => {
         setFocus(false)
+        if (props.onBlur) {
+            props.onBlur()
+        }
+
         if (!state.anchorUrlPopover) {
             setState({
                 ...state,

@@ -22,12 +22,22 @@ const change = (state: EditorState) => {
     }
 }
 
+const focus = () => {
+    console.log('Focus on MUIRichTextEditor');
+}
+
+const blur = () => {
+    console.log('Blur, focus lost on MUIRichTextEditor');
+}
+
 const Events = () => {
     return (
         <MUIRichTextEditor 
             label="Open the console to see the event callback as you type..."
             onSave={save}
             onChange={change}
+            onFocus={focus}
+            onBlur={blur}
         />
     )
 }

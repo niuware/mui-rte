@@ -303,7 +303,9 @@ Object.assign(defaultTheme, {
 |maxLength|`number`|optional|Sets the maximum characters count that can be input into the editor.|
 |autocomplete|`TAutocomplete`|optional|Sets autocomplete strategies to present suggestion lists as the user types into the editor.|
 |onSave|`(data:string) => void`|optional|Function triggered when the save button is pressed. The `data` is a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
-|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.|   
+|onChange|`(state: EditorState) => void`|optional|Function triggered on any change in the editor (key input, delete, etc.). The `state` is a `Draft.Model.ImmutableData.EditorState` object.|
+|onFocus|`() => void`|optional|Function triggered when when the editor acquires focus.|
+|onBlur|`() => void`|optional|Function triggered when when the editor loses focus.|
 
 <br />
 
