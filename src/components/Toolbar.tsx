@@ -1,5 +1,11 @@
 import React, { FunctionComponent, useState, useEffect } from 'react'
 import { EditorState } from 'draft-js'
+import LooksOneIcon from '@material-ui/icons/LooksOne'
+import LooksTwoIcon from '@material-ui/icons/LooksTwo'
+import Looks3Icon from '@material-ui/icons/Looks3'
+import Looks4Icon from '@material-ui/icons/Looks4'
+import Looks5Icon from '@material-ui/icons/Looks5'
+import Looks6Icon from '@material-ui/icons/Looks6'
 import FormatBoldIcon from '@material-ui/icons/FormatBold'
 import FormatItalicIcon from '@material-ui/icons/FormatItalic'
 import FormatUnderlinedIcon from '@material-ui/icons/FormatUnderlined'
@@ -20,9 +26,14 @@ import ToolbarButton from './ToolbarButton'
 import { getSelectionInfo } from '../utils'
 
 export type TToolbarControl =
-    "title" | "bold" | "italic" | "underline" | "link" | "numberList" |
-    "bulletList" | "quote" | "code" | "clear" | "save" | "media" |
-    "strikethrough" | "highlight" | string
+    "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "title" | "bold" | "italic" | "underline" | "link" |
+    "numberList" | "bulletList" | "quote" | "code" | "clear" | "save" | "media" | "strikethrough" |
+    "highlight" | string
+
+export const DefaultControls = [
+    "title", "bold", "italic", "underline", "link", "numberList", "bulletList", "quote", "code",
+    "clear", "save", "media", "strikethrough", "highlight"
+]
 
 export type TControlType = "inline" | "block" | "callback" | "atomic"
 
@@ -73,7 +84,49 @@ type TToolbarProps = {
 
 const STYLE_TYPES: TStyleType[] = [
     {
+        label: 'H1',
+        name: "h1",
+        style: 'header-one',
+        icon: <LooksOneIcon />,
+        type: "block"
+    },
+    {
         label: 'H2',
+        name: "h2",
+        style: 'header-two',
+        icon: <LooksTwoIcon />,
+        type: "block"
+    },
+    {
+        label: 'H3',
+        name: "h3",
+        style: 'header-three',
+        icon: <Looks3Icon />,
+        type: "block"
+    },
+    {
+        label: 'H4',
+        name: "h4",
+        style: 'header-four',
+        icon: <Looks4Icon />,
+        type: "block"
+    },
+    {
+        label: 'H5',
+        name: "h5",
+        style: 'header-five',
+        icon: <Looks5Icon />,
+        type: "block"
+    },
+    {
+        label: 'H6',
+        name: "h6",
+        style: 'header-siz',
+        icon: <Looks6Icon />,
+        type: "block"
+    },
+    {
+        label: 'Title',
         name: "title",
         style: 'header-two',
         icon: <TitleIcon />,
@@ -189,17 +242,14 @@ const STYLE_TYPES: TStyleType[] = [
 ]
 
 const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
-    const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
+    const controls = props.controls ?? DefaultControls
+    const [availableControls, setAvailableControls] = useState<TStyleType[]>([])
     const {editorState} = props
     const id = props.inlineMode ? "-inline-toolbar" : "-toolbar"
 
     useEffect(() => {
-        if (!props.controls) {
-            return
-        }
         const filteredControls: TStyleType[] = []
-        const controls = props.controls.filter((control, index) => props.controls!.indexOf(control) >= index)
-        controls.forEach(name => {
+        controls.filter((control, index) => controls!.indexOf(control) >= index).forEach(name => {
             const style = STYLE_TYPES.find(style => style.name === name)
             if (style) {
                 filteredControls.push(style)
@@ -222,7 +272,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
             }
         })
         setAvailableControls(filteredControls)
-    }, [props.controls, props.customControls])
+    }, [controls, props.customControls])
 
     return (
         <div id={`${props.id}${id}`} className={props.className}>

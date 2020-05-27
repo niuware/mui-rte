@@ -291,7 +291,7 @@ Object.assign(defaultTheme, {
 |defaultValue|`string`|optional|Default content to load. Should be a stringified `Draft.Model.Encoding.RawDraftContentState` object.|
 |inheritFontSize|`boolean`|optional|Inherit font size from parent. Useful for read only mode.|
 |error|`boolean`|optional|Renders the editor with an error style.|
-|controls|`string[]`|optional|List of controls to display in the main toolbar. If not provided, all controls will be rendered. Current available values are: "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "media", "numberList", "bulletList", "quote", "code", "clear", "save".|
+|controls|`string[]`|optional|List of controls to display in the main toolbar. Current available values are: "h1", "h2", "h3", "h4", "h5", "h6", "title", "bold", "italic", "underline", "strikethrough", "highlight", "undo", "redo", "link", "media", "numberList", "bulletList", "quote", "code", "clear", "save". If not provided, all controls except the headers (h1 - h6) will be rendered.|
 |customControls|`TCustomControl[]`|optional|Defines an array of user custom inline styles, blocks and callbacks. See more information in 'Custom Controls' below.|
 |decorators|`TDecorator[]`|optional|Defines an array of user custom decorators. See more information in 'Custom Decorators'.|
 |toolbar|`boolean`|optional|Defines if the main toolbar should be rendered.|
