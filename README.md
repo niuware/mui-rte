@@ -315,6 +315,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |id|`string`|optional|The HTML id attribute for the control|
 |name|`string`|required|The name of the custom control. For rendering the control this name should be added to the `MUIRichTextEditor` `controls` property.|
+|style|`string`|optional|The optional style of the custom control. If omitted the `name` will be used. E.g. "header-one".|
 |icon|`JSX.Element`|optional|The `@material-ui/icons` icon for the control. For "atomic" control type, the icon is not required. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
 |component|`React.FunctionComponent<TToolbarComponentProps>`|optional|The custom function component for the control. The icon has priority over the component, so if the icon is set the component will be ignored. For "atomic" control type, the component is not required.|
 |type|`string`|required|Either "inline", "block", "atomic" or "callback"|
