@@ -322,7 +322,7 @@ Object.assign(defaultTheme, {
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
 |blockWrapper|`React.ReactElement`|optional|The custom React component used for rendering a custom block.|
 |atomicComponent|`React.FunctionComponent`|optional|The custom React FunctionComponent used for rendering a custom atomic block.|
-|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement | null) => EditorState | void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
+|onClick|`(editorState: EditorState, name: string, anchor: HTMLElement \| null) => EditorState \| void`|optional|The callback function triggered when the custom control is clicked. The received arguments include the current `EditorState` object, the name of the clicked control and the `HTMLElement` from which the click was raised. If a new `EditorState` object is returned it will be replace the current one in the editor (useful to explicitly modify the `EditorState`).|   
 
 <br />
 
@@ -330,10 +330,10 @@ Object.assign(defaultTheme, {
 
 |Property|Type|description|  
 |---|---|---|  
-|id|string|The id for the component.|
-|onMouseDown|(e: React.MouseEvent) => void|The `mousedown` handler.|
-|active|boolean|Defines if the block or inline type is active for the current editor selection.|
-|disabled|boolean|Sets if the toolbar is disabled.|   
+|id|`string`|The id for the component.|
+|onMouseDown|`(e: React.MouseEvent) => void`|The `mousedown` handler.|
+|active|`boolean`|Defines if the block or inline type is active for the current editor selection.|
+|disabled|`boolean`|Sets if the toolbar is disabled.|   
 
 <br />
 
@@ -362,7 +362,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |spellCheck|`boolean`|optional|Use browser spelling check.|
 |stripPastedStyles|`boolean`|optional|Remove styles when pasting text into the editor.|  
-|handleDroppedFiles|`(selectionState: SelectionState, files: Blob[]) => DraftHandleValue`|optional|Handle files that have been dropped into the editor.|   
+|handleDroppedFiles|`(selectionState: SelectionState, files: Blob[]) => DraftHandleValue`|optional|Handle files that have been dropped into the editor. The `DraftHandleValue` is either `handled` or `not-handled`.|   
 
 <br />
 
@@ -392,7 +392,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |keys|`string[]`|required|The list of keys that the user needs to type to reveal this item suggestion.|
 |value|`any`|required|The value to insert into the editor when the item is selected.|
-|content|`string | JSX.Element`|required|The content presented in the autocomplete suggestion list for this item. Note that this content is render under a `ListItem` component.|   
+|content|`string \| JSX.Element`|required|The content presented in the autocomplete suggestion list for this item. Note that this content is render under a `ListItem` component.|   
 
 <br />
 
