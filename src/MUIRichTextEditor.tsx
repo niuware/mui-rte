@@ -1059,6 +1059,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         data={state.urlData}
                         anchor={state.anchorUrlPopover}
                         onConfirm={handleConfirmPrompt}
+                        onCancel={dismissPopover}
                         isMedia={state.urlIsMedia}
                     />
                     : null}
