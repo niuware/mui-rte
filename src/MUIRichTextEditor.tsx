@@ -689,6 +689,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         confirmLink(...args)
     }
 
+    const handleClosePrompt = () => {
+        setState({ ...state, anchorUrlPopover: undefined })
+    }
+
     const handleToolbarClick = (style: string, type: string, id: string, inlineMode?: boolean) => {
         if (type === "inline") {
             return toggleInlineStyle(style)
@@ -748,10 +752,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 removeLink()
                 return
             }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            handleClosePrompt()
             return
         }
 
@@ -792,10 +793,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             if (urlKey) {
                 removeMedia()
             }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            handleClosePrompt()
             return
         }
 
@@ -1062,6 +1060,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         data={state.urlData}
                         anchor={state.anchorUrlPopover}
                         onConfirm={handleConfirmPrompt}
+                        onCancel={handleClosePrompt}
                         isMedia={state.urlIsMedia}
                     />
                     : null}
