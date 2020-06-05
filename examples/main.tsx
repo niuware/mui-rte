@@ -14,6 +14,7 @@ import ResetValue from './reset-value'
 import AtomicCustomBlock from './atomic-custom-block'
 import KeyBindings from './key-bindings'
 import MaxLength from './max-length'
+import MUITextFieldIntegration from './mui-textfield-integration'
 import Autocomplete from './autocomplete'
 import AutocompleteAtomic from './autocomplete-atomic'
 import AsyncImageUpload from './async-image-upload'
@@ -46,6 +47,7 @@ const App = () => {
             <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
             <button onClick={() => setSample(<KeyBindings />)}>Key Bindings</button>
             <button onClick={() => setSample(<MaxLength />)}>Max length</button>
+            <button onClick={() => setSample(<MUITextFieldIntegration />)}>Material UI TextField Integration</button>
             <button onClick={() => setSample(<Autocomplete />)}>Autocomplete</button>
             <button onClick={() => setSample(<AutocompleteAtomic />)}>Autocomplete Atomic</button>
             <div style={{
