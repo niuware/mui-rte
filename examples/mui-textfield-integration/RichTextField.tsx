@@ -1,4 +1,4 @@
-import React, { Ref, useRef, useImperativeHandle, useEffect, useState } from 'react'
+import React, { Ref, useRef, useImperativeHandle, useCallback, useEffect, useState } from 'react'
 import TextField, { TextFieldProps } from '@material-ui/core/TextField'
 import { InputBaseComponentProps } from '@material-ui/core/InputBase'
 import { EditorState } from 'draft-js'
@@ -24,7 +24,7 @@ export const RichTextInput = ({
     const richTextRef = useRef<TMUIRichTextEditorRef>(null)
 
     // Attempts to focus the rich text editor reference
-    const focusRichText = () => richTextRef.current?.focus()
+    const focusRichText = useCallback(() => richTextRef.current?.focus(), [richTextRef])
 
     // Pass on the focus event of the input ref to the rich text ref
     useImperativeHandle(inputRef, () => ({ focus: () => focusRichText }))
@@ -34,7 +34,7 @@ export const RichTextInput = ({
         if (acquireFocus) {
             focusRichText()
         }
-    }, [acquireFocus])
+    }, [acquireFocus, focusRichText])
 
     return (
         <MUIRichTextEditor
