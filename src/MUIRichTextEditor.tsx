@@ -822,6 +822,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const updateStateForPopover = (editorState: EditorState) => {
         setEditorState(editorState)
+        dismissPopover()
+    }
+
+    const dismissPopover = () => {
         refocus()
         setState({
             ...state,
