@@ -738,7 +738,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const removeLink = () => {
         const selection = editorState.getSelection()
-        updateStateForPopover(RichUtils.toggleLink(editorState, selection, null))
+        setEditorState(RichUtils.toggleLink(editorState, selection, null))
     }
 
     const confirmLink = (url?: string) => {
@@ -746,12 +746,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!url) {
             if (urlKey) {
                 removeLink()
-                return
-            }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            } 
+            dismissPopover()
             return
         }
 
