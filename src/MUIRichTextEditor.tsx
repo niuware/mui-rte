@@ -792,10 +792,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             if (urlKey) {
                 removeMedia()
             }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            dismissPopover()
             return
         }
 
