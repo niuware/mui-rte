@@ -6,7 +6,7 @@ import { TCustomControl } from './components/Toolbar'
 export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
     blockType: DraftBlockType,
-    entityType: string | null,
+    entityType: string,
     linkKey: string
     block: ContentBlock
 }
@@ -21,7 +21,7 @@ const getSelectionInfo = (editorState: EditorState): TSelectionInfo => {
     const contentBlock = currentContent.getBlockForKey(selection.getStartKey())
     const currentStyle = editorState.getCurrentInlineStyle()
     const linkKey = contentBlock.getEntityAt(startOffset)
-    let entityType = null
+    let entityType = ""
     if (linkKey) {
         const linkInstance = currentContent.getEntity(linkKey)
         entityType = linkInstance.getType()
