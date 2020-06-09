@@ -738,7 +738,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const removeLink = () => {
         const selection = editorState.getSelection()
-        updateStateForPopover(RichUtils.toggleLink(editorState, selection, null))
+        setEditorState(RichUtils.toggleLink(editorState, selection, null))
     }
 
     const confirmLink = (url?: string) => {
@@ -746,17 +746,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!url) {
             if (urlKey) {
                 removeLink()
-                return
-            }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            } 
+            dismissPopover()
             return
         }
 
         const contentState = editorState.getCurrentContent()
-        let replaceEditorState = null
+        let replaceEditorState = editorState
         const data = {
             url: url
         }
@@ -792,10 +788,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             if (urlKey) {
                 removeMedia()
             }
-            setState({
-                ...state,
-                anchorUrlPopover: undefined
-            })
+            dismissPopover()
             return
         }
 
@@ -822,6 +815,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const updateStateForPopover = (editorState: EditorState) => {
         setEditorState(editorState)
+        dismissPopover()
+    }
+
+    const dismissPopover = () => {
         refocus()
         setState({
             ...state,
