@@ -758,7 +758,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const contentState = editorState.getCurrentContent()
         let replaceEditorState = editorState
         const data = {
-            url: url
+            url: url,
+            className: classes.anchorLink
         }
 
         if (urlKey) {
