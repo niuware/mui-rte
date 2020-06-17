@@ -12,10 +12,6 @@ const Link: FunctionComponent<TLinkProps> = (props) => {
     return (
         <a 
             href={url} 
-            style={{
-                textDecoration: "underline",
-                color: "inherit"
-            }} 
             className={`${className} editor-anchor`}
             target="_blank"
         >
