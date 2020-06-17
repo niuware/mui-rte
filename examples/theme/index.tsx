@@ -37,6 +37,9 @@ Object.assign(defaultTheme, {
                 width: "inherit",
                 position: "absolute",
                 top: "20px"
+            },
+            anchorLink: {
+                color: "#333333"
             }
         }
     }
