@@ -309,7 +309,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
-        setEditorState(EditorState.moveFocusToEnd(editorState))
+        if (props.readOnly === true) {
+            setEditorState(editorState)
+        } else {
+            setEditorState(EditorState.moveFocusToEnd(editorState))
+        }
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
