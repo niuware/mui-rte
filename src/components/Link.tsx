@@ -8,7 +8,7 @@ type TLinkProps = {
 }
 
 const Link: FunctionComponent<TLinkProps> = (props) => {
-    const { url } = props.contentState.getEntity(props.entityKey).getData()
+    const { url, className } = props.contentState.getEntity(props.entityKey).getData()
     return (
         <a 
             href={url} 
@@ -16,7 +16,7 @@ const Link: FunctionComponent<TLinkProps> = (props) => {
                 textDecoration: "underline",
                 color: "inherit"
             }} 
-            className="editor-anchor"
+            className={`${className} editor-anchor`}
             target="_blank"
         >
             {props.children}
