@@ -160,7 +160,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     anchorLink: {
         textDecoration: "underline",
-        color: palette.secondary.main
+        color: "inherit"
     },
     toolbar: {
     },
@@ -309,7 +309,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
-        setEditorState(EditorState.moveFocusToEnd(editorState))
+        if (props.readOnly === true) {
+            setEditorState(editorState)
+        } else {
+            setEditorState(EditorState.moveFocusToEnd(editorState))
+        }
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
@@ -754,7 +758,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const contentState = editorState.getCurrentContent()
         let replaceEditorState = editorState
         const data = {
-            url: url
+            url: url,
+            className: classes.anchorLink
         }
 
         if (urlKey) {
