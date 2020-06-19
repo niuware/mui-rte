@@ -39,7 +39,8 @@ Object.assign(defaultTheme, {
                 top: "20px"
             },
             anchorLink: {
-                color: "#333333"
+                color: "#333333",
+                textDecoration: "underline"
             }
         }
     }

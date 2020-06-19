@@ -159,8 +159,6 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         width: "100%"
     },
     anchorLink: {
-        textDecoration: "underline",
-        color: "inherit"
     },
     toolbar: {
     },
