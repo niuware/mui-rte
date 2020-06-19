@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react'
 import { ContentState } from 'draft-js'
+import MuiLink from '@material-ui/core/Link'
 
 type TLinkProps = {
     children?: React.ReactNode
@@ -10,13 +11,13 @@ type TLinkProps = {
 const Link: FunctionComponent<TLinkProps> = (props) => {
     const { url, className } = props.contentState.getEntity(props.entityKey).getData()
     return (
-        <a 
+        <MuiLink 
             href={url} 
             className={`${className} editor-anchor`}
             target="_blank"
         >
             {props.children}
-        </a>
+        </MuiLink>
     )
 }
 
