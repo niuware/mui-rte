@@ -320,6 +320,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }, [props.value, props.defaultValue])
 
     useEffect(() => {
+        if (props.onChange) {
+            props.onChange(editorState)
+        }
         editorStateRef.current = editorState
     }, [editorState])
 
@@ -483,9 +486,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const handleChange = (state: EditorState) => {
         setEditorState(state)
-        if (props.onChange) {
-            props.onChange(state)
-        }
     }
 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
