@@ -64,7 +64,7 @@ const uploadImage = (file: File) => {
                 width: 300,
                 height: 200,
                 alignment: "left", // or "center", "right"
-                type: "image" // or "video"
+                type: "image" // or "video", "audio"
             }
         })
     })

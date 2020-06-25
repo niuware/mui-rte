@@ -46,8 +46,8 @@ const Media: FunctionComponent<IMediaProps> = (props) => {
                 [props.classes.editable]: !readOnly,
                 [props.classes.focused]: !readOnly && focusKey === props.block.getKey()
             }),
-            width: width,
-            height: type === "video" ? "auto" : height,
+            width: type == "audio" ? "auto" : width,
+            height: type === "video" || type === "audio" ? "auto" : height,
             onClick: () => {
                 if (readOnly) {
                     return
@@ -61,6 +61,14 @@ const Media: FunctionComponent<IMediaProps> = (props) => {
         }
         if (type === "video") {
             return <video {...componentProps} autoPlay={false} controls />
+        }
+        if (type === "audio") {
+            return <audio {...componentProps}
+                // onClick doesn't work on audio elements
+                onPlay={componentProps.onClick}
+                onPause={componentProps.onClick}
+                onSeeking={componentProps.onClick}
+                autoPlay={false} controls />
         }
         return null
     }

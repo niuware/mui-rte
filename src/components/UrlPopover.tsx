@@ -8,6 +8,7 @@ import ButtonGroup from '@material-ui/core/ButtonGroup'
 import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
 import MovieIcon from '@material-ui/icons/Movie'
 import CheckIcon from '@material-ui/icons/Check'
+import AudioIcon from '@material-ui/icons/Audiotrack'
 import DeleteIcon from '@material-ui/icons/DeleteOutline'
 import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
 import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft'
@@ -15,7 +16,7 @@ import FormatAlignRight from '@material-ui/icons/FormatAlignRight'
 
 export type TAlignment = "left" | "center" | "right"
 
-export type TMediaType = "image" | "video"
+export type TMediaType = "image" | "video" | "audio"
 
 export type TUrlData = {
     url?: string
@@ -110,6 +111,13 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                             onClick={() => setData({...data, type: "video"})}
                                         >
                                             <MovieIcon />
+                                        </Button>
+                                        <Button
+                                            color={data.type === "audio" ? "primary" : "default"}
+                                            size="small"
+                                            onClick={() => setData({...data, type: "audio"})}
+                                        >
+                                            <AudioIcon />
                                         </Button>
                                     </ButtonGroup>
                                 </Grid>
