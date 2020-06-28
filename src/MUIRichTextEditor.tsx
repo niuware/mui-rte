@@ -159,8 +159,6 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         width: "100%"
     },
     anchorLink: {
-        textDecoration: "underline",
-        color: palette.secondary.main
     },
     toolbar: {
     },
@@ -309,7 +307,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
-        setEditorState(editorState)
+        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
+        if (props.readOnly === true) {
+            setEditorState(nextEditorState)
+        } else {
+            setEditorState(EditorState.moveFocusToEnd(nextEditorState))
+        }
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
@@ -317,6 +320,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }, [props.value, props.defaultValue])
 
     useEffect(() => {
+        if (props.onChange) {
+            props.onChange(editorState)
+        }
         editorStateRef.current = editorState
     }, [editorState])
 
@@ -480,9 +486,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const handleChange = (state: EditorState) => {
         setEditorState(state)
-        if (props.onChange) {
-            props.onChange(state)
-        }
     }
 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
@@ -751,7 +754,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const contentState = editorState.getCurrentContent()
         let replaceEditorState = editorState
         const data = {
-            url: url
+            url: url,
+            className: classes.anchorLink
         }
 
         if (urlKey) {
