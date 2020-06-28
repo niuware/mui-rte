@@ -200,15 +200,15 @@ const STYLE_TYPES: TStyleType[] = [
     {
         label: 'OL',
         name: "bulletList",
-        style: 'ordered-list-item',
-        icon: <FormatListNumberedIcon />,
+        style: 'unordered-list-item',
+        icon: <FormatListBulletedIcon />,
         type: "block"
     },
     {
         label: 'UL',
         name: "numberList",
-        style: 'unordered-list-item',
-        icon: <FormatListBulletedIcon />,
+        style: 'ordered-list-item',
+        icon: <FormatListNumberedIcon />,
         type: "block"
     },
     {
