@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react'
 import IconButton from '@material-ui/core/IconButton'
+import Tooltip from '@material-ui/core/Tooltip';
 import { TToolbarComponentProps, TToolbarButtonSize } from './Toolbar'
 
 interface IToolbarButtonProps {
@@ -34,6 +35,7 @@ const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props) => {
     }
     if (props.icon) {
         return (
+            <Tooltip title={props.label} placement="top">
             <IconButton
                 {...sharedProps}
                 aria-label={props.label}
@@ -42,6 +44,7 @@ const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props) => {
             >
                 {props.icon}
             </IconButton>
+            </Tooltip>
         )
     }
     if (props.component) {
