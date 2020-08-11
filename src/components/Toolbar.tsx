@@ -145,14 +145,14 @@ const STYLE_TYPES: TStyleType[] = [
         id: "media-control"
     },
     {
-        label: 'OL',
+        label: 'UL',
         name: "bulletList",
         style: 'unordered-list-item',
         icon: <FormatListBulletedIcon />,
         type: "block"
     },
     {
-        label: 'UL',
+        label: 'OL',
         name: "numberList",
         style: 'ordered-list-item',
         icon: <FormatListNumberedIcon />,
