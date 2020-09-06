@@ -121,7 +121,7 @@ const STYLE_TYPES: TStyleType[] = [
     {
         label: 'H6',
         name: "h6",
-        style: 'header-siz',
+        style: 'header-six',
         icon: <Looks6Icon />,
         type: "block"
     },
