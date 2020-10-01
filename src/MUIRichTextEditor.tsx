@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef, 
+import React, { FunctionComponent, useEffect, useState, useRef,
     forwardRef, useImperativeHandle, RefForwardingComponent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, 
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator,
     SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
@@ -29,6 +29,7 @@ export type TAutocompleteStrategy = {
     items: TAutocompleteItem[]
     insertSpaceAfter?: boolean
     atomicBlockName?: string
+    handleAutoComplete?: (editorState: EditorState, selectionState: SelectionState, value: any) => EditorState
 }
 
 export type TAutocomplete = {
@@ -350,7 +351,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
         setTimeout(() => {
             const selection = editorStateRef.current!.getSelection()
-            if (selection.isCollapsed() || (toolbarPositionRef !== undefined && 
+            if (selection.isCollapsed() || (toolbarPositionRef !== undefined &&
                 selectionRef.current.start === selection.getStartOffset() &&
                 selectionRef.current.end === selection.getEndOffset())) {
                     const selectionInfo = getSelectionInfo(editorStateRef.current!)
@@ -418,13 +419,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!block) {
             return
         }
-        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
+        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
                                                     selection,
                                                     "forward")
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
         const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
             value: value
-        }, { 
+        }, {
             selection: newEditorState.getCurrentContent().getSelectionAfter()
         })
         handleChange(withAtomicBlock)
@@ -433,7 +434,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
         const currentContentState = editorState.getCurrentContent()
         const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey()
-        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
+        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(),
                                                     selection,
                                                     value,
                                                     editorStateRef.current!.getCurrentInlineStyle(),
@@ -459,8 +460,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             const newSelection = currentSelection.merge({
                 'focusOffset': offset
             })
-            if (autocompleteRef.current!.atomicBlockName) {
-                const name = autocompleteRef.current!.atomicBlockName
+            const autoCompleteStrategy = autocompleteRef.current!
+            if (autoCompleteStrategy.handleAutoComplete) {
+                const newState = autoCompleteStrategy.handleAutoComplete(editorState, newSelection as SelectionState, item.value)
+                handleChange(newState)
+            } else if (autoCompleteStrategy.atomicBlockName) {
+                const name = autoCompleteStrategy.atomicBlockName
                 insertAutocompleteSuggestionAsAtomicBlock(name, newSelection as SelectionState, item.value)
             } else {
                 insertAutocompleteSuggestionAsText(newSelection as SelectionState, item.value)
@@ -544,7 +549,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!block) {
             return
         }
-        const newEditorState = insertAtomicBlock(editorState, block.name.toUpperCase(), data, { 
+        const newEditorState = insertAtomicBlock(editorState, block.name.toUpperCase(), data, {
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
@@ -576,12 +581,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const placeholderName = placeholder || name + "..."
         const currentContentState = editorStateRef.current!.getCurrentContent()
         const entityKey = currentContentState.createEntity("ASYNC_ATOMICBLOCK", 'IMMUTABLE').getLastCreatedEntityKey()
-        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(), 
+        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(),
                                                  currentContentState.getSelectionAfter(),
                                                  placeholderName,
                                                  undefined,
                                                  entityKey)
-        
+
         const selection = currentContentState.getSelectionAfter()
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
         handleChange(newEditorState)
@@ -749,7 +754,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!url) {
             if (urlKey) {
                 removeLink()
-            } 
+            }
             dismissPopover()
             return
         }
@@ -902,8 +907,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-        const newEditorStateRaw = EditorState.set(editorState, { 
-            currentContent: contentStateWithEntity, 
+        const newEditorStateRaw = EditorState.set(editorState, {
+            currentContent: contentStateWithEntity,
             ...options
         })
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
@@ -940,14 +945,14 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
-            && autocompleteRef.current 
+            && autocompleteRef.current
             && text.substr(text.length - 1) === autocompleteRef.current.triggerChar) {
             clearSearch()
-        } else if (autocompletePositionRef.current 
+        } else if (autocompletePositionRef.current
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-        } else if (!autocompletePositionRef.current && 
+        } else if (!autocompletePositionRef.current &&
             (keyBinding === "backspace"
             || keyBinding === "split-block")) {
             clearSearch()
