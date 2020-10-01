@@ -18,7 +18,7 @@
     "url": "https://github.com/niuware/mui-rte/issues"
   },
   "homepage": "https://github.com/niuware/mui-rte#readme",
-  "main": "dist/index.js",
+  "main": "./index.ts",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
     "watch": "cross-env NODE_ENV=development rollup -c -w",
