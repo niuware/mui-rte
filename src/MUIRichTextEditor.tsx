@@ -505,11 +505,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleFocus = () => {
-        setFocus(true)
-        setTimeout(() => (editorRef.current as any).focus(), 0)
+        focusEditor()
         if (props.onFocus) {
             props.onFocus()
         }
+    }
+
+    const focusEditor = () => {
+        setFocus(true)
+        setTimeout(() => editorRef.current?.focus(), 0)
     }
 
     const handleBlur = () => {
