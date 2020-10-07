@@ -150,7 +150,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     placeHolder: {
         color: palette.grey[600],
-        position: "absolute"
+        position: "absolute",
+        outline: "none"
     },
     linkPopover: {
         padding: spacing(2, 2, 2, 2)
