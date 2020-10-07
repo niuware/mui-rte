@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState, useRef, 
-    forwardRef, useImperativeHandle, RefForwardingComponent } from 'react'
+    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -502,6 +502,22 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+    }
+
+    const isSyntheticEventTriggeredByTab = (event: SyntheticEvent): boolean => {
+        if (!event.hasOwnProperty("relatedTarget") || (event as any).relatedTarget == null) {
+            return false
+        }
+        return true
+    }
+
+    const handleEditorFocus = (event: SyntheticEvent) => {
+        handleFocus()
+        if (!isSyntheticEventTriggeredByTab(event)) {
+            return
+        }
+        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
+        setTimeout(() => (setEditorState(EditorState.moveFocusToEnd(nextEditorState))), 0)
     }
 
     const handleFocus = () => {
@@ -1046,7 +1062,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
-                    })} onClick={handleFocus} onBlur={handleBlur}>
+                    })} onFocus={handleEditorFocus} onBlur={handleBlur}>
                         <Editor
                             customStyleMap={customRenderers.style}
                             blockRenderMap={customRenderers.block}
