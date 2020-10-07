@@ -252,7 +252,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         block: undefined
     })
 
-    const editorRef = useRef(null)
+    const editorRef = useRef<Editor>(null)
     const editorId = props.id || "mui-rte"
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
@@ -623,7 +623,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         for (let control of props.customControls) {
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
-                    setTimeout(() => (editorRef.current as any).blur(), 0)
+                    setTimeout(() => editorRef.current?.blur(), 0)
                     const newState = control.onClick(editorState, control.name, document.getElementById(id))
                     if (newState) {
                         if (newState.getSelection().isCollapsed()) {
@@ -834,8 +834,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const refocus = () => {
-        setTimeout(() => (editorRef.current as any).blur(), 0)
-        setTimeout(() => (editorRef.current as any).focus(), 1)
+        setTimeout(() => editorRef.current?.blur(), 0)
+        setTimeout(() => editorRef.current?.focus(), 1)
     }
 
     const toggleBlockType = (blockType: string) => {
