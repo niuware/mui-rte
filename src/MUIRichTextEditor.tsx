@@ -990,7 +990,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     className={classNames(classes.editorContainer, classes.placeHolder, {
                         [classes.error]: props.error
                     })}
-                    onClick={handleFocus}
+                    tabIndex={0}
+                    onFocus={focusEditor}
                 >
                     {props.label || ""}
                 </div>
