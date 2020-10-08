@@ -1070,13 +1070,14 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
-                    })} onFocus={handleEditorFocus} onBlur={handleBlur}>
+                    })} onBlur={handleBlur}>
                         <Editor
                             customStyleMap={customRenderers.style}
                             blockRenderMap={customRenderers.block}
                             blockRendererFn={blockRenderer}
                             editorState={editorState}
                             onChange={handleChange}
+                            onFocus={handleEditorFocus}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
