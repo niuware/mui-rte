@@ -62,6 +62,12 @@ const Media: FunctionComponent<IMediaProps> = (props) => {
         if (type === "video") {
             return <video {...componentProps} autoPlay={false} controls />
         }
+        if (type === "youtube") {
+            const youtubeDefaultwidth = componentProps.width ? componentProps.width : 560;
+            const youtubeDefaultheight = componentProps.height ? componentProps.height : 315;
+            const srcLink = componentProps.src.split('/')[3].split('v=')[1];
+            return <iframe width={youtubeDefaultwidth} height={youtubeDefaultheight} src={`https://www.youtube.com/embed/${srcLink}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+        }
         return null
     }
 
