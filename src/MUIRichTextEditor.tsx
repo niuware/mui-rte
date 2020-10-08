@@ -747,6 +747,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return isMaxLengthHandled(editorState, text.length)
     }
 
+    const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, 1)
+    }
+
     const isMaxLengthHandled = (editorState: EditorState, nextLength: number): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGreaterThan(currentLength + nextLength, props.maxLength) ? "handled" : "not-handled"
@@ -1077,6 +1081,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
                             handlePastedText={handlePastedText}
+                            handleReturn={handleReturn}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
