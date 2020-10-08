@@ -261,6 +261,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const isFirstFocus = useRef(true)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -518,6 +519,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
         const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
         setTimeout(() => (setEditorState(EditorState.moveFocusToEnd(nextEditorState))), 0)
+    }
+
+    const handlePlaceholderFocus = () => {
+        if (isFirstFocus.current === false) {
+            focusEditor()
+            return
+        }
+        handleFocus()
+        isFirstFocus.current = false
     }
 
     const handleFocus = () => {
@@ -1015,7 +1025,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         [classes.error]: props.error
                     })}
                     tabIndex={0}
-                    onFocus={focusEditor}
+                    onFocus={handlePlaceholderFocus}
                 >
                     {props.label || ""}
                 </div>
