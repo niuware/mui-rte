@@ -489,7 +489,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         setEditorState(state)
     }
 
-    const handleBeforeInput = (chars: string): DraftHandleValue => {
+    const handleBeforeInput = (chars: string, editorState: EditorState): DraftHandleValue => {
         if (chars === " " && searchTerm.length) {
             clearSearch()
         } else if (autocompleteSelectionStateRef.current) {
@@ -501,8 +501,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 updateAutocompletePosition()
             }
         }
-        const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+        return isMaxLengthHandled(editorState, 1)
     }
 
     const isSyntheticEventTriggeredByTab = (event: SyntheticEvent): boolean => {
@@ -745,8 +744,16 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, text.length)
+    }
+
+    const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, 1)
+    }
+
+    const isMaxLengthHandled = (editorState: EditorState, nextLength: number): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + nextLength, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -1074,6 +1081,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
                             handlePastedText={handlePastedText}
+                            handleReturn={handleReturn}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
