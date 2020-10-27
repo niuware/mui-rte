@@ -3,11 +3,19 @@ import Avatar from '@material-ui/core/Avatar'
 import Chip from '@material-ui/core/Chip'
 import MUIRichTextEditor from '../../'
 import { TAutocompleteItem } from '../../src/components/Autocomplete'
+import { makeStyles } from '@material-ui/core'
 
 const save = (data: string) => {
     console.log(data)
 }
 
+const useStyles = makeStyles({
+    autocomplete: {
+        backgroundColor: "lightgrey",
+        border: "1px solid grey",
+        borderRadius: "3px",
+    }
+})
 const cities: TAutocompleteItem[] = [
     {
         keys: ["mexico"],
@@ -52,17 +60,21 @@ const CityChip: FunctionComponent<any> = (props) => {
     }
 
     return (
-        <Chip 
-            avatar={<Avatar>{value.image}</Avatar>} 
-            label={value.name} 
-            onClick={handleClick} 
+        <Chip
+            avatar={<Avatar>{value.image}</Avatar>}
+            label={value.name}
+            onClick={handleClick}
         />
     )
 }
 
 const AutocompleteAtomic = () => {
+    const classes = useStyles();
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
+            classes={{
+                autocomplete: classes.autocomplete,
+            }}
             label="Try typing '/mexico'..."
             onSave={save}
             customControls={[
@@ -77,7 +89,8 @@ const AutocompleteAtomic = () => {
                     {
                         items: cities,
                         triggerChar: "/",
-                        atomicBlockName: "my-city"
+                        atomicBlockName: "my-city",
+                        minSearchChars: 1,
                     }
                 ]
             }}

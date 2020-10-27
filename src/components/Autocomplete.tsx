@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
 export type TAutocompleteItem = {
     keys: string[]
@@ -11,16 +12,21 @@ export type TAutocompleteItem = {
 }
 
 interface TAutocompleteProps extends WithStyles<typeof styles> {
+    ref: React.Ref<any>
+    editorId: string
     items: TAutocompleteItem[]
-    top: number
-    left: number
+    top: number | 'unset'
+    bottom: number | 'unset'
+    left: number | 'unset'
+    right: number | 'unset'
     selectedIndex: number
     onClick: (selectedIndex: number) => void
 }
 
 const styles = () => createStyles({
-    container: {
+    autocomplete: {
         minWidth: "200px",
+        overflow: "auto",
         position: "absolute",
         zIndex: 10
     },
@@ -36,10 +42,12 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
 
     const { classes } = props
     return (
-        <Paper className={classes.container} style={{
+        <Paper id={`${props.editorId}-autocomplete`} className={classes.autocomplete} style={{
             top: props.top,
-            left: props.left
-        }}>
+            left: props.left,
+            bottom: props.bottom,
+            right: props.right,
+        }} ref={props.ref}>
             <List dense={true}>
                 {props.items.map((item, index) => (
                     <ListItem
