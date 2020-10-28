@@ -87,6 +87,14 @@ const CityChip: FunctionComponent<any> = (props) => {
     )
 }
 
+const handleShortcut = (editorState: EditorState, selectionState: SelectionState, value: string): EditorState => {
+    const contentState = Modifier.removeRange(editorState.getCurrentContent(), selectionState, "forward")
+    editorState = EditorState.push(editorState, contentState, "remove-range")
+    editorState = RichUtils.toggleBlockType(editorState, value);
+    editorState = EditorState.forceSelection(editorState, editorState.getCurrentContent().getSelectionAfter())
+    return editorState;
+}
+
 const AutocompleteAtomic = () => {
     const classes = useStyles();
     return (
@@ -115,25 +123,14 @@ const AutocompleteAtomic = () => {
                         items: shortcutBullet,
                         triggerChar: "*",
                         minSearchChars: 1,
-                        handleAutoComplete: (editorState: EditorState, selectionState: SelectionState, value: string): EditorState => {
-                            const contentState = Modifier.removeRange(editorState.getCurrentContent(), selectionState, "forward")
-                            editorState = EditorState.push(editorState, contentState, "remove-range")
-                            editorState = RichUtils.toggleBlockType(editorState, value);
-                            editorState = EditorState.forceSelection(editorState, editorState.getCurrentContent().getSelectionAfter())
-                            return editorState;
-                        }
+                        handleAutoComplete: handleShortcut,
                     },
                     {
                         items: shortcutNumber,
                         triggerChar: "1",
                         minSearchChars: 2,
-                        handleAutoComplete: (editorState: EditorState, selectionState: SelectionState, value: string): EditorState => {
-                            const contentState = Modifier.removeRange(editorState.getCurrentContent(), selectionState, "forward")
-                            editorState = EditorState.push(editorState, contentState, "remove-range")
-                            editorState = RichUtils.toggleBlockType(editorState, value);
-                            editorState = EditorState.forceSelection(editorState, editorState.getCurrentContent().getSelectionAfter())
-                            return editorState;
-                        }
+                        handleAutoComplete: handleShortcut,
+
                     }
                 ]
             }}
