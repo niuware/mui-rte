@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { forwardRef, FunctionComponent } from 'react'
 import Paper from '@material-ui/core/Paper'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -12,7 +12,6 @@ export type TAutocompleteItem = {
 }
 
 interface TAutocompleteProps extends WithStyles<typeof styles> {
-    ref: React.Ref<any>
     editorId: string
     items: TAutocompleteItem[]
     top: number | 'unset'
@@ -35,7 +34,7 @@ const styles = () => createStyles({
     }
 })
 
-const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
+const Autocomplete: React.ForwardRefRenderFunction<unknown, TAutocompleteProps> = (props, ref) => {
     if (!props.items.length) {
         return null
     }
@@ -47,7 +46,7 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
             left: props.left,
             bottom: props.bottom,
             right: props.right,
-        }} ref={props.ref}>
+        }} ref={ref}>
             <List dense={true}>
                 {props.items.map((item, index) => (
                     <ListItem
@@ -64,4 +63,4 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Autocomplete)
+export default withStyles(styles, { withTheme: true })(forwardRef(Autocomplete))

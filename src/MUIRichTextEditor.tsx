@@ -1,6 +1,6 @@
 import React, {
     FunctionComponent, useEffect, useState, useRef,
-    forwardRef, useImperativeHandle, RefForwardingComponent
+    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent
 } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
@@ -12,6 +12,7 @@ import {
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator,
     SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
 } from 'draft-js'
+
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
 import Media from './components/Media'
@@ -264,6 +265,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         style: undefined,
         block: undefined
     })
+    const [showAutocompletePopup, setShowAutocompletePopup] = useState(false);
 
     const editorRef = useRef(null)
     const editorId = props.id || "mui-rte"
@@ -353,8 +355,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const clearSearch = () => {
         setSearchTerm("")
+        autocompleteRef.current = undefined
         autocompletePositionRef.current = undefined
         autocompleteSelectionStateRef.current = undefined
+        setShowAutocompletePopup(false)
     }
 
     const handleMouseUp = (event: any) => {
@@ -415,6 +419,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const updateAutocompletePosition = () => {
+        if (!autocompleteSelectionStateRef.current) {
+            autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
+        }
         const editor: HTMLElement = (editorRef.current as any).editor
         const { editorRect, selectionRect } = getEditorBounds(editor)
         const line = getLineNumber(editorState)
@@ -438,9 +445,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             position.left = editor.offsetLeft + (left - editorRect.left);
         } else {
             position.right = 0;
-        }
-        if (!autocompleteSelectionStateRef.current) {
-            autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
         }
         autocompletePositionRef.current = position
     }
@@ -491,6 +495,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             const newSelection = currentSelection.merge({
                 'focusOffset': offset
             })
+
             const autoCompleteStrategy = autocompleteRef.current!
             if (autoCompleteStrategy.handleAutoComplete) {
                 const newState = autoCompleteStrategy.handleAutoComplete(editorState, newSelection as SelectionState, item.value)
@@ -508,13 +513,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const handleAutocompleteClosed = () => {
         clearSearch()
         setSelectedIndex(0)
-        refocus()
     }
 
     const getAutocompleteItems = (): TAutocompleteItem[] => {
-        if (searchTerm.length < autocompletMinSearchCharCount()) {
-            return []
-        }
         return autocompleteRef.current!.items
             .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
             .splice(0, autocompleteLimit)
@@ -525,10 +526,20 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleBeforeInput = (chars: string): DraftHandleValue => {
-        if (chars === " " && searchTerm.length) {
-            clearSearch()
+        if (chars === " " && autocompleteRef.current?.items?.length == 1) {
+            if (0 <= autocompleteRef.current?.items[0].keys.findIndex(k => k === searchTerm)) {
+                handleAutocompleteSelected()
+                return "handled"
+            } else {
+                clearSearch();
+            }
         } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
+            if (autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0) {
+                setShowAutocompletePopup(true);
+            } else {
+                setShowAutocompletePopup(false);
+            }
         } else {
             const strategy = findAutocompleteStrategy(chars)
             if (strategy) {
@@ -536,6 +547,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 updateAutocompletePosition()
             }
         }
+
         const currentLength = editorState.getCurrentContent().getPlainText('').length
         return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
     }
@@ -764,6 +776,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
     }
 
+    const handleOnTab = (ev: React.KeyboardEvent<{}>) => {
+        const blockType = RichUtils.getCurrentBlockType(editorState);
+        let newEditorState = RichUtils.onTab(ev, editorState, 4)
+        //newEditorState = RichUtils.toggleBlockType(newEditorState, blockType)
+        handleChange(newEditorState);
+    }
+
     const toggleMouseUpListener = (addAfter = false) => {
         const editor: HTMLElement = (editorRef.current as any).editor
         if (!editor) {
@@ -983,6 +1002,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
+            if (autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0) {
+                setShowAutocompletePopup(true);
+            } else {
+                setShowAutocompletePopup(false);
+            }
         } else if (!autocompletePositionRef.current &&
             (keyBinding === "backspace"
                 || keyBinding === "split-block")) {
@@ -1036,7 +1060,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
-                {props.autocomplete && autocompletePositionRef.current ?
+                {props.autocomplete && showAutocompletePopup && autocompletePositionRef.current ?
                     <Autocomplete
                         editorId={editorId}
                         classes={{ autocomplete: classes.autocomplete }}
@@ -1047,7 +1071,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         right={autocompletePositionRef.current!.right}
                         onClick={handleAutocompleteSelected}
                         selectedIndex={selectedIndex}
-                        ref={autocompleteRef}
                     />
                     : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
@@ -1089,6 +1112,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             blockRendererFn={blockRenderer}
                             editorState={editorState}
                             onChange={handleChange}
+                            onTab={handleOnTab}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}

@@ -1,9 +1,12 @@
-import React, { FunctionComponent } from 'react'
+import { makeStyles } from '@material-ui/core'
 import Avatar from '@material-ui/core/Avatar'
 import Chip from '@material-ui/core/Chip'
+import { EditorState, Modifier, RichUtils, SelectionState } from 'draft-js'
+import React, { FunctionComponent } from 'react'
 import MUIRichTextEditor from '../../'
 import { TAutocompleteItem } from '../../src/components/Autocomplete'
-import { makeStyles } from '@material-ui/core'
+
+
 
 const save = (data: string) => {
     console.log(data)
@@ -50,6 +53,22 @@ const cities: TAutocompleteItem[] = [
         content: "Osaka",
     }
 ]
+const shortcutBullet: TAutocompleteItem[] = [
+    {
+        keys: [""],
+        value: "unordered-list-item",
+        content: ""
+    }
+]
+
+const shortcutNumber: TAutocompleteItem[] = [
+    {
+        keys: ["."],
+        value: "ordered-list-item",
+        content: ""
+    }
+]
+
 
 const CityChip: FunctionComponent<any> = (props) => {
     const { blockProps } = props
@@ -82,7 +101,7 @@ const AutocompleteAtomic = () => {
                     name: "my-city",
                     type: "atomic",
                     atomicComponent: CityChip
-                },
+                }
             ]}
             autocomplete={{
                 strategies: [
@@ -91,6 +110,30 @@ const AutocompleteAtomic = () => {
                         triggerChar: "/",
                         atomicBlockName: "my-city",
                         minSearchChars: 1,
+                    },
+                    {
+                        items: shortcutBullet,
+                        triggerChar: "*",
+                        minSearchChars: 1,
+                        handleAutoComplete: (editorState: EditorState, selectionState: SelectionState, value: string): EditorState => {
+                            const contentState = Modifier.removeRange(editorState.getCurrentContent(), selectionState, "forward")
+                            editorState = EditorState.push(editorState, contentState, "remove-range")
+                            editorState = RichUtils.toggleBlockType(editorState, value);
+                            editorState = EditorState.forceSelection(editorState, editorState.getCurrentContent().getSelectionAfter())
+                            return editorState;
+                        }
+                    },
+                    {
+                        items: shortcutNumber,
+                        triggerChar: "1",
+                        minSearchChars: 2,
+                        handleAutoComplete: (editorState: EditorState, selectionState: SelectionState, value: string): EditorState => {
+                            const contentState = Modifier.removeRange(editorState.getCurrentContent(), selectionState, "forward")
+                            editorState = EditorState.push(editorState, contentState, "remove-range")
+                            editorState = RichUtils.toggleBlockType(editorState, value);
+                            editorState = EditorState.forceSelection(editorState, editorState.getCurrentContent().getSelectionAfter())
+                            return editorState;
+                        }
                     }
                 ]
             }}
