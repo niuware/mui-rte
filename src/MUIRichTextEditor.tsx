@@ -346,13 +346,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }, [state.toolbarPosition])
 
     useEffect(() => {
-        if (searchTerm.length < autocompletMinSearchCharCount()) {
+        if (searchTerm.length < autocompleteMinSearchCharCount()) {
             setSelectedIndex(0)
         }
     }, [searchTerm])
 
-    const autocompletMinSearchCharCount = () => autocompleteRef.current?.minSearchChars ?? defaultAutocompleteMinSearchCharCount
-    const canShowAutocompletPopup = () => autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0
+    const autocompleteMinSearchCharCount = () => autocompleteRef.current?.minSearchChars ?? defaultAutocompleteMinSearchCharCount
+    const canShowAutocompletePopup = () => autocompleteMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0
 
     const clearSearch = () => {
         setSearchTerm("")
@@ -536,7 +536,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             }
         } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
-            if (canShowAutocompletPopup()) {
+            if (canShowAutocompletePopup()) {
                 setShowAutocompletePopup(true);
             } else {
                 setShowAutocompletePopup(false);
@@ -1003,7 +1003,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-            if (canShowAutocompletPopup()) {
+            if (canShowAutocompletePopup()) {
                 setShowAutocompletePopup(true);
             } else {
                 setShowAutocompletePopup(false);
