@@ -1,8 +1,9 @@
-import React, { FunctionComponent } from 'react'
+import React, { forwardRef, FunctionComponent } from 'react'
 import Paper from '@material-ui/core/Paper'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
 import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles'
+import classNames from 'classnames'
 
 export type TAutocompleteItem = {
     keys: string[]
@@ -11,16 +12,20 @@ export type TAutocompleteItem = {
 }
 
 interface TAutocompleteProps extends WithStyles<typeof styles> {
+    editorId: string
     items: TAutocompleteItem[]
-    top: number
-    left: number
+    top: number | 'unset'
+    bottom: number | 'unset'
+    left: number | 'unset'
+    right: number | 'unset'
     selectedIndex: number
     onClick: (selectedIndex: number) => void
 }
 
 const styles = () => createStyles({
-    container: {
+    autocomplete: {
         minWidth: "200px",
+        overflow: "auto",
         position: "absolute",
         zIndex: 10
     },
@@ -29,17 +34,19 @@ const styles = () => createStyles({
     }
 })
 
-const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
+const Autocomplete: React.ForwardRefRenderFunction<unknown, TAutocompleteProps> = (props, ref) => {
     if (!props.items.length) {
         return null
     }
 
     const { classes } = props
     return (
-        <Paper className={classes.container} style={{
+        <Paper id={`${props.editorId}-autocomplete`} className={classes.autocomplete} style={{
             top: props.top,
-            left: props.left
-        }}>
+            left: props.left,
+            bottom: props.bottom,
+            right: props.right,
+        }} ref={ref}>
             <List dense={true}>
                 {props.items.map((item, index) => (
                     <ListItem
@@ -56,4 +63,4 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Autocomplete)
+export default withStyles(styles, { withTheme: true })(forwardRef(Autocomplete))
