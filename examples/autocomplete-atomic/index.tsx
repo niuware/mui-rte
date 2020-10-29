@@ -54,7 +54,7 @@ const cities: TAutocompleteItem[] = [
     }
 ]
 
-// This autocomplet will change the block style to unordered-list-item
+// This autocomplete will change the block style to unordered-list-item
 // Autocomplete sequence is * + space
 const shortcutBullet: TAutocompleteItem[] = [
     {
@@ -64,7 +64,7 @@ const shortcutBullet: TAutocompleteItem[] = [
     }
 ]
 
-// This autocomplet will change the block style to ordered-list-item
+// This autocomplete will change the block style to ordered-list-item
 // Autocomplete sequence is 1 + . + space
 const shortcutNumber: TAutocompleteItem[] = [
     {
