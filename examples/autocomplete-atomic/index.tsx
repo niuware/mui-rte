@@ -53,6 +53,9 @@ const cities: TAutocompleteItem[] = [
         content: "Osaka",
     }
 ]
+
+// This autocomplet will change the block style to unordered-list-item
+// Autocomplete sequence is * + space
 const shortcutBullet: TAutocompleteItem[] = [
     {
         keys: [""],
@@ -61,6 +64,8 @@ const shortcutBullet: TAutocompleteItem[] = [
     }
 ]
 
+// This autocomplet will change the block style to ordered-list-item
+// Autocomplete sequence is 1 + . + space
 const shortcutNumber: TAutocompleteItem[] = [
     {
         keys: ["."],

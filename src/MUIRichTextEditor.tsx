@@ -351,7 +351,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }, [searchTerm])
 
-    const autocompletMinSearchCharCount = () => autocompleteRef.current?.minSearchChars ?? defaultAutocompleteMinSearchCharCount;
+    const autocompletMinSearchCharCount = () => autocompleteRef.current?.minSearchChars ?? defaultAutocompleteMinSearchCharCount
+    const canShowAutocompletPopup = () => autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0
 
     const clearSearch = () => {
         setSearchTerm("")
@@ -535,7 +536,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             }
         } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
-            if (autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0) {
+            if (canShowAutocompletPopup()) {
                 setShowAutocompletePopup(true);
             } else {
                 setShowAutocompletePopup(false);
@@ -1002,7 +1003,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-            if (autocompletMinSearchCharCount() <= searchTerm.length + 1 && getAutocompleteItems().length > 0) {
+            if (canShowAutocompletPopup()) {
                 setShowAutocompletePopup(true);
             } else {
                 setShowAutocompletePopup(false);
