@@ -1,7 +1,5 @@
-import React, {
-    FunctionComponent, useEffect, useState, useRef,
-    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent
-} from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef,
+    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -161,7 +159,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     placeHolder: {
         color: palette.grey[600],
-        position: "absolute"
+        position: "absolute",
+        outline: "none"
     },
     linkPopover: {
         padding: spacing(2, 2, 2, 2)
@@ -267,7 +266,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     })
     const [showAutocompletePopup, setShowAutocompletePopup] = useState(false);
 
-    const editorRef = useRef(null)
+    const editorRef = useRef<Editor>(null)
     const editorId = props.id || "mui-rte"
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
@@ -275,6 +274,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const isFirstFocus = useRef(true)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -549,17 +549,44 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
             }
         }
+        return isMaxLengthHandled(editorState, 1)
+    }
 
-        const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+    const isSyntheticEventTriggeredByTab = (event: SyntheticEvent): boolean => {
+        if (!event.hasOwnProperty("relatedTarget") || (event as any).relatedTarget == null) {
+            return false
+        }
+        return true
+    }
+
+    const handleEditorFocus = (event: SyntheticEvent) => {
+        handleFocus()
+        if (!isSyntheticEventTriggeredByTab(event)) {
+            return
+        }
+        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
+        setTimeout(() => (setEditorState(EditorState.moveFocusToEnd(nextEditorState))), 0)
+    }
+
+    const handlePlaceholderFocus = () => {
+        if (isFirstFocus.current === false) {
+            focusEditor()
+            return
+        }
+        handleFocus()
+        isFirstFocus.current = false
     }
 
     const handleFocus = () => {
-        setFocus(true)
-        setTimeout(() => (editorRef.current as any).focus(), 0)
+        focusEditor()
         if (props.onFocus) {
             props.onFocus()
         }
+    }
+
+    const focusEditor = () => {
+        setFocus(true)
+        setTimeout(() => editorRef.current?.focus(), 0)
     }
 
     const handleBlur = () => {
@@ -673,7 +700,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         for (let control of props.customControls) {
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
-                    setTimeout(() => (editorRef.current as any).blur(), 0)
+                    setTimeout(() => editorRef.current?.blur(), 0)
                     const newState = control.onClick(editorState, control.name, document.getElementById(id))
                     if (newState) {
                         if (newState.getSelection().isCollapsed()) {
@@ -773,9 +800,17 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }
 
-    const handlePastedText = (text: string, _html: string | undefined, editorState: EditorState): DraftHandleValue => {
+    const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, text.length)
+    }
+
+    const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, 1)
+    }
+
+    const isMaxLengthHandled = (editorState: EditorState, nextLength: number): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + nextLength, props.maxLength) ? "handled" : "not-handled"
     }
 
     const handleOnTab = (ev: React.KeyboardEvent<{}>) => {
@@ -891,8 +926,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const refocus = () => {
-        setTimeout(() => (editorRef.current as any).blur(), 0)
-        setTimeout(() => (editorRef.current as any).focus(), 1)
+        setTimeout(() => editorRef.current?.blur(), 0)
+        setTimeout(() => editorRef.current?.focus(), 1)
     }
 
     const toggleBlockType = (blockType: string) => {
@@ -1048,7 +1083,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     className={classNames(classes.editorContainer, classes.placeHolder, {
                         [classes.error]: props.error
                     })}
-                    onClick={handleFocus}
+                    tabIndex={0}
+                    onFocus={handlePlaceholderFocus}
                 >
                     {props.label || ""}
                 </div>
@@ -1107,7 +1143,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
-                    })} onClick={handleFocus} onBlur={handleBlur}>
+                    })} onBlur={handleBlur}>
                         <Editor
                             customStyleMap={customRenderers.style}
                             blockRenderMap={customRenderers.block}
@@ -1115,10 +1151,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             editorState={editorState}
                             onChange={handleChange}
                             onTab={handleOnTab}
+                            onFocus={handleEditorFocus}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
                             handlePastedText={handlePastedText}
+                            handleReturn={handleReturn}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
