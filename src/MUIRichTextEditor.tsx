@@ -420,13 +420,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const updateAutocompletePosition = () => {
-        if (!autocompleteSelectionStateRef.current) {
-            autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
-        }
         const editor: HTMLElement = (editorRef.current as any).editor
         const { editorRect, selectionRect } = getEditorBounds(editor)
         const line = getLineNumber(editorState)
         const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
+        const bottom = selectionRect ? selectionRect.bottom : editorRect.top + (lineHeight * (1 + line))
         const left = selectionRect ? selectionRect.left : editorRect.left
         const width = autocompleteRef.current?.maxWidth ?? defaultAutocompleteMaxWidth;
         const height = autocompleteRef.current?.maxHeight ?? defaultAutocompleteMaxHeight;
@@ -440,7 +438,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (top + height <= window.innerHeight) {
             position.top = editor.offsetTop + (top - editorRect.top) + lineHeight;
         } else {
-            position.bottom = editorRect.bottom - top + lineHeight / 2;
+            position.bottom = editorRect.bottom - bottom + lineHeight;
         }
         if (left + width < window.innerWidth) {
             position.left = editor.offsetLeft + (left - editorRect.left);
@@ -537,6 +535,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         } else if (autocompleteSelectionStateRef.current) {
             setSearchTerm(searchTerm + chars)
             if (canShowAutocompletePopup()) {
+                if (!showAutocompletePopup) {
+                    updateAutocompletePosition()
+                }
                 setShowAutocompletePopup(true);
             } else {
                 setShowAutocompletePopup(false);
@@ -545,7 +546,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             const strategy = findAutocompleteStrategy(chars)
             if (strategy) {
                 autocompleteRef.current = strategy
-                updateAutocompletePosition()
+                autocompleteSelectionStateRef.current = editorStateRef.current!.getSelection()
             }
         }
 
