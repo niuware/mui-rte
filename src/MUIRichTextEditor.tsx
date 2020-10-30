@@ -1,23 +1,27 @@
-import React, { FunctionComponent, useEffect, useState, useRef, 
-    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent } from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef, forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent  } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import {
-    Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
+    EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
-    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, 
+    DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, getVisibleSelectionRect,
     SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
 } from 'draft-js'
+import Editor from 'draft-js-plugins-editor';
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
 import Media from './components/Media'
 import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
-import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
 import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
+import {
+    registerCopySource,
+    handleDraftEditorPastedText,
+  } from "draftjs-conductor";
+import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
 
 export type TDecorator = {
     component: FunctionComponent
@@ -54,6 +58,7 @@ export type TMUIRichTextEditorRef = {
 export type TDraftEditorProps = {
     spellCheck?: boolean
     stripPastedStyles?: boolean
+    plugins: any[]
     handleDroppedFiles?: (selectionState: SelectionState, files: Blob[]) => DraftHandleValue
 }
 
@@ -82,13 +87,16 @@ export type TMUIRichTextEditorProps = {
     inlineToolbar?: boolean
     inlineToolbarControls?: Array<TToolbarControl>
     draftEditorProps?: TDraftEditorProps
+    keyBindingFn?: (e: React.KeyboardEvent<{}>) => string | null | undefined
     keyCommands?: TKeyCommand[]
     maxLength?: number
+    maxHeight?: number
     autocomplete?: TAutocomplete
     onSave?: (data: string) => void
-    onChange?: (state: EditorState) => void
+    onBlur?: (data: string) => void
     onFocus?: () => void
-    onBlur?: () => void
+    onChange?: (state: EditorState) => void
+    handlePastedText?: (_text: string, html: string | undefined, editorState: EditorState) => EditorState
 }
 
 interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
@@ -160,6 +168,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
         width: "100%"
     },
     anchorLink: {
+        textDecoration: "underline",
+        color: palette.secondary.main
     },
     toolbar: {
     },
@@ -247,11 +257,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
+    const [remountKey, setRemountKey] = useState<number>(0);
     const [focusMediaKey, setFocusMediaKey] = useState("")
     const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
         style: undefined,
         block: undefined
     })
+
+    // prevent memleak
+    let copySource: null | { unregister: () => void } = null
 
     const editorRef = useRef<Editor>(null)
     const editorId = props.id || "mui-rte"
@@ -309,15 +323,35 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             style: customStyleMap,
             block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
         })
+
         const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
         if (props.readOnly === true) {
             setEditorState(nextEditorState)
         } else {
             setEditorState(EditorState.moveFocusToEnd(nextEditorState))
         }
+        if (props.draftEditorProps && props.draftEditorProps.plugins) {
+            setRemountKey(remountKey + 1);
+        }
+
+        if (copySource !== null) {
+            copySource.unregister()
+            copySource = null
+        }
+        // check if editor exists because register; registerCopySource does not check it
+        if ((editorRef.current as any) &&
+            (editorRef.current as any).editor &&
+            (editorRef.current as any).editor.editor) {
+            copySource = registerCopySource((editorRef.current as any).editor)
+        }
+
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
+            if (copySource !== null) {
+                copySource.unregister()
+                copySource = null
+            }
         }
     }, [props.value, props.defaultValue])
 
@@ -347,23 +381,23 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const handleMouseUp = (event: any) => {
         const nodeName = event.target.nodeName
         clearSearch()
-        if (nodeName === "IMG" || nodeName === "VIDEO"){
+        if (nodeName === "IMG" || nodeName === "VIDEO") {
             return
         }
         setTimeout(() => {
             const selection = editorStateRef.current!.getSelection()
-            if (selection.isCollapsed() || (toolbarPositionRef !== undefined && 
+            if (selection.isCollapsed() || (toolbarPositionRef !== undefined &&
                 selectionRef.current.start === selection.getStartOffset() &&
                 selectionRef.current.end === selection.getEndOffset())) {
-                    const selectionInfo = getSelectionInfo(editorStateRef.current!)
-                    if (selectionInfo.entityType === "IMAGE") {
-                        focusMedia(selectionInfo.block)
-                        return
-                    }
-                    setState({
-                        ...state,
-                        toolbarPosition: undefined
-                    })
+                const selectionInfo = getSelectionInfo(editorStateRef.current!)
+                if (selectionInfo.entityType === "IMAGE") {
+                    focusMedia(selectionInfo.block)
+                    return
+                }
+                setState({
+                    ...state,
+                    toolbarPosition: undefined
+                })
                 return
             }
 
@@ -372,6 +406,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 end: selection.getEndOffset()
             }
 
+            // <<<<<<< HEAD
+            //             const editor: HTMLElement = (editorRef.current as any).editor.editor
+            //             const selectionRect = getVisibleSelectionRect(window)
+            //             const editorRect = editor.getBoundingClientRect()
+            // =======
             const editor: HTMLElement = (editorRef.current as any).editor
             const { editorRect, selectionRect } = getEditorBounds(editor)
             if (!selectionRect) {
@@ -545,7 +584,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const handleBlur = () => {
         setFocus(false)
         if (props.onBlur) {
-            props.onBlur()
+            props.onBlur(JSON.stringify(convertToRaw(editorState.getCurrentContent())))
         }
 
         if (!state.anchorUrlPopover) {
@@ -754,7 +793,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
-        return isMaxLengthHandled(editorState, text.length)
+        let newState = handleDraftEditorPastedText(_html, editorState);
+        newState = !newState && props.handlePastedText ? props.handlePastedText(text, _html, editorState) : newState
+        if (newState) {
+            handleChange(newState);
+            return 'handled';
+        }
+        return 'not-handled';
     }
 
     const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
@@ -767,7 +812,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
-        const editor: HTMLElement = (editorRef.current as any).editor
+        const editor: HTMLElement = (editorRef.current as any).editor.editor
         if (!editor) {
             return
         }
@@ -940,8 +985,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
         const entityKey = contentStateWithEntity.getLastCreatedEntityKey()
-        const newEditorStateRaw = EditorState.set(editorState, { 
-            currentContent: contentStateWithEntity, 
+        const newEditorStateRaw = EditorState.set(editorState, {
+            currentContent: contentStateWithEntity,
             ...options
         })
         return AtomicBlockUtils.insertAtomicBlock(newEditorStateRaw, entityKey, ' ')
@@ -1008,6 +1053,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const keyBinding = getDefaultKeyBinding(e)
         updateSearchTermForKeyBinding(keyBinding)
 
+        // return null
         return keyBinding
     }
 
@@ -1076,7 +1122,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     />
                     : null}
                 {placeholder}
-                <div id={`${editorId}-editor`} className={classes.editor}>
+                <div id={`${editorId}-editor`} className={classes.editor} style={{maxHeight:props.maxHeight}}>
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
@@ -1095,6 +1141,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             handleReturn={handleReturn}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
+                            key={remountKey}
                             {...props.draftEditorProps}
                         />
                     </div>
