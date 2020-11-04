@@ -263,6 +263,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const isFirstFocus = useRef(true)
     const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
+    const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -904,6 +905,24 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         handlePromptForMedia(false, newEditorState)
     }
 
+    const getStyleMap = (): DraftStyleMap => {
+        if (customStyleMapRef.current === undefined) {
+            setupStyleMap()
+        }
+        return customStyleMapRef.current!
+    }
+
+    const setupStyleMap = () => {
+        const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
+        if (props.customControls) {
+            props.customControls.forEach(control => {
+                if (control.type === "inline" && control.inlineStyle) {
+                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
+                }
+            })
+        }
+        customStyleMapRef.current = customStyleMap
+    }
 
     const getBlockMap = (): DraftBlockRenderMap => {
         if (customBlockMapRef.current === undefined) {
