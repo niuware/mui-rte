@@ -69,6 +69,7 @@ type TToolbarProps = {
     className?: string
     disabled?: boolean
     size?: TToolbarButtonSize
+    isActive: boolean
 }
 
 const STYLE_TYPES: TStyleType[] = [

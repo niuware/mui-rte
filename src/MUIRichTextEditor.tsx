@@ -1087,6 +1087,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             controls={inlineToolbarControls}
                             customControls={customControls}
                             inlineMode={true}
+                            isActive={true}
                         />
                     </Paper>
                     : null}
@@ -1100,6 +1101,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         className={classes.toolbar}
                         disabled={!editable}
                         size={props.toolbarButtonSize}
+                        isActive={focus}
                     />
                     : null}
                 {placeholder}
