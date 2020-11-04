@@ -979,6 +979,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return null
     }
 
+    const styleRenderer = (style: any, _block: ContentBlock): React.CSSProperties => {
+        const customStyleMap = getStyleMap()
+        const styleNames = style.toJS()
+        return styleNames.reduce((styles: any, styleName: string) => {
+            styles = customStyleMap[styleName]
+            return styles
+        }, {})
+    }
+
     const insertAtomicBlock = (editorState: EditorState, type: string, data: any, options?: any) => {
         const contentState = editorState.getCurrentContent()
         const contentStateWithEntity = contentState.createEntity(type, 'IMMUTABLE', data)
@@ -1125,9 +1134,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         [classes.error]: props.error
                     })} onBlur={handleBlur}>
                         <Editor
-                            customStyleMap={customRenderers.style}
                             blockRenderMap={getBlockMap()}
                             blockRendererFn={blockRenderer}
+                            customStyleFn={styleRenderer}
                             editorState={editorState}
                             onChange={handleChange}
                             onFocus={handleEditorFocus}
