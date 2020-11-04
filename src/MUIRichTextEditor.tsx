@@ -248,10 +248,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [focusMediaKey, setFocusMediaKey] = useState("")
-    const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
-        style: undefined,
-        block: undefined
-    })
 
     const editorRef = useRef<Editor>(null)
     const editorId = props.id || "mui-rte"
@@ -292,31 +288,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     useEffect(() => {
         const editorState = useEditorState(props)
-        const customBlockMap: any = {}
-        const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "inline" && control.inlineStyle) {
-                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
-                }
-                else if (control.type === "block" && control.blockWrapper) {
-                    customBlockMap[control.name.toUpperCase()] = {
-                        element: "div",
-                        wrapper: control.blockWrapper
-                    }
-                }
-            })
-        }
-        setCustomRenderers({
-            style: customStyleMap,
-            block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
-        })
-        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
-        if (props.readOnly === true) {
-            setEditorState(nextEditorState)
-        } else {
-            setEditorState(EditorState.moveFocusToEnd(nextEditorState))
-        }
+        setEditorState(editorState)
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
@@ -559,7 +531,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleClearFormat = () => {
-        const withoutStyles = clearInlineStyles(editorState, customRenderers.style)
+        if (customStyleMapRef.current === undefined) {
+            return
+        }
+        const withoutStyles = clearInlineStyles(editorState, customStyleMapRef.current)
         const selectionInfo = getSelectionInfo(editorState)
         const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style')
         setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
