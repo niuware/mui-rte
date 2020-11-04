@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState, useRef, 
-    forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent } from 'react'
+    forwardRef, useImperativeHandle, RefForwardingComponent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -260,6 +260,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const isFirstFocus = useRef(true)
     const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
     const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)
+    const isFocusedWithMouse = useRef(false)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -479,16 +480,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return isMaxLengthHandled(editorState, 1)
     }
 
-    const isSyntheticEventTriggeredByTab = (event: SyntheticEvent): boolean => {
-        if (!event.hasOwnProperty("relatedTarget") || (event as any).relatedTarget == null) {
-            return false
-        }
-        return true
-    }
-
-    const handleEditorFocus = (event: SyntheticEvent) => {
+    const handleEditorFocus = () => {
         handleFocus()
-        if (!isSyntheticEventTriggeredByTab(event)) {
+        if (isFocusedWithMouse.current === true) {
+            isFocusedWithMouse.current = false
             return
         }
         const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
@@ -517,6 +512,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleBlur = () => {
+        isFocusedWithMouse.current = false
         setFocus(false)
         if (props.onBlur) {
             props.onBlur()
@@ -528,6 +524,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 toolbarPosition: undefined
             })
         }
+    }
+
+    const handleMouseDown = () => {
+        isFocusedWithMouse.current = true
     }
 
     const handleClearFormat = () => {
@@ -1107,7 +1107,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
-                    })} onBlur={handleBlur}>
+                    })} onMouseDown={handleMouseDown} onBlur={handleBlur}>
                         <Editor
                             blockRenderMap={getBlockMap()}
                             blockRendererFn={blockRenderer}
