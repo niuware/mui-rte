@@ -234,7 +234,10 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                 }
                 let active = false
                 const action = props.onClick
-                if (style.type === "inline") {
+                if (!props.isActive) {
+                    active = false
+                }
+                else if (style.type === "inline") {
                     active = editorState.getCurrentInlineStyle().has(style.style)
                 }
                 else if (style.type === "block") {
