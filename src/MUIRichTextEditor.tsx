@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, 
-    SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier, DraftBlockRenderMap
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
@@ -262,6 +262,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
     const isFirstFocus = useRef(true)
+    const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -903,6 +904,29 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         handlePromptForMedia(false, newEditorState)
     }
 
+
+    const getBlockMap = (): DraftBlockRenderMap => {
+        if (customBlockMapRef.current === undefined) {
+            setupBlockMap()
+        }
+        return customBlockMapRef.current!
+    }
+
+    const setupBlockMap = () => {
+        const customBlockMap: any = {}
+        if (props.customControls) {
+            props.customControls.forEach(control => {
+                if (control.type === "block" && control.blockWrapper) {
+                    customBlockMap[control.name.toUpperCase()] = {
+                        element: "div",
+                        wrapper: control.blockWrapper
+                    }
+                }
+            })
+        }
+        customBlockMapRef.current = DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
+    }
+
     const blockRenderer = (contentBlock: ContentBlock) => {
         const blockType = contentBlock.getType()
         if (blockType === 'atomic') {
@@ -1083,7 +1107,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     })} onBlur={handleBlur}>
                         <Editor
                             customStyleMap={customRenderers.style}
-                            blockRenderMap={customRenderers.block}
+                            blockRenderMap={getBlockMap()}
                             blockRendererFn={blockRenderer}
                             editorState={editorState}
                             onChange={handleChange}
