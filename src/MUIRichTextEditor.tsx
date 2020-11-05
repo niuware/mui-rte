@@ -929,13 +929,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     }
                 } else {
                     const block = atomicBlockExists(type.toLowerCase(), props.customControls)
-                    if (!block) {
-                        return null
-                    }
-                    return {
-                        component: block.atomicComponent,
-                        editable: false,
-                        props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                    if (block) {
+                        return {
+                            component: block.atomicComponent,
+                            editable: false,
+                            props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                        }
                     }
                 }
             }
