@@ -900,16 +900,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const setupBlockMap = () => {
         const customBlockMap: any = {}
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "block" && control.blockWrapper) {
-                    customBlockMap[control.name.toUpperCase()] = {
-                        element: "div",
-                        wrapper: control.blockWrapper
-                    }
+        props.customControls?.filter(control => control.type === "block" && control.blockWrapper)
+            .forEach(control => {
+                customBlockMap[control.name.toUpperCase()] = {
+                    element: "div",
+                    wrapper: control.blockWrapper
                 }
             })
-        }
         customBlockMapRef.current = DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
     }
 
