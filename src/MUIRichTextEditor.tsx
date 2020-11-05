@@ -942,7 +942,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return null
     }
 
-    const styleRenderer = (style: any, _block: ContentBlock): React.CSSProperties => {
+    const styleRenderer = (style: any): React.CSSProperties => {
         const customStyleMap = getStyleMap()
         const styleNames = style.toJS()
         return styleNames.reduce((styles: any, styleName: string) => {
