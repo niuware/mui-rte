@@ -884,13 +884,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const setupStyleMap = () => {
         const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "inline" && control.inlineStyle) {
-                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
-                }
+        props.customControls?.filter(control => control.type === "inline" && control.inlineStyle)
+            .forEach(control => {
+                customStyleMap[control.name.toUpperCase()] = control.inlineStyle
             })
-        }
         customStyleMapRef.current = customStyleMap
     }
 
