@@ -739,7 +739,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
-        const editor: HTMLElement = (editorRef.current as any).editor
+        const editor: HTMLElement = (editorRef.current as any)?.editor
         if (!editor) {
             return
         }
