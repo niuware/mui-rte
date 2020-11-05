@@ -111,11 +111,6 @@ type TPosition = {
     left: number
 }
 
-type TCustomRenderers = {
-    style?: DraftStyleMap
-    block?: Immutable.Map<any, any>
-}
-
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
     },
@@ -889,13 +884,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const setupStyleMap = () => {
         const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "inline" && control.inlineStyle) {
-                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
-                }
+        props.customControls?.filter(control => control.type === "inline" && control.inlineStyle)
+            .forEach(control => {
+                customStyleMap[control.name.toUpperCase()] = control.inlineStyle
             })
-        }
         customStyleMapRef.current = customStyleMap
     }
 
@@ -908,16 +900,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const setupBlockMap = () => {
         const customBlockMap: any = {}
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "block" && control.blockWrapper) {
-                    customBlockMap[control.name.toUpperCase()] = {
-                        element: "div",
-                        wrapper: control.blockWrapper
-                    }
+        props.customControls?.filter(control => control.type === "block" && control.blockWrapper)
+            .forEach(control => {
+                customBlockMap[control.name.toUpperCase()] = {
+                    element: "div",
+                    wrapper: control.blockWrapper
                 }
             })
-        }
         customBlockMapRef.current = DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
     }
 
@@ -940,13 +929,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     }
                 } else {
                     const block = atomicBlockExists(type.toLowerCase(), props.customControls)
-                    if (!block) {
-                        return null
-                    }
-                    return {
-                        component: block.atomicComponent,
-                        editable: false,
-                        props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                    if (block) {
+                        return {
+                            component: block.atomicComponent,
+                            editable: false,
+                            props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                        }
                     }
                 }
             }
@@ -954,7 +942,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         return null
     }
 
-    const styleRenderer = (style: any, _block: ContentBlock): React.CSSProperties => {
+    const styleRenderer = (style: any): React.CSSProperties => {
         const customStyleMap = getStyleMap()
         const styleNames = style.toJS()
         return styleNames.reduce((styles: any, styleName: string) => {
