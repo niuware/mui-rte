@@ -111,11 +111,6 @@ type TPosition = {
     left: number
 }
 
-type TCustomRenderers = {
-    style?: DraftStyleMap
-    block?: Immutable.Map<any, any>
-}
-
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
     },
