@@ -46,7 +46,6 @@ export const RichTextInput = ({
 }
 
 export interface RichTextFieldProps extends Omit<TextFieldProps, 'value' | 'onChange'> {
-    defaultValue?: string
     onChange?: (state: EditorState) => void
 }
 
