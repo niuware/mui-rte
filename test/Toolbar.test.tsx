@@ -18,6 +18,7 @@ describe('<EditorControls />', () => {
                 id="mui-rte"
                 editorState={editorState}
                 onClick={() => {}}
+                isActive={true}
             />
         )
         const result = wrapper.find(EditorButton)
@@ -41,6 +42,7 @@ describe('<EditorControls />', () => {
                 editorState={editorState}
                 controls={controls}
                 onClick={() => {}}
+                isActive={true}
             />
         )
         const result = wrapper.find(EditorButton).map(item => {
@@ -56,6 +58,7 @@ describe('<EditorControls />', () => {
                 editorState={editorState}
                 controls={[]}
                 onClick={() => {}}
+                isActive={true}
             />
         )
         const result = wrapper.find(EditorButton)

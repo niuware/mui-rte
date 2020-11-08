@@ -69,6 +69,7 @@ type TToolbarProps = {
     className?: string
     disabled?: boolean
     size?: TToolbarButtonSize
+    isActive: boolean
 }
 
 const STYLE_TYPES: TStyleType[] = [
@@ -145,14 +146,14 @@ const STYLE_TYPES: TStyleType[] = [
         id: "media-control"
     },
     {
-        label: 'OL',
+        label: 'UL',
         name: "bulletList",
         style: 'unordered-list-item',
         icon: <FormatListBulletedIcon />,
         type: "block"
     },
     {
-        label: 'UL',
+        label: 'OL',
         name: "numberList",
         style: 'ordered-list-item',
         icon: <FormatListNumberedIcon />,
@@ -233,7 +234,10 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                 }
                 let active = false
                 const action = props.onClick
-                if (style.type === "inline") {
+                if (!props.isActive) {
+                    active = false
+                }
+                else if (style.type === "inline") {
                     active = editorState.getCurrentInlineStyle().has(style.style)
                 }
                 else if (style.type === "block") {

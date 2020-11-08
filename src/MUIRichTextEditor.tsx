@@ -8,7 +8,7 @@ import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
     DraftHandleValue, DraftStyleMap, ContentBlock, DraftDecorator, 
-    SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier
+    SelectionState, KeyBindingUtil, getDefaultKeyBinding, Modifier, DraftBlockRenderMap
 } from 'draft-js'
 import Toolbar, { TToolbarControl, TCustomControl, TToolbarButtonSize } from './components/Toolbar'
 import Link from './components/Link'
@@ -111,11 +111,6 @@ type TPosition = {
     left: number
 }
 
-type TCustomRenderers = {
-    style?: DraftStyleMap
-    block?: Immutable.Map<any, any>
-}
-
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     root: {
     },
@@ -150,7 +145,8 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     placeHolder: {
         color: palette.grey[600],
-        position: "absolute"
+        position: "absolute",
+        outline: "none"
     },
     linkPopover: {
         padding: spacing(2, 2, 2, 2)
@@ -247,12 +243,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
     const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [focusMediaKey, setFocusMediaKey] = useState("")
-    const [customRenderers, setCustomRenderers] = useState<TCustomRenderers>({
-        style: undefined,
-        block: undefined
-    })
 
-    const editorRef = useRef(null)
+    const editorRef = useRef<Editor>(null)
     const editorId = props.id || "mui-rte"
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
@@ -260,6 +252,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const isFirstFocus = useRef(true)
+    const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
+    const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)
+    const isFocusedWithMouse = useRef(false)
     const selectionRef = useRef<TStateOffset>({
         start: 0,
         end: 0
@@ -288,31 +284,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     useEffect(() => {
         const editorState = useEditorState(props)
-        const customBlockMap: any = {}
-        const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
-        if (props.customControls) {
-            props.customControls.forEach(control => {
-                if (control.type === "inline" && control.inlineStyle) {
-                    customStyleMap[control.name.toUpperCase()] = control.inlineStyle
-                }
-                else if (control.type === "block" && control.blockWrapper) {
-                    customBlockMap[control.name.toUpperCase()] = {
-                        element: "div",
-                        wrapper: control.blockWrapper
-                    }
-                }
-            })
-        }
-        setCustomRenderers({
-            style: customStyleMap,
-            block: DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
-        })
-        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
-        if (props.readOnly === true) {
-            setEditorState(nextEditorState)
-        } else {
-            setEditorState(EditorState.moveFocusToEnd(nextEditorState))
-        }
+        setEditorState(editorState)
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
@@ -488,7 +460,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         setEditorState(state)
     }
 
-    const handleBeforeInput = (chars: string): DraftHandleValue => {
+    const handleBeforeInput = (chars: string, editorState: EditorState): DraftHandleValue => {
         if (chars === " " && searchTerm.length) {
             clearSearch()
         } else if (autocompleteSelectionStateRef.current) {
@@ -500,19 +472,42 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 updateAutocompletePosition()
             }
         }
-        const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + 1, props.maxLength) ? "handled" : "not-handled"
+        return isMaxLengthHandled(editorState, 1)
+    }
+
+    const handleEditorFocus = () => {
+        handleFocus()
+        if (isFocusedWithMouse.current === true) {
+            isFocusedWithMouse.current = false
+            return
+        }
+        const nextEditorState = EditorState.forceSelection(editorState, editorState.getSelection())
+        setTimeout(() => (setEditorState(EditorState.moveFocusToEnd(nextEditorState))), 0)
+    }
+
+    const handlePlaceholderFocus = () => {
+        if (isFirstFocus.current === false) {
+            focusEditor()
+            return
+        }
+        handleFocus()
+        isFirstFocus.current = false
     }
 
     const handleFocus = () => {
-        setFocus(true)
-        setTimeout(() => (editorRef.current as any).focus(), 0)
+        focusEditor()
         if (props.onFocus) {
             props.onFocus()
         }
     }
 
+    const focusEditor = () => {
+        setFocus(true)
+        setTimeout(() => editorRef.current?.focus(), 0)
+    }
+
     const handleBlur = () => {
+        isFocusedWithMouse.current = false
         setFocus(false)
         if (props.onBlur) {
             props.onBlur()
@@ -526,8 +521,15 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }
 
+    const handleMouseDown = () => {
+        isFocusedWithMouse.current = true
+    }
+
     const handleClearFormat = () => {
-        const withoutStyles = clearInlineStyles(editorState, customRenderers.style)
+        if (customStyleMapRef.current === undefined) {
+            return
+        }
+        const withoutStyles = clearInlineStyles(editorState, customStyleMapRef.current)
         const selectionInfo = getSelectionInfo(editorState)
         const newEditorState = EditorState.push(editorState, withoutStyles, 'change-inline-style')
         setEditorState(RichUtils.toggleBlockType(newEditorState, selectionInfo.blockType))
@@ -623,7 +625,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         for (let control of props.customControls) {
             if (control.name.toUpperCase() === style) {
                 if (control.onClick) {
-                    setTimeout(() => (editorRef.current as any).blur(), 0)
+                    setTimeout(() => editorRef.current?.blur(), 0)
                     const newState = control.onClick(editorState, control.name, document.getElementById(id))
                     if (newState) {
                         if (newState.getSelection().isCollapsed()) {
@@ -724,8 +726,16 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, text.length)
+    }
+
+    const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
+        return isMaxLengthHandled(editorState, 1)
+    }
+
+    const isMaxLengthHandled = (editorState: EditorState, nextLength: number): DraftHandleValue => {
         const currentLength = editorState.getCurrentContent().getPlainText('').length
-        return isGreaterThan(currentLength + text.length, props.maxLength) ? "handled" : "not-handled"
+        return isGreaterThan(currentLength + nextLength, props.maxLength) ? "handled" : "not-handled"
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
@@ -834,8 +844,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const refocus = () => {
-        setTimeout(() => (editorRef.current as any).blur(), 0)
-        setTimeout(() => (editorRef.current as any).focus(), 1)
+        setTimeout(() => editorRef.current?.blur(), 0)
+        setTimeout(() => editorRef.current?.focus(), 1)
     }
 
     const toggleBlockType = (blockType: string) => {
@@ -865,6 +875,41 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         handlePromptForMedia(false, newEditorState)
     }
 
+    const getStyleMap = (): DraftStyleMap => {
+        if (customStyleMapRef.current === undefined) {
+            setupStyleMap()
+        }
+        return customStyleMapRef.current!
+    }
+
+    const setupStyleMap = () => {
+        const customStyleMap = JSON.parse(JSON.stringify(styleRenderMap))
+        props.customControls?.filter(control => control.type === "inline" && control.inlineStyle)
+            .forEach(control => {
+                customStyleMap[control.name.toUpperCase()] = control.inlineStyle
+            })
+        customStyleMapRef.current = customStyleMap
+    }
+
+    const getBlockMap = (): DraftBlockRenderMap => {
+        if (customBlockMapRef.current === undefined) {
+            setupBlockMap()
+        }
+        return customBlockMapRef.current!
+    }
+
+    const setupBlockMap = () => {
+        const customBlockMap: any = {}
+        props.customControls?.filter(control => control.type === "block" && control.blockWrapper)
+            .forEach(control => {
+                customBlockMap[control.name.toUpperCase()] = {
+                    element: "div",
+                    wrapper: control.blockWrapper
+                }
+            })
+        customBlockMapRef.current = DefaultDraftBlockRenderMap.merge(blockRenderMap, Immutable.Map(customBlockMap))
+    }
+
     const blockRenderer = (contentBlock: ContentBlock) => {
         const blockType = contentBlock.getType()
         if (blockType === 'atomic') {
@@ -884,18 +929,26 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     }
                 } else {
                     const block = atomicBlockExists(type.toLowerCase(), props.customControls)
-                    if (!block) {
-                        return null
-                    }
-                    return {
-                        component: block.atomicComponent,
-                        editable: false,
-                        props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                    if (block) {
+                        return {
+                            component: block.atomicComponent,
+                            editable: false,
+                            props: contentState.getEntity(contentBlock.getEntityAt(0)).getData()
+                        }
                     }
                 }
             }
         }
         return null
+    }
+
+    const styleRenderer = (style: any): React.CSSProperties => {
+        const customStyleMap = getStyleMap()
+        const styleNames = style.toJS()
+        return styleNames.reduce((styles: any, styleName: string) => {
+            styles = customStyleMap[styleName]
+            return styles
+        }, {})
     }
 
     const insertAtomicBlock = (editorState: EditorState, type: string, data: any, options?: any) => {
@@ -986,7 +1039,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     className={classNames(classes.editorContainer, classes.placeHolder, {
                         [classes.error]: props.error
                     })}
-                    onClick={handleFocus}
+                    tabIndex={0}
+                    onFocus={handlePlaceholderFocus}
                 >
                     {props.label || ""}
                 </div>
@@ -1021,6 +1075,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                             controls={inlineToolbarControls}
                             customControls={customControls}
                             inlineMode={true}
+                            isActive={true}
                         />
                     </Paper>
                     : null}
@@ -1034,6 +1089,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                         className={classes.toolbar}
                         disabled={!editable}
                         size={props.toolbarButtonSize}
+                        isActive={focus}
                     />
                     : null}
                 {placeholder}
@@ -1041,17 +1097,19 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
-                    })} onClick={handleFocus} onBlur={handleBlur}>
+                    })} onMouseDown={handleMouseDown} onBlur={handleBlur}>
                         <Editor
-                            customStyleMap={customRenderers.style}
-                            blockRenderMap={customRenderers.block}
+                            blockRenderMap={getBlockMap()}
                             blockRendererFn={blockRenderer}
+                            customStyleFn={styleRenderer}
                             editorState={editorState}
                             onChange={handleChange}
+                            onFocus={handleEditorFocus}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
                             handlePastedText={handlePastedText}
+                            handleReturn={handleReturn}
                             keyBindingFn={keyBindingFn}
                             ref={editorRef}
                             {...props.draftEditorProps}
