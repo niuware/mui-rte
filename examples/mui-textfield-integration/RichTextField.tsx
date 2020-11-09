@@ -4,11 +4,13 @@ import { InputBaseComponentProps } from '@material-ui/core/InputBase'
 import { EditorState } from 'draft-js'
 import MUIRichTextEditor from '../../'
 import { TMUIRichTextEditorRef } from '../../src/MUIRichTextEditor'
+import { TToolbarControl } from '../../src/components/Toolbar'
 
 export interface RichTextInputProps extends Omit<InputBaseComponentProps, 'value'> {
     inputRef?: Ref<unknown>
     doFocus?: boolean
     onStateChange?: (state: EditorState) => void
+    controls?: Array<TToolbarControl>
 }
 
 export const RichTextInput = ({
@@ -41,6 +43,7 @@ export const RichTextInput = ({
             {...richTextProps}
             ref={richTextRef}
             onChange={onStateChange}
+            controls={controls}
         />
     )
 }
