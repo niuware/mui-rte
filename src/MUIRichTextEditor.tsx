@@ -342,7 +342,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 end: selection.getEndOffset()
             }
 
-            const editor: HTMLElement = (editorRef.current as any).editor
+            const editor: HTMLElement = (editorRef.current as any)?.editor
+            if (!editor) {
+                return
+            }
             const { editorRect, selectionRect } = getEditorBounds(editor)
             if (!selectionRect) {
                 return
@@ -370,7 +373,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const updateAutocompletePosition = () => {
-        const editor: HTMLElement = (editorRef.current as any).editor
+        const editor: HTMLElement = (editorRef.current as any)?.editor
+        if (!editor) {
+            return
+        }
         const { editorRect, selectionRect } = getEditorBounds(editor)
         const line = getLineNumber(editorState)
         const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
@@ -739,7 +745,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const toggleMouseUpListener = (addAfter = false) => {
-        const editor: HTMLElement = (editorRef.current as any).editor
+        const editor: HTMLElement = (editorRef.current as any)?.editor
         if (!editor) {
             return
         }
