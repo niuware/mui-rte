@@ -8,6 +8,7 @@ export type TAutocompleteItem = {
   keys: string[];
   value: any;
   content: string | JSX.Element;
+  data?: any;
 };
 
 interface TAutocompleteProps extends WithStyles<typeof styles> {

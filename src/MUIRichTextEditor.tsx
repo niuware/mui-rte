@@ -64,6 +64,7 @@ import {
 export type TDecorator = {
   component: FunctionComponent;
   regex: RegExp;
+  name?: string;
 };
 
 export type TAutocompleteStrategy = {
@@ -71,6 +72,7 @@ export type TAutocompleteStrategy = {
   items: TAutocompleteItem[];
   insertSpaceAfter?: boolean;
   atomicBlockName?: string;
+  decoratorName?: string; // the decorator to use on inserting this autocomplete value
 };
 
 export type TAutocomplete = {
@@ -252,6 +254,32 @@ const findLinkEntities = (
   }, callback);
 };
 
+// const findMentionEntities = (
+//   contentBlock: any,
+//   callback: any,
+//   contentState: any
+// ) => {
+//   console.log(JSON.stringify(contentBlock));
+//   console.log(JSON.stringify(contentState));
+//   console.log(callback);
+//   contentBlock.findEntityRanges((character: any) => {
+//     const entityKey = character.getEntity();
+//     return (
+//       entityKey !== null &&
+//       contentState.getEntity(entityKey).getType() === "LINK"
+//     );
+//   }, callback);
+//   contentBlock.findEntityRanges((character: any) => {
+//     const entityKey = character.getEntity();
+
+//     return (
+//       entityKey !== null &&
+//       contentState.getEntity(entityKey).getType() === "AC_ITEM"
+//     );
+//   }, callback);
+//   findDecoWithRegex(/\@[\w ]+\@/g, contentBlock, callback);
+// };
+
 const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
   const text = contentBlock.getText();
   let matchArr, start;
@@ -259,6 +287,20 @@ const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
     start = matchArr.index;
     callback(start, start + matchArr[0].length);
   }
+};
+
+const findDecoWithNameFromAutoComplete = (
+  name: any,
+  contentBlock: any,
+  callback: any,
+  contentState: any
+) => {
+  contentBlock.findEntityRanges((character: any) => {
+    const entityKey = character.getEntity();
+    return (
+      entityKey !== null && contentState.getEntity(entityKey).getType() === name
+    );
+  }, callback);
 };
 
 const useEditorState = (props: IMUIRichTextEditorProps) => {
@@ -271,9 +313,18 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
   if (props.decorators) {
     props.decorators.forEach((deco) =>
       decorators.push({
-        strategy: (contentBlock: any, callback: any) => {
-          findDecoWithRegex(deco.regex, contentBlock, callback);
-        },
+        strategy: deco.name
+          ? (contentBlock: any, callback: any, contentState: any) => {
+              findDecoWithNameFromAutoComplete(
+                deco.name,
+                contentBlock,
+                callback,
+                contentState
+              );
+            }
+          : (contentBlock: any, callback: any) => {
+              findDecoWithRegex(deco.regex, contentBlock, callback);
+            },
         component: deco.component,
       })
     );
@@ -484,6 +535,7 @@ const MUIRichTextEditor: RefForwardingComponent<
       contentState,
       "remove-range"
     );
+    // console.log(value);
     const withAtomicBlock = insertAtomicBlock(
       newEditorState,
       name.toUpperCase(),
@@ -532,6 +584,44 @@ const MUIRichTextEditor: RefForwardingComponent<
     }
   };
 
+  const insertAutocompleteSuggestionUsingDecorator = (
+    name: string,
+    selection: SelectionState,
+    item: any
+  ) => {
+    // console.log(name, selection, item);
+    const currentContentState = editorState.getCurrentContent();
+    const entityKey = currentContentState
+      .createEntity(name, "IMMUTABLE", item.data)
+      .getLastCreatedEntityKey();
+    const contentState = Modifier.replaceText(
+      editorStateRef.current!.getCurrentContent(),
+      selection,
+      item.value,
+      editorStateRef.current!.getCurrentInlineStyle(),
+      entityKey
+    );
+
+    const newEditorState = EditorState.push(
+      editorStateRef.current!,
+      contentState,
+      "insert-characters"
+    );
+    if (autocompleteRef.current!.insertSpaceAfter === false) {
+      handleChange(newEditorState);
+    } else {
+      const addSpaceState = Modifier.insertText(
+        newEditorState.getCurrentContent(),
+        newEditorState.getSelection(),
+        " ",
+        newEditorState.getCurrentInlineStyle()
+      );
+      handleChange(
+        EditorState.push(newEditorState, addSpaceState, "insert-characters")
+      );
+    }
+  };
+
   const handleAutocompleteSelected = (index?: number) => {
     const itemIndex = index || selectedIndex;
     const items = getAutocompleteItems();
@@ -548,6 +638,12 @@ const MUIRichTextEditor: RefForwardingComponent<
           name,
           newSelection as SelectionState,
           item.value
+        );
+      } else if (autocompleteRef.current!.decoratorName) {
+        insertAutocompleteSuggestionUsingDecorator(
+          autocompleteRef.current!.decoratorName,
+          newSelection as SelectionState,
+          item // send the entire item, so it's data can also be set in the entity
         );
       } else {
         insertAutocompleteSuggestionAsText(
