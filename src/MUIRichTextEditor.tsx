@@ -35,6 +35,8 @@ import {
   getDefaultKeyBinding,
   Modifier,
   DraftBlockRenderMap,
+  ContentState,
+  convertFromHTML,
 } from "draft-js";
 import Toolbar, {
   TToolbarControl,
@@ -60,6 +62,7 @@ import {
   getEditorBounds,
   getLineNumber,
 } from "./utils";
+import { stateToHTML } from "draft-js-export-html";
 
 export type TDecorator = {
   component: FunctionComponent;
@@ -87,6 +90,7 @@ export type TAsyncAtomicBlockResponse = {
 export type TMUIRichTextEditorRef = {
   focus: () => void;
   save: () => void;
+  saveHtml: (options?: any) => void; // options are for saveToHTML options
   /**
    * @deprecated Use `insertAtomicBlockSync` instead.
    */
@@ -121,6 +125,7 @@ export type TMUIRichTextEditorProps = {
    */
   value?: any;
   defaultValue?: any;
+  defaultValueHtml?: any;
   label?: string;
   readOnly?: boolean;
   inheritFontSize?: boolean;
@@ -137,6 +142,7 @@ export type TMUIRichTextEditorProps = {
   maxLength?: number;
   autocomplete?: TAutocomplete;
   onSave?: (data: string) => void;
+  onSaveHtml?: (data: string) => void;
   onChange?: (state: EditorState) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -330,7 +336,18 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
     );
   }
   const decorator = new CompositeDecorator(decorators);
-  const defaultValue = props.defaultValue || props.value;
+  let defaultValue: any;
+
+  if (props.defaultValueHtml) {
+    const contentHTML = convertFromHTML(props.defaultValueHtml);
+    const state = ContentState.createFromBlockArray(
+      contentHTML.contentBlocks,
+      contentHTML.entityMap
+    );
+    defaultValue = JSON.stringify(convertToRaw(state));
+  } else {
+    defaultValue = props.defaultValue || props.value;
+  }
   return defaultValue
     ? EditorState.createWithContent(
         convertFromRaw(JSON.parse(defaultValue)),
@@ -382,6 +399,9 @@ const MUIRichTextEditor: RefForwardingComponent<
     },
     save: () => {
       handleSave();
+    },
+    saveHtml: (options?: any) => {
+      handleSaveHtml(options);
     },
     insertAtomicBlock: (name: string, data: any) => {
       handleInsertAtomicBlockSync(name, data);
@@ -774,6 +794,12 @@ const MUIRichTextEditor: RefForwardingComponent<
       props.onSave(
         JSON.stringify(convertToRaw(editorState.getCurrentContent()))
       );
+    }
+  };
+
+  const handleSaveHtml = (options?: any) => {
+    if (props.onSaveHtml) {
+      props.onSaveHtml(stateToHTML(editorState.getCurrentContent(), options));
     }
   };
 
