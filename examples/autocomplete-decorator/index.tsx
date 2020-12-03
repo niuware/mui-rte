@@ -6,8 +6,21 @@ import { TMUIRichTextEditorRef } from "../../src/MUIRichTextEditor";
 let options = {
   entityStyleFn: (entity: any) => {
     const entityType = entity.get("type");
-    if (entityType === "MYATDECO") {
+    if (entityType === "MYATDECO" || entityType === "MYHASHDECO") {
       const data: any = entity.getData();
+      if(data.key.includes("#")){
+        return {
+        element: "a",
+        attributes: {
+          href: data ? data.url : "",
+          key: data.key,
+        },
+        style: {
+          color: "orange",
+          cursor: "pointer",
+        },
+      };
+      }
       return {
         element: "a",
         attributes: {
@@ -19,7 +32,21 @@ let options = {
           cursor: "pointer",
         },
       };
-    } else {
+    } else if(entityType==='LINK'){
+       const data: any = entity.getData();
+       return {
+        element: "a",
+        attributes: {
+          href: data ? data.url : "",
+          key: data.key,
+        },
+        style: {
+          color: "red",
+          cursor: "pointer",
+        },
+      };
+    }
+    else {
       return {};
     }
   },
@@ -64,6 +91,45 @@ const cities: TAutocompleteItem[] = [
   },
 ];
 
+const tags: TAutocompleteItem[] = [
+  {
+    keys: ["travel","tour", "trip"],
+    value: "#Travel", // gets inserted
+    content: "#Travel", // gets displayed
+    data: {
+      url: "/travel",
+      key: "#travel",
+    },
+  },
+  {
+    keys: ["food", "breakfast", "dinner", "lunch", "cooking"],
+    value: "#Food",
+    content: "#food",
+    data: {
+      url: "/food",
+      key: "#food",
+    },
+  },
+  {
+    keys: ["literature", "books"],
+    value: "#Literature",
+    content: "#Literature",
+    data: {
+      url: "/literature",
+      key: "#literature",
+    },
+  },
+  {
+    keys: ["technology", "phone", "laptop"],
+    value: "#Tech",
+    content: "#Tech",
+    data: {
+      url: "/tech",
+      key: "#tech",
+    },
+  },
+];
+
 const MyAtDecorator = (props: any) => {
   const data = props.contentState.getEntity(props.entityKey).data;
   return (
@@ -72,6 +138,23 @@ const MyAtDecorator = (props: any) => {
       key={data.key}
       style={{
         color: "red",
+        cursor: "pointer",
+      }}
+    >
+      {props.children}
+    </a>
+  );
+};
+
+const MyHashTagDecorator = (props: any) => {
+  const data = props.contentState.getEntity(props.entityKey).data;
+  
+  return (
+    <a
+      onClick={() => (window.location.href = data.url)}
+       key={data.key}
+      style={{
+        color: 'orange',
         cursor: "pointer",
       }}
     >
@@ -100,6 +183,12 @@ const AutocompleteDecorator = () => {
               decoratorName: "MYATDECO",
               insertSpaceAfter: false,
             },
+            {
+              items: tags,
+              triggerChar: "#",
+              decoratorName: "MYHASHDECO",
+              insertSpaceAfter: false,
+            },
           ],
         }}
         decorators={[
@@ -107,6 +196,11 @@ const AutocompleteDecorator = () => {
             component: MyAtDecorator,
             regex: /\@[\w ]+\@/g, // unused but required
             name: "MYATDECO",
+          },
+          {
+            component: MyHashTagDecorator,
+            regex: /\#[\w ]+/g, // unused but required
+            name: "MYHASHDECO",
           },
         ]}
       />
