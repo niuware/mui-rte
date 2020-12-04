@@ -20,12 +20,17 @@ interface TAutocompleteProps extends WithStyles<typeof styles> {
 
 const styles = () => createStyles({
     container: {
+        maxHeight:'250px',
+        overflowY:'scroll',
         minWidth: "200px",
         position: "absolute",
         zIndex: 10
     },
     item: {
-        cursor: "pointer"
+        cursor: "pointer",
+        '&:hover':{
+            backgroundColor:'#9ee7ff'
+        }
     }
 })
 
@@ -45,7 +50,8 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
                     <ListItem
                         key={index}
                         className={classes.item}
-                        selected={index === props.selectedIndex}
+                        //TODO: Fix 'Enter' key event for autocomplete before enabling this
+                        //selected={index === props.selectedIndex} 
                         onClick={() => props.onClick(index)}
                     >
                         {item.content}
