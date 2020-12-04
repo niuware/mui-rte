@@ -609,7 +609,7 @@ const MUIRichTextEditor: RefForwardingComponent<
     selection: SelectionState,
     item: any
   ) => {
-    // console.log(name, selection, item);
+    //console.log(name, selection, item);
     const currentContentState = editorState.getCurrentContent();
     const entityKey = currentContentState
       .createEntity(name, "IMMUTABLE", item.data)
