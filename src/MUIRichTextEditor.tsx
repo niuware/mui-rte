@@ -137,6 +137,9 @@ export type TMUIRichTextEditorProps = {
   toolbarButtonSize?: TToolbarButtonSize;
   inlineToolbar?: boolean;
   inlineToolbarControls?: Array<TToolbarControl>;
+  floatingToolbar?: boolean;
+  floatingToolbarPosition?: any; // added to styles - so use top, bottom, left, right
+  floatingToolbarControls?: Array<TToolbarControl>;
   draftEditorProps?: TDraftEditorProps;
   keyCommands?: TKeyCommand[];
   maxLength?: number;
@@ -1479,6 +1482,25 @@ const MUIRichTextEditor: RefForwardingComponent<
               editorState={editorState}
               onClick={handleToolbarClick}
               controls={inlineToolbarControls}
+              customControls={customControls}
+              inlineMode={true}
+              isActive={true}
+            />
+          </Paper>
+        ) : null}
+        {props.floatingToolbar &&
+        props.floatingToolbarPosition &&
+        props.floatingToolbarControls &&
+        editable ? (
+          <Paper
+            className={classes.inlineToolbar}
+            style={props.floatingToolbarPosition}
+          >
+            <Toolbar
+              id={editorId}
+              editorState={editorState}
+              onClick={handleToolbarClick}
+              controls={props.floatingToolbarControls}
               customControls={customControls}
               inlineMode={true}
               isActive={true}

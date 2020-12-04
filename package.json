@@ -73,7 +73,6 @@
     "classnames": "^2.2.6",
     "draft-js": "^0.11.7",
     "draft-js-export-html": "^1.4.1",
-    "html-to-draftjs": "^1.5.0",
     "immutable": "^3.8.2"
   },
   "files": [

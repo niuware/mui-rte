@@ -19,6 +19,7 @@ import AutocompleteAtomic from "./autocomplete-atomic";
 import AsyncImageUpload from "./async-image-upload";
 import AsyncAtomicCustomBlock from "./async-atomic-custom-block";
 import AutocompleteDecorator from "./autocomplete-decorator";
+import FloatingToolbar from "./floating-toolbar";
 
 const App = () => {
   const [sample, setSample] = useState(<Basic />);
@@ -64,6 +65,9 @@ const App = () => {
       </button>
       <button onClick={() => setSample(<AutocompleteDecorator />)}>
         Autocomplete Decorator
+      </button>
+      <button onClick={() => setSample(<FloatingToolbar />)}>
+        Floating Toolbar
       </button>
       <div
         style={{
