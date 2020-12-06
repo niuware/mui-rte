@@ -1,1 +1,1 @@
-export {default} from './src/MUIRichTextEditor'
+export {default, TMUIRichTextEditorRef} from './src/MUIRichTextEditor'
