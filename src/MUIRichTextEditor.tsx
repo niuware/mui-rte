@@ -38,7 +38,10 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
+    autocompleteMinSearchCharCount?:number
 }
+
+const defaultAutocompleteMinSearchCharCount = 2
 
 export type TAsyncAtomicBlockResponse = {
     data: any
@@ -91,6 +94,7 @@ export type TMUIRichTextEditorProps = {
     keyCommands?: TKeyCommand[]
     maxLength?: number
     maxHeight?: number
+    singleLine?: boolean
     autocomplete?: TAutocomplete
     onSave?: (data: string) => void
     onBlur?: (data: string) => void
@@ -129,7 +133,7 @@ const styles = ({ spacing, typography, palette }: Theme) => createStyles({
     },
     container: {
         margin: spacing(1, 0, 0, 0),
-        position: "relative",
+        position: "static",
         fontFamily: typography.body1.fontFamily,
         fontSize: typography.body1.fontSize,
         '& figure': {
@@ -201,7 +205,6 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
-const autocompleteMinSearchCharCount = 2
 const lineHeight = 26
 const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
@@ -249,6 +252,13 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         : EditorState.createEmpty(decorator)
 }
 
+const getAutocompleteItems = (searchTerm:string,autoCompleteOptions:TAutocompleteItem[],minSearchChar:number): TAutocompleteItem[] => {
+    if (searchTerm.length < minSearchChar) {
+        return []
+    }
+    return autoCompleteOptions.filter(item => (item.keys.filter((key:string) => key.toLowerCase().includes(searchTerm.toLowerCase())).length > 0))
+}
+
 const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
 
@@ -280,6 +290,14 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         start: 0,
         end: 0
     })
+    const memoedAutocompleteItems = React.useMemo(()=>{
+        const minSearchCharCount = props?.autocomplete?.autocompleteMinSearchCharCount || defaultAutocompleteMinSearchCharCount
+        if(searchTerm === ""){
+            return autocompleteRef?.current?.items.splice(0,autocompleteLimit) || []
+        } else {
+            return getAutocompleteItems(searchTerm, autocompleteRef.current!.items,minSearchCharCount).splice(0,autocompleteLimit)
+        }
+    },[searchTerm,autocompleteRef.current?.items])
 
     /**
      * Exposed methods
@@ -346,6 +364,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
 
         toggleMouseUpListener(true)
+
         return () => {
             toggleMouseUpListener()
             if (copySource !== null) {
@@ -367,7 +386,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }, [state.toolbarPosition])
 
     useEffect(() => {
-        if (searchTerm.length < autocompleteMinSearchCharCount) {
+        const minSearchCharCount = props?.autocomplete?.autocompleteMinSearchCharCount || defaultAutocompleteMinSearchCharCount
+        if (searchTerm.length < minSearchCharCount) {
             setSelectedIndex(0)
         }
     }, [searchTerm])
@@ -412,6 +432,9 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             //             const editorRect = editor.getBoundingClientRect()
             // =======
             const editor: HTMLElement = (editorRef.current as any).editor
+            if(!editor){
+                return
+            }
             const { editorRect, selectionRect } = getEditorBounds(editor)
             if (!selectionRect) {
                 return
@@ -439,7 +462,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const updateAutocompletePosition = () => {
-        const editor: HTMLElement = (editorRef.current as any).editor
+        const editor: HTMLElement = (editorRef.current as any).editor.editor
+        if(!editor){
+            return
+        }
         const { editorRect, selectionRect } = getEditorBounds(editor)
         const line = getLineNumber(editorState)
         const top = selectionRect ? selectionRect.top : editorRect.top + (lineHeight * line)
@@ -492,7 +518,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const handleAutocompleteSelected = (index?: number) => {
         const itemIndex = index || selectedIndex
-        const items = getAutocompleteItems()
+        const items = memoedAutocompleteItems
         if (items.length > itemIndex) {
             const item = items[itemIndex]
             const currentSelection = autocompleteSelectionStateRef.current!
@@ -516,20 +542,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         refocus()
     }
 
-    const getAutocompleteItems = (): TAutocompleteItem[] => {
-        if (searchTerm.length < autocompleteMinSearchCharCount) {
-            return []
-        }
-        return autocompleteRef.current!.items
-                .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
-                .splice(0, autocompleteLimit)
-    }
-
     const handleChange = (state: EditorState) => {
         setEditorState(state)
     }
 
     const handleBeforeInput = (chars: string, editorState: EditorState): DraftHandleValue => {
+
         if (chars === " " && searchTerm.length) {
             clearSearch()
         } else if (autocompleteSelectionStateRef.current) {
@@ -803,6 +821,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
+        if(props.singleLine){
+            handleKeyCommand("mui-autocomplete-insert",editorState)
+            return "handled"
+        }
+
         return isMaxLengthHandled(editorState, 1)
     }
 
@@ -993,7 +1016,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const getAutocompleteKeyEvent = (keyboardEvent: React.KeyboardEvent<{}>): string | null => {
-        const itemsLength = getAutocompleteItems().length
+        const itemsLength = memoedAutocompleteItems.length
         const limit = autocompleteLimit > itemsLength ? itemsLength : autocompleteLimit
         switch (keyboardEvent.key) {
             case "ArrowDown":
@@ -1055,7 +1078,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 return comm.name
             }
         }
-        if (searchTerm) {
+        
+        if (autocompletePositionRef.current) {
             const autocompleteEvent = getAutocompleteKeyEvent(e)
             if (autocompleteEvent) {
                 return autocompleteEvent
@@ -1091,22 +1115,25 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     {props.label || ""}
                 </div>
             )
-            className = classes.hidePlaceholder
+            if(!props.singleLine){
+                className = classes.hidePlaceholder
+            }
         }
     }
 
+
     return (
-        <div id={`${editorId}-root`} className={classes.root}>
+        <div id={`${editorId}-root`} className={classes.root} style={{overflow:props.singleLine ? 'visible': 'hidden'}}>
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.autocomplete && autocompletePositionRef.current ?
                     <Autocomplete
-                        items={getAutocompleteItems()}
-                        top={autocompletePositionRef.current!.top}
-                        left={autocompletePositionRef.current!.left}
-                        onClick={handleAutocompleteSelected}
-                        selectedIndex={selectedIndex}
+                    items={memoedAutocompleteItems}
+                    top={autocompletePositionRef.current!.top}
+                    left={autocompletePositionRef.current!.left}
+                    onClick={handleAutocompleteSelected}
+                    selectedIndex={selectedIndex}
                     />
                     : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
@@ -1137,7 +1164,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     />
                     : null}
                 {placeholder}
-                <div id={`${editorId}-editor`} className={classes.editor} style={{maxHeight:props.maxHeight}}>
+                <div id={`${editorId}-editor`} className={classes.editor} style={{maxHeight:props.maxHeight, overflowY:props.singleLine? 'visible': 'scroll'}}>
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
