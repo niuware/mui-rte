@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef, forwardRef, useImperativeHandle, RefForwardingComponent, SyntheticEvent  } from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef, forwardRef, useImperativeHandle, KeyboardEvent, RefForwardingComponent, SyntheticEvent  } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -88,7 +88,7 @@ export type TMUIRichTextEditorProps = {
     inlineToolbar?: boolean
     inlineToolbarControls?: Array<TToolbarControl>
     draftEditorProps?: TDraftEditorProps
-    keyBindingFn?: (e: React.KeyboardEvent<{}>) => string | null | undefined
+    keyBindingFn?: ((e: KeyboardEvent<HTMLElement>) => string | null) | undefined
     keyCommands?: TKeyCommand[]
     maxLength?: number
     maxHeight?: number
@@ -98,7 +98,7 @@ export type TMUIRichTextEditorProps = {
     onBlur?: (data: string) => void
     onFocus?: () => void
     onChange?: (state: EditorState) => void
-    handlePastedText?: (_text: string, html: string | undefined, editorState: EditorState) => EditorState
+    handlePastedText?: (_text: string, html: string | undefined, editorState: EditorState) => EditorState | undefined
 }
 
 interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
@@ -627,7 +627,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!block) {
             return
         }
-        const newEditorState = insertAtomicBlock(editorState, block.name.toUpperCase(), data, { 
+        const newEditorState = insertAtomicBlock(editorState, block.name.toUpperCase(), data, {
             selection: editorState.getCurrentContent().getSelectionAfter()
         })
         updateStateForPopover(newEditorState)
@@ -650,7 +650,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 return
             }
             const newContentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
-                                                         newSelection as SelectionState, "forward")
+                newSelection as SelectionState, "forward")
             handleChange(EditorState.push(editorStateRef.current!, newContentState, "remove-range"))
         })
     }
@@ -659,12 +659,12 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const placeholderName = placeholder || name + "..."
         const currentContentState = editorStateRef.current!.getCurrentContent()
         const entityKey = currentContentState.createEntity("ASYNC_ATOMICBLOCK", 'IMMUTABLE').getLastCreatedEntityKey()
-        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(), 
-                                                 currentContentState.getSelectionAfter(),
-                                                 placeholderName,
-                                                 undefined,
-                                                 entityKey)
-        
+        const contentState = Modifier.insertText(editorStateRef.current!.getCurrentContent(),
+            currentContentState.getSelectionAfter(),
+            placeholderName,
+            undefined,
+            entityKey)
+
         const selection = currentContentState.getSelectionAfter()
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
         handleChange(newEditorState)
@@ -749,7 +749,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             urlKey: linkKey,
             toolbarPosition: !inlineMode ? undefined : state.toolbarPosition,
             anchorUrlPopover: !inlineMode ? document.getElementById(`${editorId}-${type}-control-button`)!
-                                            : document.getElementById(`${editorId}-${type}-control-button-toolbar`)!,
+                : document.getElementById(`${editorId}-${type}-control-button-toolbar`)!,
             urlIsMedia: type === "media" ? true : undefined
         })
     }
@@ -850,7 +850,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!url) {
             if (urlKey) {
                 removeLink()
-            } 
+            }
             dismissPopover()
             return
         }
@@ -1042,21 +1042,32 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const text = editorStateRef.current!.getCurrentContent().getLastBlock().getText()
 
         if (keyBinding === "backspace"
-            && autocompleteRef.current 
+            && autocompleteRef.current
             && text.substr(text.length - 1) === autocompleteRef.current.triggerChar) {
             clearSearch()
-        } else if (autocompletePositionRef.current 
+        } else if (autocompletePositionRef.current
             && keyBinding === "backspace"
             && searchTerm.length) {
             setSearchTerm(searchTerm.substr(0, searchTerm.length - 1))
-        } else if (!autocompletePositionRef.current && 
+        } else if (!autocompletePositionRef.current &&
             (keyBinding === "backspace"
-            || keyBinding === "split-block")) {
+                || keyBinding === "split-block")) {
             clearSearch()
         }
     }
 
-    const keyBindingFn = (e: React.KeyboardEvent<{}>): string | null => {
+    const keyBindingFn = (e: React.KeyboardEvent<HTMLElement>): string | null => {
+        if (e.keyCode === 9) {
+            const newEditorState = RichUtils.onTab(e, editorState, 5)
+            if (newEditorState !== editorState) {
+                setEditorState(newEditorState)
+                if (props.onChange) {
+                    props.onChange(newEditorState)
+                }
+            }
+            return "handled"
+        }
+
         if (hasCommandModifier(e) && props.keyCommands) {
             const comm = props.keyCommands.find(comm => comm.key === e.keyCode)
             if (comm) {
@@ -1072,6 +1083,10 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
         const keyBinding = getDefaultKeyBinding(e)
         updateSearchTermForKeyBinding(keyBinding)
+
+        if (props.keyBindingFn) {
+            props.keyBindingFn(e)
+        }
 
         // return null
         return keyBinding
@@ -1116,7 +1131,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     onClick={handleAutocompleteSelected}
                     selectedIndex={selectedIndex}
                     />
-                : null}
+                    : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
                     <Paper className={classes.inlineToolbar} style={{
                         top: state.toolbarPosition.top,
