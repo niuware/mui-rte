@@ -12,12 +12,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/niuware/mui-rte.git"
+    "url": "https://github.com/finite-loop/mui-rte.git"
   },
   "bugs": {
-    "url": "https://github.com/niuware/mui-rte/issues"
+    "url": "https://github.com/finite-loop/mui-rte/issues"
   },
-  "homepage": "https://github.com/niuware/mui-rte#readme",
+  "homepage": "https://github.com/finite-loop/mui-rte#readme",
   "main": "dist/index.js",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
