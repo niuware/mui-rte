@@ -94,6 +94,7 @@ var ToolbarButton = function (props) {
     }
     return null;
 };
+//# sourceMappingURL=ToolbarButton.js.map
 
 /**
  * Get the current selection details
@@ -169,6 +170,7 @@ var getLineNumber = function (editorState) {
     return editorState.getCurrentContent().getBlockMap()
         .keySeq().findIndex(function (k) { return k === currentBlockKey; });
 };
+//# sourceMappingURL=utils.js.map
 
 var STYLE_TYPES = [
     {
@@ -348,11 +350,13 @@ var Toolbar = function (props) {
         return (React__default.createElement(ToolbarButton, { id: style.id, editorId: props.id, key: "key-" + style.label, active: active, label: style.label, onClick: action, style: style.style, type: style.type, icon: style.icon, component: style.component, inlineMode: props.inlineMode, disabled: props.disabled, size: props.size }));
     })));
 };
+//# sourceMappingURL=Toolbar.js.map
 
 var Link = function (props) {
     var _a = props.contentState.getEntity(props.entityKey).getData(), url = _a.url, className = _a.className;
     return (React__default.createElement(MuiLink, { href: url, className: className + " editor-anchor", target: "_blank" }, props.children));
 };
+//# sourceMappingURL=Link.js.map
 
 var styles = function (_a) {
     var shadows = _a.shadows;
@@ -417,6 +421,7 @@ var Media = function (props) {
             _a)) }, htmlTag()));
 };
 var Media$1 = styles$6.withStyles(styles, { withTheme: true })(Media);
+//# sourceMappingURL=Media.js.map
 
 var styles$1 = function (_a) {
     var palette = _a.palette;
@@ -432,6 +437,7 @@ var Blockquote = function (props) {
     return (React__default.createElement("div", { className: props.classes.root }, props.children));
 };
 var Blockquote$1 = styles$6.withStyles(styles$1, { withTheme: true })(Blockquote);
+//# sourceMappingURL=Blockquote.js.map
 
 var styles$2 = function (_a) {
     var spacing = _a.spacing, palette = _a.palette;
@@ -446,6 +452,7 @@ var CodeBlock = function (props) {
     return (React__default.createElement("div", { className: props.classes.root }, props.children));
 };
 var CodeBlock$1 = styles$6.withStyles(styles$2, { withTheme: true })(CodeBlock);
+//# sourceMappingURL=CodeBlock.js.map
 
 var styles$3 = function (_a) {
     var spacing = _a.spacing;
@@ -528,6 +535,7 @@ var UrlPopover = function (props) {
                         React__default.createElement(CheckIcon, null)))))));
 };
 var UrlPopover$1 = styles$6.withStyles(styles$3, { withTheme: true })(UrlPopover);
+//# sourceMappingURL=UrlPopover.js.map
 
 var styles$4 = function () {
     return styles$6.createStyles({
@@ -553,6 +561,7 @@ var Autocomplete = function (props) {
         React__default.createElement(List, { dense: true }, props.items.map(function (item, index) { return (React__default.createElement(ListItem, { key: index, className: classes.item, selected: index === props.selectedIndex, onClick: function () { return props.onClick(index); } }, item.content)); }))));
 };
 var Autocomplete$1 = styles$6.withStyles(styles$4, { withTheme: true })(Autocomplete);
+//# sourceMappingURL=Autocomplete.js.map
 
 var styles$5 = function (_a) {
     var spacing = _a.spacing, typography = _a.typography, palette = _a.palette;
@@ -599,6 +608,16 @@ var styles$5 = function (_a) {
         },
         anchorLink: {},
         toolbar: {},
+        floatingToolbar: {
+            position: "absolute",
+            paddingTop: "6px",
+            paddingBottom: "6px",
+            "& button": {
+                marginLeft: 4,
+                marginRight: 4,
+            },
+            zIndex: 9999,
+        },
         inlineToolbar: {
             maxWidth: "180px",
             position: "absolute",
@@ -1485,8 +1504,12 @@ var MUIRichTextEditor = function (props, ref) {
             props.floatingToolbar &&
                 props.floatingToolbarPosition &&
                 props.floatingToolbarControls &&
-                editable ? (React__default.createElement(Paper, { className: classes.inlineToolbar, style: props.floatingToolbarPosition },
-                React__default.createElement(Toolbar, { id: editorId, editorState: editorState, onClick: handleToolbarClick, controls: props.floatingToolbarControls, customControls: customControls, inlineMode: true, isActive: true }))) : null,
+                editable ? (React__default.createElement(Paper, { className: classes.floatingToolbar, style: props.floatingToolbarPosition },
+                React__default.createElement(Toolbar, { id: editorId, editorState: editorState, onClick: handleToolbarClick, controls: props.floatingToolbarControls, customControls: customControls, 
+                    // className={classes.floatingToolbar}
+                    size: props.toolbarButtonSize, 
+                    // inlineMode={true}
+                    isActive: true }))) : null,
             renderToolbar ? (React__default.createElement(Toolbar, { id: editorId, editorState: editorState, onClick: handleToolbarClick, controls: controls, customControls: customControls, className: classes.toolbar, disabled: !editable, size: props.toolbarButtonSize, isActive: focus })) : null,
             placeholder,
             React__default.createElement("div", { id: editorId + "-editor", className: classes.editor },
@@ -1501,6 +1524,7 @@ var MUIRichTextEditor$1 = styles$6.withStyles(styles$5, {
     withTheme: true,
     name: "MUIRichTextEditor",
 })(React.forwardRef(MUIRichTextEditor));
+//# sourceMappingURL=MUIRichTextEditor.js.map
 
 exports.default = MUIRichTextEditor$1;
 //# sourceMappingURL=index.js.map

@@ -217,6 +217,16 @@ const styles = ({ spacing, typography, palette }: Theme) =>
     },
     anchorLink: {},
     toolbar: {},
+    floatingToolbar: {
+      position: "absolute",
+      paddingTop: "6px",
+      paddingBottom: "6px",
+      "& button": {
+        marginLeft: 4,
+        marginRight: 4,
+      },
+      zIndex: 9999,
+    },
     inlineToolbar: {
       maxWidth: "180px",
       position: "absolute",
@@ -1493,7 +1503,7 @@ const MUIRichTextEditor: RefForwardingComponent<
         props.floatingToolbarControls &&
         editable ? (
           <Paper
-            className={classes.inlineToolbar}
+            className={classes.floatingToolbar}
             style={props.floatingToolbarPosition}
           >
             <Toolbar
@@ -1502,7 +1512,9 @@ const MUIRichTextEditor: RefForwardingComponent<
               onClick={handleToolbarClick}
               controls={props.floatingToolbarControls}
               customControls={customControls}
-              inlineMode={true}
+              // className={classes.floatingToolbar}
+              size={props.toolbarButtonSize}
+              // inlineMode={true}
               isActive={true}
             />
           </Paper>
