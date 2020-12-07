@@ -31,7 +31,6 @@ export type TDecorator = {
 export type TAutocompleteStrategy = {
     triggerChar: string
     items: TAutocompleteItem[]
-    autocompleteMinSearchCharCount:number
     insertSpaceAfter?: boolean
     atomicBlockName?: string
 }
@@ -39,7 +38,10 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
+    autocompleteMinSearchCharCount?:number
 }
+
+const defaultAutocompleteMinSearchCharCount = 2
 
 export type TAsyncAtomicBlockResponse = {
     data: any
@@ -289,10 +291,11 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         end: 0
     })
     const memoedAutocompleteItems = React.useMemo(()=>{
+        const minSearchCharCount = props?.autocomplete?.autocompleteMinSearchCharCount || defaultAutocompleteMinSearchCharCount
         if(searchTerm === ""){
             return autocompleteRef?.current?.items.splice(0,autocompleteLimit) || []
         } else {
-            return getAutocompleteItems(searchTerm, autocompleteRef.current!.items,props.autocompleteMinSearchCharCount).splice(0,autocompleteLimit)
+            return getAutocompleteItems(searchTerm, autocompleteRef.current!.items,minSearchCharCount).splice(0,autocompleteLimit)
         }
     },[searchTerm,autocompleteRef.current?.items])
 
@@ -383,7 +386,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }, [state.toolbarPosition])
 
     useEffect(() => {
-        if (searchTerm.length < props.autocompleteMinSearchCharCount) {
+        const minSearchCharCount = props?.autocomplete?.autocompleteMinSearchCharCount || defaultAutocompleteMinSearchCharCount
+        if (searchTerm.length < minSearchCharCount) {
             setSelectedIndex(0)
         }
     }, [searchTerm])
@@ -818,6 +822,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
         if(props.singleLine){
+            handleKeyCommand("mui-autocomplete-insert",editorState)
             return "handled"
         }
 
@@ -1028,7 +1033,6 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     setSelectedIndex(limit - 1)
                 }
                 return "mui-autocomplete-navigate"
-            //TODO: Fix 'Enter' key event. Function isn't currently recieving 'enter' key
             case "Enter":
                 return "mui-autocomplete-insert"
             case "Escape":
