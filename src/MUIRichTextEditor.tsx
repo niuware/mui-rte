@@ -503,9 +503,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey()
         const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(),
             selection,
-            value,
-            undefined,
-            entityKey)
+            value)
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
         if (autocompleteRef.current!.insertSpaceAfter === false) {
             handleChange(newEditorState)
