@@ -73,7 +73,8 @@
     "draft-js": "^0.11.6",
     "draft-js-plugins-editor": "^3.0.0",
     "draftjs-conductor": "^1.0.1",
-    "immutable": "^3.8.2"
+    "immutable": "^3.8.2",
+    "lodash": "^4.17.20"
   },
   "files": [
     "dist",
