@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useRef, forwardRef, useImperativeHandle, KeyboardEvent, RefForwardingComponent, SyntheticEvent  } from 'react'
+import React, { FunctionComponent, useEffect, useState, useRef, forwardRef, useImperativeHandle, KeyboardEvent, RefForwardingComponent, SyntheticEvent } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
@@ -20,8 +20,9 @@ import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan,
 import {
     registerCopySource,
     handleDraftEditorPastedText,
-  } from "draftjs-conductor";
+} from "draftjs-conductor";
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
+import { filter } from 'lodash'
 
 export type TDecorator = {
     component: FunctionComponent
@@ -38,10 +39,10 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
-    autocompleteMinSearchCharCount?:number
+    autocompleteMinSearchCharCount?: number
 }
 
-const defaultAutocompleteMinSearchCharCount = 2
+const defaultAutocompleteMinSearchCharCount = 0
 
 export type TAsyncAtomicBlockResponse = {
     data: any
@@ -103,7 +104,7 @@ export type TMUIRichTextEditorProps = {
     handlePastedText?: (_text: string, html: string | undefined, editorState: EditorState) => EditorState | undefined
 }
 
-interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> {}
+interface IMUIRichTextEditorProps extends TMUIRichTextEditorProps, WithStyles<typeof styles> { }
 
 type TMUIRichTextEditorState = {
     anchorUrlPopover?: HTMLElement
@@ -252,11 +253,11 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         : EditorState.createEmpty(decorator)
 }
 
-const getAutocompleteItems = (searchTerm:string,autoCompleteOptions:TAutocompleteItem[],minSearchChar:number): TAutocompleteItem[] => {
+const getAutocompleteItems = (searchTerm: string, autoCompleteOptions: TAutocompleteItem[], minSearchChar: number): TAutocompleteItem[] => {
     if (searchTerm.length < minSearchChar) {
         return []
     }
-    return autoCompleteOptions.filter(item => (item.keys.filter((key:string) => key.toLowerCase().includes(searchTerm.toLowerCase())).length > 0))
+    return filter(autoCompleteOptions, item => (item.keys.filter((key: string) => key.toLowerCase().includes(searchTerm.toLowerCase())).length > 0))
 }
 
 const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
@@ -290,14 +291,14 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         start: 0,
         end: 0
     })
-    const memoedAutocompleteItems = React.useMemo(()=>{
+    const memoedAutocompleteItems = React.useMemo(() => {
         const minSearchCharCount = props?.autocomplete?.autocompleteMinSearchCharCount || defaultAutocompleteMinSearchCharCount
-        if(searchTerm === ""){
-            return autocompleteRef?.current?.items.splice(0,autocompleteLimit) || []
+        if (searchTerm === "") {
+            return autocompleteRef.current?.items.slice(0, autocompleteLimit) || []
         } else {
-            return getAutocompleteItems(searchTerm, autocompleteRef.current!.items,minSearchCharCount).splice(0,autocompleteLimit)
+            return getAutocompleteItems(searchTerm, autocompleteRef.current!.items || [], minSearchCharCount).splice(0, autocompleteLimit)
         }
-    },[searchTerm,autocompleteRef.current?.items])
+    }, [searchTerm, autocompleteRef.current?.items])
 
     /**
      * Exposed methods
@@ -432,7 +433,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
             //             const editorRect = editor.getBoundingClientRect()
             // =======
             const editor: HTMLElement = (editorRef.current as any).editor
-            if(!editor){
+            if (!editor) {
                 return
             }
             const { editorRect, selectionRect } = getEditorBounds(editor)
@@ -463,7 +464,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
     const updateAutocompletePosition = () => {
         const editor: HTMLElement = (editorRef.current as any).editor.editor
-        if(!editor){
+        if (!editor) {
             return
         }
         const { editorRect, selectionRect } = getEditorBounds(editor)
@@ -485,13 +486,13 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!block) {
             return
         }
-        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(), 
-                                                    selection,
-                                                    "forward")
+        const contentState = Modifier.removeRange(editorStateRef.current!.getCurrentContent(),
+            selection,
+            "forward")
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "remove-range")
         const withAtomicBlock = insertAtomicBlock(newEditorState, name.toUpperCase(), {
             value: value
-        }, { 
+        }, {
             selection: newEditorState.getCurrentContent().getSelectionAfter()
         })
         handleChange(withAtomicBlock)
@@ -500,18 +501,16 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     const insertAutocompleteSuggestionAsText = (selection: SelectionState, value: string) => {
         const currentContentState = editorState.getCurrentContent()
         const entityKey = currentContentState.createEntity("AC_ITEM", 'IMMUTABLE').getLastCreatedEntityKey()
-        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(), 
-                                                    selection,
-                                                    value,
-                                                    editorStateRef.current!.getCurrentInlineStyle(),
-                                                    entityKey)
+        const contentState = Modifier.replaceText(editorStateRef.current!.getCurrentContent(),
+            selection,
+            value)
         const newEditorState = EditorState.push(editorStateRef.current!, contentState, "insert-characters")
         if (autocompleteRef.current!.insertSpaceAfter === false) {
             handleChange(newEditorState)
         } else {
             const addSpaceState = Modifier.insertText(newEditorState.getCurrentContent(),
-                                                newEditorState.getSelection(), " ",
-                                                newEditorState.getCurrentInlineStyle())
+                newEditorState.getSelection(), " ",
+                newEditorState.getCurrentInlineStyle())
             handleChange(EditorState.push(newEditorState, addSpaceState, "insert-characters"))
         }
     }
@@ -810,7 +809,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         }
     }
 
-    const handlePastedText = (text: string, _html: string|undefined, editorState: EditorState): DraftHandleValue => {
+    const handlePastedText = (text: string, _html: string | undefined, editorState: EditorState): DraftHandleValue => {
         let newState = handleDraftEditorPastedText(_html, editorState);
         newState = !newState && props.handlePastedText ? props.handlePastedText(text, _html, editorState) : newState
         if (newState) {
@@ -821,8 +820,8 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
     }
 
     const handleReturn = (_e: any, editorState: EditorState): DraftHandleValue => {
-        if(props.singleLine){
-            handleKeyCommand("mui-autocomplete-insert",editorState)
+        if (props.singleLine) {
+            handleKeyCommand("mui-autocomplete-insert", editorState)
             return "handled"
         }
 
@@ -1078,7 +1077,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                 return comm.name
             }
         }
-        
+
         if (autocompletePositionRef.current) {
             const autocompleteEvent = getAutocompleteKeyEvent(e)
             if (autocompleteEvent) {
@@ -1115,7 +1114,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     {props.label || ""}
                 </div>
             )
-            if(!props.singleLine){
+            if (!props.singleLine) {
                 className = classes.hidePlaceholder
             }
         }
@@ -1123,17 +1122,17 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
 
 
     return (
-        <div id={`${editorId}-root`} className={classes.root} style={{overflow:props.singleLine ? 'visible': 'hidden'}}>
+        <div id={`${editorId}-root`} className={classes.root} style={{ overflow: props.singleLine ? 'visible' : 'hidden' }}>
             <div id={`${editorId}-container`} className={classNames(classes.container, {
                 [classes.inheritFontSize]: props.inheritFontSize
             })}>
                 {props.autocomplete && autocompletePositionRef.current ?
                     <Autocomplete
-                    items={memoedAutocompleteItems}
-                    top={autocompletePositionRef.current!.top}
-                    left={autocompletePositionRef.current!.left}
-                    onClick={handleAutocompleteSelected}
-                    selectedIndex={selectedIndex}
+                        items={memoedAutocompleteItems}
+                        top={autocompletePositionRef.current!.top}
+                        left={autocompletePositionRef.current!.left}
+                        onClick={handleAutocompleteSelected}
+                        selectedIndex={selectedIndex}
                     />
                     : null}
                 {props.inlineToolbar && editable && state.toolbarPosition ?
@@ -1164,7 +1163,7 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
                     />
                     : null}
                 {placeholder}
-                <div id={`${editorId}-editor`} className={classes.editor} style={{maxHeight:props.maxHeight, overflowY:props.singleLine? 'visible': 'scroll'}}>
+                <div id={`${editorId}-editor`} className={classes.editor} style={{ maxHeight: props.maxHeight, overflowY: props.singleLine ? 'visible' : 'scroll' }}>
                     <div id={`${editorId}-editor-container`} className={classNames(className, classes.editorContainer, {
                         [classes.editorReadOnly]: !editable,
                         [classes.error]: props.error
