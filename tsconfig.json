@@ -20,10 +20,12 @@
             "*": [
                 "node_modules/*"
             ]
-        }
+        },
+        "typeRoots": [ "./types", "./node_modules/@types"]
     },
     "include": [
         "src/**/*",
         "declarations.d.ts"
-    ]
+    ],
+    "exclude": ["node_modules", "typings"]
 }
