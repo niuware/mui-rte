@@ -1,7 +1,8 @@
 {
-  "name": "mui-rte",
+  "name": "@workbase/mui-rte",
   "version": "1.25.0",
   "description": "Material-UI Rich Text Editor and Viewer",
+  "type": "module",
   "keywords": [
     "material-ui",
     "rich text editor",
@@ -12,12 +13,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/niuware/mui-rte.git"
+    "url": "git+https://github.com/workbase/mui-rte.git"
   },
   "bugs": {
-    "url": "https://github.com/niuware/mui-rte/issues"
+    "url": "https://github.com/workbase/mui-rte/issues"
   },
-  "homepage": "https://github.com/niuware/mui-rte#readme",
+  "homepage": "https://github.com/workbase/mui-rte#readme",
   "main": "dist/index.js",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
@@ -25,8 +26,9 @@
     "build": "cross-env NODE_ENV=production rollup -c",
     "test": "mocha -r ts-node/register test/setup.ts test/*.test.*"
   },
-  "author": "Erik Lopez",
-  "license": "MIT",
+  "author": "Ed Parsons",
+  "originalAuthor": "Erik Lopez",
+  "license": "SEE LICENSE IN readme.md",
   "devDependencies": {
     "@material-ui/core": "^4.10.2",
     "@material-ui/icons": "^4.9.1",
@@ -84,5 +86,9 @@
     "*.json",
     "*.ts",
     "*.tsx"
-  ]
+  ],
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  }
 }
