@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "moduleResolution": "node",
+        "target": "es5",
+        "strict": true,
+        "sourceMap": true,
+        "esModuleInterop": true,
+        "noImplicitReturns": true,
+        "noUnusedParameters": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "jsx": "react",
+        "lib": [
+            "es5",
+            "es6",
+            "dom"
+        ],
+        "paths": {
+            "*": [
+                "node_modules/*"
+            ]
+        },
+        "typeRoots": [ "./types", "./node_modules/@types"]
+    },
+    "include": [
+        "src/**/*",
+        "declarations.d.ts"
+    ],
+    "exclude": ["node_modules", "typings"]
+}
