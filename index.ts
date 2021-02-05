@@ -1,4 +1,6 @@
-import type { TMUIRichTextEditorRef } from 'mui-rte/src/MUIRichTextEditor'
+import type { TMUIRichTextEditorRef } from './src/MUIRichTextEditor'
 
-export { default } from 'mui-rte/src/MUIRichTextEditor'
+export { default } from './src/MUIRichTextEditor'
 export { TMUIRichTextEditorRef }
+
+//TODO
