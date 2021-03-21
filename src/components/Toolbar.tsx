@@ -191,7 +191,7 @@ const STYLE_TYPES: TStyleType[] = [
 
 const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
     const [availableControls, setAvailableControls] = useState(props.controls ? [] : STYLE_TYPES)
-    const {editorState} = props
+    const { editorState } = props
     const id = props.inlineMode ? "-inline-toolbar" : "-toolbar"
 
     useEffect(() => {
@@ -207,7 +207,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
             }
             else if (props.customControls) {
                 const customControl = props.customControls.find(style => style.name === name)
-                if (customControl && customControl.type !== "atomic" && 
+                if (customControl && customControl.type !== "atomic" &&
                     (customControl.icon || customControl.component)) {
                     filteredControls.push({
                         id: customControl.id || (customControl.name + "Id"),
@@ -228,7 +228,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
     return (
         <div id={`${props.id}${id}`} className={props.className}>
             {availableControls.map(style => {
-                if (props.inlineMode && 
+                if (props.inlineMode &&
                     (style.type !== "inline" && (style.name !== "link" && style.name !== "clear"))) {
                     return null
                 }
@@ -243,7 +243,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                 else if (style.type === "block") {
                     const selection = editorState.getSelection()
                     const block = editorState.getCurrentContent().getBlockForKey(selection.getStartKey())
-                    if (block) { 
+                    if (block) {
                         active = style.style === block.getType()
                     }
                 }
