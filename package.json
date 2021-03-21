@@ -81,4 +81,5 @@
     "*.ts",
     "*.tsx"
   ]
+  "types": "index.d.ts"
 }
