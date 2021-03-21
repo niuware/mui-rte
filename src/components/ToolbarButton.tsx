@@ -46,7 +46,7 @@ const ToolbarButton: FunctionComponent<IToolbarButtonProps> = (props) => {
     }
     if (props.component) {
         return (
-            <props.component 
+            <props.component
                 {...sharedProps}
                 active={props.active || false}
             />

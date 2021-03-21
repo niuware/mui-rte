@@ -11,8 +11,8 @@ type TLinkProps = {
 const Link: FunctionComponent<TLinkProps> = (props) => {
     const { url, className } = props.contentState.getEntity(props.entityKey).getData()
     return (
-        <MuiLink 
-            href={url} 
+        <MuiLink
+            href={url}
             className={`${className} editor-anchor`}
             target="_blank"
         >

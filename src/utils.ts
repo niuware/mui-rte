@@ -1,7 +1,14 @@
-import { EditorState, DraftBlockType, ContentBlock, ContentState, 
-    Modifier, SelectionState, getVisibleSelectionRect, DraftStyleMap } from 'draft-js'
+import {
+    EditorState, DraftBlockType, ContentBlock, ContentState,
+    Modifier, SelectionState, getVisibleSelectionRect, DraftStyleMap
+} from 'draft-js'
 import Immutable from 'immutable'
 import { TCustomControl } from './components/Toolbar'
+
+export type TPosition = {
+    top: number
+    left: number
+}
 
 export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
@@ -61,9 +68,9 @@ const atomicBlockExists = (name: string, controls?: TCustomControl[]) => {
     if (!controls) {
         return undefined
     }
-    return controls.find(control => 
-        control.type === "atomic" && 
-        control.name === name && 
+    return controls.find(control =>
+        control.type === "atomic" &&
+        control.name === name &&
         control.atomicComponent !== undefined)
 }
 
@@ -85,8 +92,12 @@ const clearInlineStyles = (editorState: EditorState, customStyles?: DraftStyleMa
 }
 
 const getEditorBounds = (editor: HTMLElement) => {
+    let fakeClientRect = getVisibleSelectionRect(window)
     return {
-        selectionRect: getVisibleSelectionRect(window),
+        selectionRect: fakeClientRect ? {
+            top: fakeClientRect?.top,
+            left: fakeClientRect?.left
+        } as TPosition : null,
         editorRect: editor.getBoundingClientRect()
     }
 }
