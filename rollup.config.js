@@ -3,7 +3,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import { uglify } from 'rollup-plugin-uglify';
 
 export default {
-    input: './index.ts',
+    input: './src/MUIRichTextEditor.tsx',
     plugins: [
         typescript(),
         commonjs({
