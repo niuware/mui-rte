@@ -75,11 +75,8 @@
   },
   "files": [
     "dist",
-    "src",
-    "*.js",
-    "*.json",
-    "*.ts",
-    "*.tsx"
-  ]
+    "index.js",
+    "index.d.ts"
+  ],
   "types": "index.d.ts"
 }
