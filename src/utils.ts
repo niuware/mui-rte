@@ -3,6 +3,11 @@ import { EditorState, DraftBlockType, ContentBlock, ContentState,
 import Immutable from 'immutable'
 import { TCustomControl } from './components/Toolbar'
 
+export type TPosition = {
+    top: number
+    left: number
+}
+
 export type TSelectionInfo = {
     inlineStyle: Immutable.OrderedSet<string>,
     blockType: DraftBlockType,
@@ -85,8 +90,12 @@ const clearInlineStyles = (editorState: EditorState, customStyles?: DraftStyleMa
 }
 
 const getEditorBounds = (editor: HTMLElement) => {
+    let fakeClientRect = getVisibleSelectionRect(window)
     return {
-        selectionRect: getVisibleSelectionRect(window),
+        selectionRect: fakeClientRect ? {
+            top: fakeClientRect?.top,
+            left: fakeClientRect?.left
+        } as TPosition : null,
         editorRect: editor.getBoundingClientRect()
     }
 }

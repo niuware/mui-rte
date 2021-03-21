@@ -17,7 +17,7 @@ import Blockquote from './components/Blockquote'
 import CodeBlock from './components/CodeBlock'
 import UrlPopover, { TAlignment, TUrlData, TMediaType } from './components/UrlPopover'
 import Autocomplete, { TAutocompleteItem } from './components/Autocomplete'
-import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber } from './utils'
+import { getSelectionInfo, removeBlockFromMap, atomicBlockExists, isGreaterThan, clearInlineStyles, getEditorBounds, getLineNumber, TPosition } from './utils'
 
 export type TDecorator = {
     component: FunctionComponent
@@ -104,11 +104,6 @@ type TMUIRichTextEditorState = {
 type TStateOffset = {
     start: number
     end: number
-}
-
-type TPosition = {
-    top: number
-    left: number
 }
 
 const styles = ({ spacing, typography, palette }: Theme) => createStyles({
