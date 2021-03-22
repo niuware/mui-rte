@@ -625,26 +625,23 @@ const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichT
         if (!props.customControls) {
             return
         }
-        for (let control of props.customControls) {
-            if (control.name.toUpperCase() === style) {
-                if (control.onClick) {
-                    setTimeout(() => editorRef.current?.blur(), 0)
-                    const newState = control.onClick(editorState, control.name, document.getElementById(id))
-                    if (newState) {
-                        if (newState.getSelection().isCollapsed()) {
-                            setEditorState(newState)
-                        }
-                        else {
-                            updateStateForPopover(newState)
-                        }
-                    }
-                    else {
-                        if (!editorState.getSelection().isCollapsed()) {
-                            refocus()
-                        }
-                    }
+
+        const control = props.customControls?.find(c => (c.style ?? c.name) === style)
+        if (control?.onClick) {
+            setTimeout(() => editorRef.current?.blur(), 0)
+            const newState = control.onClick(editorState, control.name, document.getElementById(id))
+            if (newState) {
+                if (newState.getSelection().isCollapsed()) {
+                    setEditorState(newState)
                 }
-                break
+                else {
+                    updateStateForPopover(newState)
+                }
+            }
+            else {
+                if (!editorState.getSelection().isCollapsed()) {
+                    refocus()
+                }
             }
         }
     }

@@ -38,6 +38,7 @@ export type TToolbarComponentProps = {
 export type TCustomControl = {
     id?: string
     name: string
+    style?: string
     icon?: JSX.Element
     type: TControlType
     component?: FunctionComponent<TToolbarComponentProps>
@@ -213,7 +214,7 @@ const Toolbar: FunctionComponent<TToolbarProps> = (props) => {
                         id: customControl.id || (customControl.name + "Id"),
                         name: customControl.name,
                         label: customControl.name,
-                        style: customControl.name.toUpperCase(),
+                        style: customControl.style ?? customControl.name,
                         icon: customControl.icon,
                         component: customControl.component,
                         type: customControl.type,
