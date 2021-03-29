@@ -3,7 +3,7 @@ import MUIRichTextEditor from '../../'
 
 const InlineToolbar = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Try selecting some text to show the inline toolbar..."
             inlineToolbar={true}
         />

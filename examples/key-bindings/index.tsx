@@ -8,7 +8,7 @@ const save = (data: string) => {
 
 const KeyBindings = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Press CMD + C to clear the editor or CMD + K to add 'italic' style to the selection..."
             onSave={save}
             controls={["title", "italic", "save"]}

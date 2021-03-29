@@ -1,6 +1,5 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
-import MUIRichTextEditor from '../..'
-import { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse } from '../../src/MUIRichTextEditor'
+import MUIRichTextEditor, { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse } from '../..'
 import Grid from '@material-ui/core/Grid'
 import { makeStyles } from '@material-ui/core/styles'
 import Popover from '@material-ui/core/Popover'
@@ -106,8 +105,8 @@ const UploadImagePopover: FunctionComponent<IUploadImagePopoverProps> = (props) 
         >
             <Grid container spacing={1} className={classes.root}>
                 <Grid item xs={10}>
-                    <TextField 
-                        className={classes.textField} 
+                    <TextField
+                        className={classes.textField}
                         disabled
                         value={data.file?.name || ""}
                         placeholder="Click icon to attach image"
@@ -167,7 +166,7 @@ const AsyncImageUpload: FunctionComponent = () => {
 
     return (
         <>
-            <UploadImagePopover 
+            <UploadImagePopover
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert && data.file) {

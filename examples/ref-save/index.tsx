@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useRef } from 'react'
-import MUIRichTextEditor from '../../'
-import { TMUIRichTextEditorRef } from '../../src/MUIRichTextEditor'
+import MUIRichTextEditor, { TMUIRichTextEditorRef } from '../../'
 
 const RefSave: FunctionComponent = () => {
 
@@ -20,22 +19,22 @@ const RefSave: FunctionComponent = () => {
 
     return (
         <div>
-            Save editor state from external button: 
+            Save editor state from external button:
             <button style={{
-                    marginLeft: 5,
-                    padding: 5
-                }} 
+                marginLeft: 5,
+                padding: 5
+            }}
                 onClick={handleClick}>
                 Save
             </button>
             <button style={{
-                    marginLeft: 5,
-                    padding: 5
-                }}
+                marginLeft: 5,
+                padding: 5
+            }}
                 onClick={handleFocus}>
                 Focus
             </button>
-            <MUIRichTextEditor 
+            <MUIRichTextEditor
                 label="Type something here..."
                 onSave={handleSave}
                 ref={ref}

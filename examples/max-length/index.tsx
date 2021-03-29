@@ -7,7 +7,7 @@ const save = (data: string) => {
 
 const MaxLength = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="You can only type 10 characters..."
             maxLength={10}
             onSave={save}

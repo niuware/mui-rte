@@ -1,8 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import { Chip, Avatar, Button } from '@material-ui/core'
 import InvertColorsIcon from '@material-ui/icons/InvertColors'
-import MUIRichTextEditor from '../../'
-import { TToolbarComponentProps } from '../../src/components/Toolbar'
+import MUIRichTextEditor, { TToolbarComponentProps } from '../../'
 import { EditorState } from 'draft-js'
 
 const save = (data: string) => {
@@ -23,9 +22,9 @@ const MyBlock = (props: any) => {
 
 const MyCallbackComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
     return (
-        <Chip 
+        <Chip
             id={props.id}
-            avatar={<Avatar>C</Avatar>} 
+            avatar={<Avatar>C</Avatar>}
             onClick={props.onMouseDown}
             label="Callback"
             disabled={props.disabled}
@@ -35,7 +34,7 @@ const MyCallbackComponent: FunctionComponent<TToolbarComponentProps> = (props) =
 
 const ClearComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
     return (
-        <Chip 
+        <Chip
             id={props.id}
             onClick={props.onMouseDown}
             label="Clear all"
@@ -50,7 +49,7 @@ const MyBlockComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
             id={props.id}
             variant="contained"
             onMouseDown={props.onMouseDown}
-            color={props.active ? "primary": "default"}
+            color={props.active ? "primary" : "default"}
             disabled={props.disabled}
         >
             My Block
@@ -60,7 +59,7 @@ const MyBlockComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
 
 const CustomControls = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Type something here..."
             onSave={save}
             controls={["title", "bold", "my-block", "my-style", "clear", "my-callback", "clear-callback", "save"]}

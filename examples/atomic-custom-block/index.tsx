@@ -1,8 +1,9 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
-import MUIRichTextEditor from '../..'
-import { TMUIRichTextEditorRef } from '../../src/MUIRichTextEditor'
-import { Card, CardHeader, Avatar, CardMedia, CardContent, 
-    Typography, IconButton, CardActions, Grid } from '@material-ui/core'
+import MUIRichTextEditor, { TMUIRichTextEditorRef } from '../..'
+import {
+    Card, CardHeader, Avatar, CardMedia, CardContent,
+    Typography, IconButton, CardActions, Grid
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import Popover from '@material-ui/core/Popover'
 import TextField from '@material-ui/core/TextField'
@@ -94,12 +95,12 @@ const MyCard: FunctionComponent<any> = (props) => {
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>
-                <IconButton 
-                    aria-label="like card" 
+                <IconButton
+                    aria-label="like card"
                     onClick={handleLiked}>
                     <FavoriteIcon />
                 </IconButton>
-                <IconButton 
+                <IconButton
                     aria-label="share"
                     onClick={handleShared}
                 >
@@ -161,29 +162,29 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
         >
             <Grid container spacing={1} className={classes.root}>
                 <Grid item xs={6}>
-                    <TextField 
+                    <TextField
                         {...textFieldProps}
-                        autoFocus={true} 
+                        autoFocus={true}
                         label="Title"
                         name="title"
                     />
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField 
+                    <TextField
                         {...textFieldProps}
                         label="Name"
                         name="name"
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField 
+                    <TextField
                         {...textFieldProps}
                         label="Text"
                         name="text"
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField 
+                    <TextField
                         {...textFieldProps}
                         label="Image URL"
                         name="image"
@@ -215,12 +216,12 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
 }
 
 const AtomicCustomBlock: FunctionComponent = () => {
-    
+
     const ref = useRef<TMUIRichTextEditorRef>(null)
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     return (
         <>
-            <MyCardPopover 
+            <MyCardPopover
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert) {

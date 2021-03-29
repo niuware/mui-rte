@@ -2,8 +2,7 @@ import React, { FunctionComponent } from 'react'
 import ListItemText from '@material-ui/core/ListItemText'
 import ListItemAvatar from '@material-ui/core/ListItemAvatar'
 import Avatar from '@material-ui/core/Avatar'
-import MUIRichTextEditor from '../../'
-import { TAutocompleteItem } from '../../src/components/Autocomplete'
+import MUIRichTextEditor, { TAutocompleteItem } from '../../'
 
 const save = (data: string) => {
     console.log(data)
@@ -107,7 +106,7 @@ const staff = [
 
 const Autocomplete = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Try typing ':grin' or '/mexico'..."
             onSave={save}
             autocomplete={{
