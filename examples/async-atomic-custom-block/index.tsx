@@ -1,6 +1,5 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
-import MUIRichTextEditor from '../..'
-import { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse} from '../../src/MUIRichTextEditor'
+import MUIRichTextEditor, { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse } from '../..'
 import { makeStyles } from '@material-ui/core/styles'
 import Card from '@material-ui/core/Card'
 import CardContent from '@material-ui/core/CardContent'
@@ -140,9 +139,9 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
         >
             <Grid container spacing={1} className={classes.root}>
                 <Grid item xs={12}>
-                    <TextField 
+                    <TextField
                         {...textFieldProps}
-                        autoFocus={true} 
+                        autoFocus={true}
                         label="Search term"
                         name="searchTerm"
                         placeholder="Type anything here..."
@@ -174,12 +173,12 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
 }
 
 const AsyncAtomicCustomBlock: FunctionComponent = () => {
-    
+
     const ref = useRef<TMUIRichTextEditorRef>(null)
     const [anchor, setAnchor] = useState<HTMLElement | null>(null)
     return (
         <>
-            <MyCardPopover 
+            <MyCardPopover
                 anchor={anchor}
                 onSubmit={(data, insert) => {
                     if (insert && data.searchTerm) {

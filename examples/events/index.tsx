@@ -32,7 +32,7 @@ const blur = () => {
 
 const Events = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Open the console to see the event callback as you type..."
             onSave={save}
             onChange={change}

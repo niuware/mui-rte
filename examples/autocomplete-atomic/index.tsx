@@ -1,8 +1,7 @@
 import React, { FunctionComponent } from 'react'
 import Avatar from '@material-ui/core/Avatar'
 import Chip from '@material-ui/core/Chip'
-import MUIRichTextEditor from '../../'
-import { TAutocompleteItem } from '../../src/components/Autocomplete'
+import MUIRichTextEditor, { TAutocompleteItem } from '../../'
 
 const save = (data: string) => {
     console.log(data)
@@ -52,17 +51,17 @@ const CityChip: FunctionComponent<any> = (props) => {
     }
 
     return (
-        <Chip 
-            avatar={<Avatar>{value.image}</Avatar>} 
-            label={value.name} 
-            onClick={handleClick} 
+        <Chip
+            avatar={<Avatar>{value.image}</Avatar>}
+            label={value.name}
+            onClick={handleClick}
         />
     )
 }
 
 const AutocompleteAtomic = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Try typing '/mexico'..."
             onSave={save}
             customControls={[

@@ -7,7 +7,7 @@ const save = (data: string) => {
 
 const Basic = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Type something here..."
             onSave={save}
         />

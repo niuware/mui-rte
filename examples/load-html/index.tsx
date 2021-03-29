@@ -13,8 +13,8 @@ const save = (data: string) => {
 
 const LoadHTML = () => {
     return (
-        <MUIRichTextEditor 
-            defaultValue={content} 
+        <MUIRichTextEditor
+            defaultValue={content}
             onSave={save}
         />
     )

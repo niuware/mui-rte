@@ -53,7 +53,7 @@ const save = (data: string) => {
 const Theme = () => {
     return (
         <MuiThemeProvider theme={defaultTheme}>
-            <MUIRichTextEditor 
+            <MUIRichTextEditor
                 label="Type something here..."
                 onSave={save}
             />

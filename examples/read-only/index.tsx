@@ -5,8 +5,8 @@ const content = '{"blocks":[{"key":"7po5","text":"My Title","type":"header-two",
 
 const ReadOnly = () => {
     return (
-        <MUIRichTextEditor 
-            defaultValue={content} 
+        <MUIRichTextEditor
+            defaultValue={content}
             readOnly={true}
         />
     )

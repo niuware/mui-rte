@@ -29,10 +29,10 @@ const App = () => {
 
     return (
         <div>
-            Choose example: &nbsp; 
-            <button onClick={() => setSample(<Basic />)}>Basic</button> 
-            <button onClick={() => setSample(<Theme />)}>Theme</button> 
-            <button onClick={() => setSample(<RefSave />)}>Ref Events</button> 
+            Choose example: &nbsp;
+            <button onClick={() => setSample(<Basic />)}>Basic</button>
+            <button onClick={() => setSample(<Theme />)}>Theme</button>
+            <button onClick={() => setSample(<RefSave />)}>Ref Events</button>
             <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
             <button onClick={() => setSample(<Decorators />)}>Decorators</button>
             <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
@@ -40,7 +40,7 @@ const App = () => {
             <button onClick={() => setSample(<AtomicCustomBlock />)}>Atomic Custom Block</button>
             <button onClick={() => setSample(<AsyncAtomicCustomBlock />)}>Async Atomic Custom Block</button>
             <button onClick={() => setSample(<AsyncImageUpload />)}>Async image upload</button>
-            <button onClick={() => setSample(<ReadOnly />)}>Read Only</button> 
+            <button onClick={() => setSample(<ReadOnly />)}>Read Only</button>
             <button onClick={() => setSample(<Events />)}>Events</button>
             <button onClick={() => setSample(<LoadHTML />)}>Load from HTML</button>
             <button onClick={() => setSample(<ResetValue />)}>Reset value</button>
@@ -52,7 +52,7 @@ const App = () => {
                 margin: "20px 0"
             }}>
                 <p>
-                <strong>{sample.type.name}</strong> example:
+                    <strong>{sample.type.name}</strong> example:
                 </p>
                 {sample}
             </div>

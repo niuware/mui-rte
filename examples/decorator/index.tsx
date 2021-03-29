@@ -32,7 +32,7 @@ const MyAtDecorator = (props: any) => {
 
 const Decorators = () => {
     return (
-        <MUIRichTextEditor 
+        <MUIRichTextEditor
             label="Try writing a #hashtag or a @mention..."
             onSave={save}
             decorators={[

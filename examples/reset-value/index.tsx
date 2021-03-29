@@ -14,8 +14,8 @@ const ResetValue = () => {
     return (
         <>
             <button onClick={() => setContent(contentTwo)}>Reset content</button>
-            <MUIRichTextEditor 
-                defaultValue={content} 
+            <MUIRichTextEditor
+                defaultValue={content}
                 onSave={save}
             />
         </>
