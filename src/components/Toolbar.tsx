@@ -10,7 +10,7 @@ import InsertLinkIcon from '@material-ui/icons/InsertLink'
 import PhotoLibraryIcon from '@material-ui/icons/PhotoLibrary'
 import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered'
 import FormatListBulletedIcon from '@material-ui/icons/FormatListBulleted'
-import FormatQuoteIcon from '@material-ui/icons/FormatQuote'
+import FormatIndentIncreaseIcon from '@material-ui/icons/FormatIndentIncrease'
 import CodeIcon from '@material-ui/icons/Code'
 import FormatClearIcon from '@material-ui/icons/FormatClear'
 import SaveIcon from '@material-ui/icons/Save'
@@ -163,7 +163,7 @@ const STYLE_TYPES: TStyleType[] = [
         label: 'Blockquote',
         name: "quote",
         style: 'blockquote',
-        icon: <FormatQuoteIcon />,
+        icon: <FormatIndentIncreaseIcon />,
         type: "block"
     },
     {
