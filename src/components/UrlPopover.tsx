@@ -14,7 +14,7 @@ import { getCompatibleSpacing } from '../utils'
 const styles = ({ spacing }: Theme) => createStyles({
     linkPopover: {
         padding: getCompatibleSpacing(spacing, 2, 2, 2, 2),
-        maxWidth: 250
+        minWidth: "90%",
     },
     linkTextField: {
         width: "100%"
@@ -38,6 +38,7 @@ interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
     data?: TUrlData
     isMedia?: boolean
     onConfirm: (isMedia?: boolean, ...args: any) => void
+    onCancel: () => void
 }
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
@@ -65,15 +66,19 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
 
     return (
         <Popover
+            onClose={props.onCancel}
             open={props.anchor !== undefined}
             anchorEl={props.anchor}
             anchorOrigin={{
                 vertical: "bottom",
-                horizontal: "left"
+                horizontal: "center"
             }}
             transformOrigin={{
                 vertical: 'top',
-                horizontal: 'left',
+                horizontal: 'center',
+            }}
+            PaperProps={{
+                style: { width: '70%' },
             }}
         >
             <div className={classes.linkPopover}>
@@ -82,10 +87,13 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                         <Grid item xs={12}>
                             <TextField
                                 className={classes.linkTextField}
-                                onChange={(event) => setData({...data, url: event.target.value})}
+                                onChange={(event) => {
+                                    setData({...data, url: event.target.value})
+                                }}
                                 label="URL"
                                 defaultValue={props.data && props.data.url}
                                 autoFocus={true}
+                                multiline={true}
                                 InputLabelProps={{
                                     shrink: true
                                 }}
@@ -95,16 +103,16 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                             <>
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
-                                        <Button 
-                                            color={(!data.type || data.type === "image") ? "primary" : "default"} 
-                                            size="small" 
+                                        <Button
+                                            color={(!data.type || data.type === "image") ? "primary" : "default"}
+                                            size="small"
                                             onClick={() => setData({...data, type: "image"})}
                                         >
                                             <InsertPhotoIcon />
                                         </Button>
-                                        <Button 
-                                            color={data.type === "video" ? "primary" : "default"} 
-                                            size="small" 
+                                        <Button
+                                            color={data.type === "video" ? "primary" : "default"}
+                                            size="small"
                                             onClick={() => setData({...data, type: "video"})}
                                         >
                                             <MovieIcon />
@@ -133,23 +141,23 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
-                                        <Button 
-                                            color={data.alignment === "left" ? "primary" : "default"} 
-                                            size="small" 
+                                        <Button
+                                            color={data.alignment === "left" ? "primary" : "default"}
+                                            size="small"
                                             onClick={() => setData({...data, alignment: "left"})}
                                         >
                                             <FormatAlignLeft />
                                         </Button>
-                                        <Button 
-                                            color={data.alignment === "center" ? "primary" : "default"} 
-                                            size="small" 
+                                        <Button
+                                            color={data.alignment === "center" ? "primary" : "default"}
+                                            size="small"
                                             onClick={() => setData({...data, alignment: "center"})}
                                         >
                                             <FormatAlignCenter />
                                         </Button>
-                                        <Button 
-                                            color={data.alignment === "right" ? "primary" : "default"} 
-                                            size="small" 
+                                        <Button
+                                            color={data.alignment === "right" ? "primary" : "default"}
+                                            size="small"
                                             onClick={() => setData({...data, alignment: "right"})}>
                                             <FormatAlignRight />
                                         </Button>

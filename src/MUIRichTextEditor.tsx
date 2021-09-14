@@ -697,6 +697,17 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
         }
     }
 
+    const dismissPopover = () => {
+        refocus()
+        setState({
+            ...state,
+            anchorUrlPopover: undefined,
+            urlKey: undefined,
+            urlIsMedia: undefined,
+            urlData: undefined
+        })
+    }
+
     return (
         <div id={`${id}-root`} className={classes.root}>
             <div id={`${id}-container`} className={classNames(classes.container, {
@@ -754,6 +765,7 @@ const MUIRichTextEditor: RefForwardingComponent<any, IMUIRichTextEditorProps> = 
                         data={state.urlData}
                         anchor={state.anchorUrlPopover}
                         onConfirm={handleConfirmPrompt}
+                        onCancel={dismissPopover}
                         isMedia={state.urlIsMedia}
                     />
                     : null}
