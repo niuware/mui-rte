@@ -90,6 +90,12 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 onChange={(event) => {
                                     setData({...data, url: event.target.value})
                                 }}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        props.onConfirm(props.isMedia, data.url, data.width, data.height, data.alignment, data.type);
+                                    }
+                                }}
                                 label="URL"
                                 defaultValue={props.data && props.data.url}
                                 autoFocus={true}
