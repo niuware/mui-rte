@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react'
-import { Chip, Avatar, Button } from '@material-ui/core'
-import InvertColorsIcon from '@material-ui/icons/InvertColors'
+import { Chip, Avatar, Button } from '@mui/material'
+import InvertColorsIcon from '@mui/icons-material/InvertColors'
 import MUIRichTextEditor, { TToolbarComponentProps } from '../../'
 import { EditorState } from 'draft-js'
 
@@ -49,7 +49,7 @@ const MyBlockComponent: FunctionComponent<TToolbarComponentProps> = (props) => {
             id={props.id}
             variant="contained"
             onMouseDown={props.onMouseDown}
-            color={props.active ? "primary" : "default"}
+            color={props.active ? "primary" : "inherit"}
             disabled={props.disabled}
         >
             My Block

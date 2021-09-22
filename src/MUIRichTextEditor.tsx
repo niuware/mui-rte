@@ -1,11 +1,12 @@
 import React, {
     FunctionComponent, useEffect, useState, useRef,
-    forwardRef, useImperativeHandle, RefForwardingComponent
+    forwardRef, useImperativeHandle, ForwardRefRenderFunction
 } from 'react'
 import Immutable from 'immutable'
 import classNames from 'classnames'
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
+import { createStyles, withStyles, WithStyles, CSSProperties, CreateCSSProperties, PropsFunc } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
+import { Paper } from '@mui/material'
 import {
     Editor, EditorState, convertFromRaw, RichUtils, AtomicBlockUtils,
     CompositeDecorator, convertToRaw, DefaultDraftBlockRenderMap, DraftEditorCommand,
@@ -108,54 +109,71 @@ type TStateOffset = {
     end: number
 }
 
-const styles = ({ spacing, typography, palette }: Theme) => createStyles({
-    root: {
-    },
-    container: {
-        margin: spacing(1, 0, 0, 0),
+interface TMUIRichTextEditorStyles {
+    overrides?: {
+        MUIRichTextEditor?: {
+            root?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            container?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            inheritFontSize?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            editor?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            editorContainer?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            editorReadOnly?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            error?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            hidePlaceholder?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            placeHolder?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            linkPopover?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            linkTextField?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            anchorLink?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            toolbar?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>,
+            inlineToolbar?: CSSProperties | CreateCSSProperties<{}> | PropsFunc<{}, CreateCSSProperties<{}>>
+        }
+    }
+}
+
+const styles = (theme: Theme & TMUIRichTextEditorStyles) => createStyles({
+    root: theme?.overrides?.MUIRichTextEditor?.root || {},
+    container: theme?.overrides?.MUIRichTextEditor?.container || {
+        margin: theme.spacing(1, 0, 0, 0),
         position: "relative",
-        fontFamily: typography.body1.fontFamily,
-        fontSize: typography.body1.fontSize,
+        fontFamily: theme.typography.body1.fontFamily,
+        fontSize: theme.typography.body1.fontSize,
         '& figure': {
             margin: 0
         }
     },
-    inheritFontSize: {
+    inheritFontSize: theme?.overrides?.MUIRichTextEditor?.inheritFontSize || {
         fontSize: "inherit"
     },
-    editor: {
-    },
-    editorContainer: {
-        margin: spacing(1, 0, 0, 0),
+    editor: theme?.overrides?.MUIRichTextEditor?.editor || {},
+    editorContainer: theme?.overrides?.MUIRichTextEditor?.editorContainer || {
+        margin: theme.spacing(1, 0, 0, 0),
         cursor: "text",
         width: "100%",
-        padding: spacing(0, 0, 1, 0)
+        padding: theme.spacing(0, 0, 1, 0)
     },
-    editorReadOnly: {
+    editorReadOnly: theme?.overrides?.MUIRichTextEditor?.editorReadOnly || {
         borderBottom: "none"
     },
-    error: {
+    error: theme?.overrides?.MUIRichTextEditor?.error || {
         borderBottom: "2px solid red"
     },
-    hidePlaceholder: {
+    hidePlaceholder: theme?.overrides?.MUIRichTextEditor?.hidePlaceholder || {
         display: "none"
     },
-    placeHolder: {
-        color: palette.grey[600],
+    placeHolder: theme?.overrides?.MUIRichTextEditor?.placeHolder || {
+        color: theme.palette.grey[600],
         position: "absolute",
         outline: "none"
     },
-    linkPopover: {
-        padding: spacing(2, 2, 2, 2)
+    linkPopover: theme?.overrides?.MUIRichTextEditor?.linkPopover || {
+        padding: theme.spacing(2, 2, 2, 2)
     },
-    linkTextField: {
+    linkTextField: theme?.overrides?.MUIRichTextEditor?.linkTextField || {
         width: "100%"
     },
-    anchorLink: {
-    },
-    toolbar: {
-    },
-    inlineToolbar: {
+    anchorLink: theme?.overrides?.MUIRichTextEditor?.anchorLink || {},
+    toolbar: theme?.overrides?.MUIRichTextEditor?.toolbar || {},
+    inlineToolbar: theme?.overrides?.MUIRichTextEditor?.inlineToolbar || {
         maxWidth: "180px",
         position: "absolute",
         padding: "5px",
@@ -231,7 +249,7 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
         : EditorState.createEmpty(decorator)
 }
 
-const MUIRichTextEditor: RefForwardingComponent<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
+const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
     const { classes, controls, customControls } = props
 
     const [state, setState] = useState<TMUIRichTextEditorState>({})

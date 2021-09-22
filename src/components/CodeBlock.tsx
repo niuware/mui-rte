@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react'
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
+import { createStyles, withStyles, WithStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
 const styles = ({ spacing, palette }: Theme) => createStyles({
     root: {

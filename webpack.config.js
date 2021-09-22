@@ -1,5 +1,4 @@
 const path = require('path');
-const webpack = require("webpack");
 
 module.exports = {
     name: "mui-rte-example",
@@ -16,7 +15,7 @@ module.exports = {
         path: path.join(__dirname, "examples")
     },
 
-    devtool: "source-map",
+    devtool: "inline-source-map",
 
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".json"]
@@ -26,12 +25,7 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                loader: "awesome-typescript-loader"
-            },
-            {
-                enforce: "pre",
-                test: /\.js$/,
-                loader: "source-map-loader"
+                loader: "ts-loader"
             }
         ]
     },
@@ -40,15 +34,14 @@ module.exports = {
         minimize: (process.env.NODE_ENV === "production")
     },
 
-    plugins: [
-        new webpack.NamedModulesPlugin()
-    ],
-
     devServer: {
         hot: true,
-        contentBase: path.join(__dirname, "examples"),
-        port: 9000,
-        watchContentBase: true,
+        static: {
+            directory: path.join(__dirname, "examples")
+        },
+        port: 9001,
+        watchFiles: ["src/*"],
+        compress: true,
         host: "0.0.0.0"
     }
 };

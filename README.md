@@ -1,11 +1,10 @@
-# mui-rte
-![Tests](https://github.com/niuware/mui-rte/workflows/Tests/badge.svg)   
+# mui-rte  
 
 The Material-UI Rich Text Editor and Viewer
 
 <img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
-**mui-rte** is a complete text editor and viewer for `material-ui` based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, autocomplete strategies, async/sync custom atomic blocks, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
+**mui-rte** is a complete text editor and viewer for the MUI library (formerly Material-UI) based on `draft-js` and written in Typescript. It is ready to use out of the box yet supports user defined blocks, styles, autocomplete strategies, async/sync custom atomic blocks, callbacks, and decorators as well as toolbar and theme customization to enhance the editor to all needs.
 
 ## Installation
 
@@ -13,7 +12,7 @@ The Material-UI Rich Text Editor and Viewer
 npm install mui-rte --save
 ```
 
-Install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react` and `react-dom`.
+Install the peer dependencies: `@mui/material`, `@mui/icons-material`, `@mui/styles`, `react` and `react-dom`. Also you will need to install the peer dependencies for MUI: `@emotion/react` and `@emotion/styled`.
 
 ## Demo
 
@@ -22,10 +21,17 @@ Install the peer dependencies: `@material-ui/core`, `@material-ui/icons`, `react
 ## Usage
 
 ```js
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 import MUIRichTextEditor from 'mui-rte'
 
+const myTheme = createTheme({
+    // Set up your custom MUI theme here
+})
+
 ReactDOM.render(
-    <MUIRichTextEditor label="Start typing..." />, 
+    <ThemeProvider theme={myTheme}>
+        <MUIRichTextEditor label="Start typing..." />
+    </ThemeProvider>, 
     document.getElementById("root")
 )
 ```
@@ -38,13 +44,19 @@ import MUIRichTextEditor from 'mui-rte'
 const data = getContentStateAsStringFromSomewhere()
 
 ReactDOM.render(
-    <MUIRichTextEditor 
-        defaultValue={data}
-        label="Start typing..." 
-    />, 
+    <ThemeProvider theme={myTheme}>
+        <MUIRichTextEditor 
+            defaultValue={data}
+            label="Start typing..." 
+        />
+    </ThemeProvider>, 
     document.getElementById("root")
 )
 ```
+
+## Material-UI v4 compatibility
+
+`mui-rte` version 2.x is compatible with MUI (v5) only. You can still use version [1.x](https://github.com/niuware/mui-rte/releases/tag/1.29.0) for Material-UI v4. Current code using `mui-rte` version 1.x should be compatible with version 2.x, the only breaking change is that it requires to be wrapped on a `ThemeProvider` as shown in the examples.
 
 ## Examples
 
@@ -52,7 +64,7 @@ Check the [examples](https://github.com/niuware/mui-rte/tree/master/examples) di
 
 ## Custom Controls
 
-You can define your custom inline styles, blocks, atomic blocks and callback actions to the editor. Just select an icon from `@material-ui/icons` or create your own `FunctionComponent` and define your rules.
+You can define your custom inline styles, blocks, atomic blocks and callback actions to the editor. Just select an icon from `@mui/icons-material` or create your own `FunctionComponent` and define your rules.
 
 ### Adding a custom inline style
 
@@ -60,7 +72,7 @@ This sample adds a control to change the background color and font color of the 
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import InvertColorsIcon from '@material-ui/icons/InvertColors'
+import InvertColorsIcon from '@mui/icons-material/InvertColors'
 
 <MUIRichTextEditor 
     controls={["my-style"]}
@@ -84,7 +96,7 @@ This sample adds a block to the editor based on a `React Element`:
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import TableChartIcon from '@material-ui/icons/TableChart'
+import TableChartIcon from '@mui/icons-material/TableChart'
 
 const MyBlock = (props) => {
     return (
@@ -117,11 +129,11 @@ const MyBlock = (props) => {
 
 It is possible to insert custom blocks based on asynchronous behavior using the `insertAtomicBlockAsync` API. The above example shows an [example](https://github.com/niuware/mui-rte/blob/master/examples/async-image-upload/index.tsx) on how to upload an image and use the `MUIRichTextEditor` default image control for further edition. You can use this behavior to upload a file when dropping it inside the editor and render it as an image entity after upload.
 
-Check this [other sample](https://github.com/niuware/mui-rte/blob/master/examples/async-atomic-custom-block/index.tsx) that shows how to add a `@material-ui/core` Card with asynchronous downloaded content.
+Check this [other sample](https://github.com/niuware/mui-rte/blob/master/examples/async-atomic-custom-block/index.tsx) that shows how to add a `@mui/material` Card with asynchronous downloaded content.
 
 ### Adding a custom atomic block (Sync)
 
-Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@material-ui/core` Card component to the editor.
+Check [this sample](https://github.com/niuware/mui-rte/blob/master/examples/atomic-custom-block/index.tsx) that shows how to create a control to add a `@mui/material` Card component to the editor.
 
 ### Adding a custom callback control
 
@@ -129,7 +141,7 @@ This sample adds a control that will trigger a custom callback function to clear
 
 ```js
 import MUIRichTextEditor from 'mui-rte'
-import DoneIcon from '@material-ui/icons/Done'
+import DoneIcon from '@mui/icons-material/Done'
 import { EditorState } from 'draft-js'
 
 <MUIRichTextEditor 
@@ -251,7 +263,7 @@ import MUIRichTextEditor from 'mui-rte'
 You can style the editor using the `Material-UI` theming feature. First create a theme with `createMuiTheme` and override classes such as `root`, `container`, `editor`, and `editorContainer`. Check the examples directory for more.
 
 ```js
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
+import { createMuiTheme, MuiThemeProvider } from '@mui/material/styles'
 import MUIRichTextEditor from 'mui-rte'
 
 const defaultTheme = createMuiTheme()
@@ -315,7 +327,7 @@ Object.assign(defaultTheme, {
 |---|---|---|---|
 |id|`string`|optional|The HTML id attribute for the control|
 |name|`string`|required|The name of the custom control. For rendering the control this name should be added to the `MUIRichTextEditor` `controls` property.|
-|icon|`JSX.Element`|optional|The `@material-ui/icons` icon for the control. For "atomic" control type, the icon is not required. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
+|icon|`JSX.Element`|optional|The `@mui/icons-material` icon for the control. For "atomic" control type, the icon is not required. [Check this](https://material.io/resources/icons/?style=baseline) for available icons.|
 |component|`React.FunctionComponent<TToolbarComponentProps>`|optional|The custom function component for the control. The icon has priority over the component, so if the icon is set the component will be ignored. For "atomic" control type, the component is not required.|
 |type|`string`|required|Either "inline", "block", "atomic" or "callback"|
 |inlineStyle|`string`|optional|The `React.CSSProperties` object for styling the text when using a custom inline style.|
@@ -424,13 +436,13 @@ Check the [release notes](https://github.com/niuware/mui-rte/releases) for the c
 For development use:
 
 ```
-$ npm run watch
+$ npm run build
 $ npm run serve
 ```
 
 ## Future plans
 
-- Increase test coverage
+- Add test coverage
 - Refactor code
 - Add new features
 

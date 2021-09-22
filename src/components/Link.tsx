@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react'
 import { ContentState } from 'draft-js'
-import MuiLink from '@material-ui/core/Link'
+import { Link as MuiLink } from '@mui/material'
 
 type TLinkProps = {
     children?: React.ReactNode

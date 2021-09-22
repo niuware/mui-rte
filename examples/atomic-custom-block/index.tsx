@@ -3,16 +3,16 @@ import MUIRichTextEditor, { TMUIRichTextEditorRef } from '../..'
 import {
     Card, CardHeader, Avatar, CardMedia, CardContent,
     Typography, IconButton, CardActions, Grid
-} from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import Popover from '@material-ui/core/Popover'
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import WebAssetIcon from '@material-ui/icons/WebAsset'
-import ShareIcon from '@material-ui/icons/Share'
-import FavoriteIcon from '@material-ui/icons/Favorite'
-import DoneIcon from '@material-ui/icons/Done'
-import CloseIcon from '@material-ui/icons/Close'
+} from '@mui/material'
+import { makeStyles } from '@mui/styles'
+import Popover from '@mui/material/Popover'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import WebAssetIcon from '@mui/icons-material/WebAsset'
+import ShareIcon from '@mui/icons-material/Share'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import DoneIcon from '@mui/icons-material/Done'
+import CloseIcon from '@mui/icons-material/Close'
 
 type TMyCardData = {
     title?: string
@@ -148,9 +148,6 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
         <Popover
             anchorEl={state.anchor}
             open={state.anchor !== null}
-            onExited={() => {
-                props.onSubmit(data, !state.isCancelled)
-            }}
             anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "right"
@@ -190,7 +187,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
                         name="image"
                     />
                 </Grid>
-                <Grid item container xs={12} justify="flex-end">
+                <Grid item container xs={12} justifyContent="flex-end">
                     <Button onClick={() => {
                         setState({
                             anchor: null,
@@ -205,6 +202,7 @@ const MyCardPopover: FunctionComponent<IMyCardPopoverProps> = (props) => {
                             anchor: null,
                             isCancelled: false
                         })
+                        props.onSubmit(data, !state.isCancelled)
                     }}
                     >
                         <DoneIcon />
