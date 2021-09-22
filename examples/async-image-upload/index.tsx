@@ -1,15 +1,15 @@
 import React, { useRef, useState, FunctionComponent, useEffect } from 'react'
 import MUIRichTextEditor, { TMUIRichTextEditorRef, TAsyncAtomicBlockResponse } from '../..'
-import Grid from '@material-ui/core/Grid'
-import { makeStyles } from '@material-ui/core/styles'
-import Popover from '@material-ui/core/Popover'
-import TextField from '@material-ui/core/TextField'
-import IconButton from '@material-ui/core/IconButton'
-import Button from '@material-ui/core/Button'
-import BackupIcon from '@material-ui/icons/Backup'
-import DoneIcon from '@material-ui/icons/Done'
-import CloseIcon from '@material-ui/icons/Close'
-import AttachFileIcon from '@material-ui/icons/AttachFile'
+import Grid from '@mui/material/Grid'
+import { makeStyles } from '@mui/styles'
+import Popover from '@mui/material/Popover'
+import TextField from '@mui/material/TextField'
+import IconButton from '@mui/material/IconButton'
+import Button from '@mui/material/Button'
+import BackupIcon from '@mui/icons-material/Backup'
+import DoneIcon from '@mui/icons-material/Done'
+import CloseIcon from '@mui/icons-material/Close'
+import AttachFileIcon from '@mui/icons-material/AttachFile'
 
 interface IUploadImagePopoverProps {
     anchor: TAnchor
@@ -91,9 +91,6 @@ const UploadImagePopover: FunctionComponent<IUploadImagePopoverProps> = (props) 
         <Popover
             anchorEl={state.anchor}
             open={state.anchor !== null}
-            onExited={() => {
-                props.onSubmit(data, !state.isCancelled)
-            }}
             anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "right"
@@ -131,7 +128,7 @@ const UploadImagePopover: FunctionComponent<IUploadImagePopoverProps> = (props) 
                         </IconButton>
                     </label>
                 </Grid>
-                <Grid item container xs={12} justify="flex-end">
+                <Grid item container xs={12} justifyContent="flex-end">
                     <Button onClick={() => {
                         setState({
                             anchor: null,
@@ -146,6 +143,7 @@ const UploadImagePopover: FunctionComponent<IUploadImagePopoverProps> = (props) 
                             anchor: null,
                             isCancelled: false
                         })
+                        props.onSubmit(data, !state.isCancelled)
                     }}
                     >
                         <DoneIcon />

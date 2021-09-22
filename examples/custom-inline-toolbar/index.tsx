@@ -1,6 +1,6 @@
 import React from 'react'
 import MUIRichTextEditor from '../../'
-import InvertColorsIcon from '@material-ui/icons/InvertColors'
+import InvertColorsIcon from '@mui/icons-material/InvertColors'
 
 const save = (data: string) => {
     console.log(data)

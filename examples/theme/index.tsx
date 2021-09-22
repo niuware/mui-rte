@@ -1,8 +1,9 @@
 import React from 'react'
-import { createMuiTheme, Theme, MuiThemeProvider } from '@material-ui/core/styles'
+import { createTheme, Theme, ThemeProvider } from '@mui/material/styles'
 import MUIRichTextEditor from '../../'
+import { TMUIRichTextEditorStyles } from '../../'
 
-export const defaultTheme: Theme = createMuiTheme({
+export const defaultTheme: Theme = createTheme({
     palette: {
         primary: {
             main: "#000000"
@@ -10,7 +11,7 @@ export const defaultTheme: Theme = createMuiTheme({
     }
 })
 
-Object.assign(defaultTheme, {
+const muiRteTheme: TMUIRichTextEditorStyles = {
     overrides: {
         MUIRichTextEditor: {
             root: {
@@ -35,8 +36,6 @@ Object.assign(defaultTheme, {
                 backgroundColor: "#ebebeb",
                 paddingLeft: 20,
                 width: "inherit",
-                position: "absolute",
-                top: "20px"
             },
             anchorLink: {
                 color: "#333333",
@@ -44,21 +43,23 @@ Object.assign(defaultTheme, {
             }
         }
     }
-})
+}
+
+Object.assign(defaultTheme, muiRteTheme)
 
 const save = (data: string) => {
     console.log(data)
 }
 
-const Theme = () => {
+const Themed = () => {
     return (
-        <MuiThemeProvider theme={defaultTheme}>
+        <ThemeProvider theme={defaultTheme}>
             <MUIRichTextEditor
                 label="Type something here..."
                 onSave={save}
             />
-        </MuiThemeProvider>
+        </ThemeProvider>
     )
 }
 
-export default Theme
+export default Themed
