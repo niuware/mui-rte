@@ -1,8 +1,6 @@
 import React, { FunctionComponent } from 'react'
-import Paper from '@material-ui/core/Paper'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import { createStyles, withStyles, WithStyles } from '@material-ui/core/styles'
+import { Paper, List, ListItem } from '@mui/material'
+import { createStyles, withStyles, WithStyles } from '@mui/styles'
 
 export type TAutocompleteItem = {
     keys: string[]

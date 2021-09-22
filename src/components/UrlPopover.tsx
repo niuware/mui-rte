@@ -1,17 +1,18 @@
 import React, { FunctionComponent, useState } from 'react'
-import Button from '@material-ui/core/Button'
-import Grid from '@material-ui/core/Grid'
-import Popover from '@material-ui/core/Popover'
-import TextField from '@material-ui/core/TextField'
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
-import ButtonGroup from '@material-ui/core/ButtonGroup'
-import InsertPhotoIcon from '@material-ui/icons/InsertPhoto'
-import MovieIcon from '@material-ui/icons/Movie'
-import CheckIcon from '@material-ui/icons/Check'
-import DeleteIcon from '@material-ui/icons/DeleteOutline'
-import FormatAlignCenter from '@material-ui/icons/FormatAlignCenter'
-import FormatAlignLeft from '@material-ui/icons/FormatAlignLeft'
-import FormatAlignRight from '@material-ui/icons/FormatAlignRight'
+import Button from '@mui/material/Button'
+import Grid from '@mui/material/Grid'
+import Popover from '@mui/material/Popover'
+import TextField from '@mui/material/TextField'
+import { createStyles, withStyles, WithStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
+import ButtonGroup from '@mui/material/ButtonGroup'
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto'
+import MovieIcon from '@mui/icons-material/Movie'
+import CheckIcon from '@mui/icons-material/Check'
+import DeleteIcon from '@mui/icons-material/DeleteOutline'
+import FormatAlignCenter from '@mui/icons-material/FormatAlignCenter'
+import FormatAlignLeft from '@mui/icons-material/FormatAlignLeft'
+import FormatAlignRight from '@mui/icons-material/FormatAlignRight'
 
 export type TAlignment = "left" | "center" | "right"
 
@@ -98,14 +99,14 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
                                         <Button 
-                                            color={(!data.type || data.type === "image") ? "primary" : "default"} 
+                                            color={(!data.type || data.type === "image") ? "primary" : "inherit"} 
                                             size="small" 
                                             onClick={() => setData({...data, type: "image"})}
                                         >
                                             <InsertPhotoIcon />
                                         </Button>
                                         <Button 
-                                            color={data.type === "video" ? "primary" : "default"} 
+                                            color={data.type === "video" ? "primary" : "inherit"} 
                                             size="small" 
                                             onClick={() => setData({...data, type: "video"})}
                                         >
@@ -136,21 +137,21 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                                 <Grid item xs={12}>
                                     <ButtonGroup fullWidth>
                                         <Button 
-                                            color={data.alignment === "left" ? "primary" : "default"} 
+                                            color={data.alignment === "left" ? "primary" : "inherit"} 
                                             size="small" 
                                             onClick={() => setData({...data, alignment: "left"})}
                                         >
                                             <FormatAlignLeft />
                                         </Button>
                                         <Button 
-                                            color={data.alignment === "center" ? "primary" : "default"} 
+                                            color={data.alignment === "center" ? "primary" : "inherit"} 
                                             size="small" 
                                             onClick={() => setData({...data, alignment: "center"})}
                                         >
                                             <FormatAlignCenter />
                                         </Button>
                                         <Button 
-                                            color={data.alignment === "right" ? "primary" : "default"} 
+                                            color={data.alignment === "right" ? "primary" : "inherit"} 
                                             size="small" 
                                             onClick={() => setData({...data, alignment: "right"})}>
                                             <FormatAlignRight />
@@ -160,7 +161,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                             </>
                             : null}
                     </Grid>
-                    <Grid container item xs={12} direction="row" justify="flex-end">
+                    <Grid container item xs={12} direction="row" justifyContent="flex-end">
                         {props.data && props.data.url ?
                         <Button
                             onClick={() => props.onConfirm(props.isMedia, "")}

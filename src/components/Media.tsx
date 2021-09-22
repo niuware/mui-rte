@@ -1,7 +1,8 @@
 import React, { FunctionComponent } from 'react'
 import classNames from 'classnames'
 import { ContentState, ContentBlock } from 'draft-js'
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles'
+import { createStyles, withStyles, WithStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
 interface IMediaProps extends WithStyles<typeof styles> {
     block: ContentBlock
