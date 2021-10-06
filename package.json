@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -19,10 +19,11 @@
     "url": "https://github.com/niuware/mui-rte/issues"
   },
   "homepage": "https://github.com/niuware/mui-rte#readme",
-  "main": "dist/index.js",
+  "main": "index.js",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
-    "build": "tsc"
+    "build": "tsc",
+    "watch": "tsc --watch"
   },
   "author": "Erik Lopez",
   "license": "MIT",
