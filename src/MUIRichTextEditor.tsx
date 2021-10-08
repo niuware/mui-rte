@@ -1142,6 +1142,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
                         data={state.urlData}
                         anchor={state.anchorUrlPopover}
                         onConfirm={handleConfirmPrompt}
+                        onCancel={dismissPopover}
                         isMedia={state.urlIsMedia}
                     />
                     : null}
