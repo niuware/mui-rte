@@ -638,6 +638,11 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         }
         return "not-handled"
     }
+    
+    function onTab(e: any) {
+        const maxDepth = 4;
+        handleChange(RichUtils.onTab(e, editorState, maxDepth));
+    }
 
     const handleCustomClick = (style: any, id: string) => {
         if (!props.customControls) {
@@ -1127,6 +1132,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
                             onChange={handleChange}
                             onFocus={handleEditorFocus}
                             readOnly={props.readOnly}
+                            onTab={onTab}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
                             handlePastedText={handlePastedText}
