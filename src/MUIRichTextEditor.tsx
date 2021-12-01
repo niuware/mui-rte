@@ -29,7 +29,8 @@ export type TDecorator = {
 
 export type TAutocompleteStrategy = {
     triggerChar: string
-    items: TAutocompleteItem[]
+    items?: TAutocompleteItem[]
+    asyncItems?: (search: string) => Promise<TAutocompleteItem[]>
     insertSpaceAfter?: boolean
     atomicBlockName?: string
 }
@@ -256,6 +257,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     const [focus, setFocus] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedIndex, setSelectedIndex] = useState<number>(0)
+    const [autocompleteItems, setAutocompleteItems] = useState<TAutocompleteItem[]>([])
     const [editorState, setEditorState] = useState(() => useEditorState(props))
     const [focusMediaKey, setFocusMediaKey] = useState("")
 
@@ -320,6 +322,8 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     useEffect(() => {
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             setSelectedIndex(0)
+        } else if (autocompleteRef.current?.asyncItems !== undefined) {
+            autocompleteRef.current?.asyncItems(searchTerm).then((items: TAutocompleteItem[]) => setAutocompleteItems(items));
         }
     }, [searchTerm])
 
@@ -472,9 +476,13 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             return []
         }
-        return autocompleteRef.current!.items
-            .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
-            .splice(0, autocompleteLimit)
+        if (autocompleteRef.current?.items !== undefined) {
+            return autocompleteRef.current!.items
+                .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
+                .splice(0, autocompleteLimit)
+        } else {
+            return autocompleteItems;
+        }
     }
 
     const handleChange = (state: EditorState) => {

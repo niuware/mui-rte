@@ -82,7 +82,8 @@ export declare type TDecorator = {
 };
 export declare type TAutocompleteStrategy = {
     triggerChar: string;
-    items: TAutocompleteItem[];
+    items?: TAutocompleteItem[];
+    asyncItems?: (search: string) => Promise<TAutocompleteItem[]>
     insertSpaceAfter?: boolean;
     atomicBlockName?: string;
 };
