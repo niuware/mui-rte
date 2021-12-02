@@ -7,6 +7,7 @@ import RefSave from './ref-save'
 import ReadOnly from './read-only'
 import CustomControls from './custom-controls'
 import Decorators from './decorator'
+import Emoji from './emoji'
 import InlineToolbar from './inline-toolbar'
 import CustomInlineToolbar from './custom-inline-toolbar'
 import LoadHTML from './load-html'
@@ -40,6 +41,7 @@ const App = () => {
                 <button onClick={() => setSample(<RefSave />)}>Ref Events</button>
                 <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
                 <button onClick={() => setSample(<Decorators />)}>Decorators</button>
+                <button onClick={() => setSample(<Emoji />)}>Emoji</button>
                 <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
                 <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
                 <button onClick={() => setSample(<AtomicCustomBlock />)}>Atomic Custom Block</button>

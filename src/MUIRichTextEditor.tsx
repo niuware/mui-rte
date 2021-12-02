@@ -47,6 +47,7 @@ export type TAsyncAtomicBlockResponse = {
 export type TMUIRichTextEditorRef = {
     focus: () => void
     save: () => void
+    insertText: (text : string) => void
     /**
      * @deprecated Use `insertAtomicBlockSync` instead.
      */
@@ -287,6 +288,9 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         },
         save: () => {
             handleSave()
+        },
+        insertText: (text: string) => {
+            handleInsertText(text)
         },
         insertAtomicBlock: (name: string, data: any) => {
             handleInsertAtomicBlockSync(name, data)
@@ -569,6 +573,19 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
             props.onSave(JSON.stringify(convertToRaw(editorState.getCurrentContent())))
         }
     }
+    const handleInsertText = (text: string) => {
+        const currentContent = editorStateRef.current!.getCurrentContent()
+        const currentSelection = editorStateRef.current!.getSelection();
+
+        const newContent = Modifier.replaceText(
+            currentContent,
+            currentSelection,
+            text
+        );
+
+        const newEditorState = EditorState.push(editorState, newContent, 'insert-characters');
+        handleChange(EditorState.forceSelection(newEditorState, newContent.getSelectionAfter()));
+    };
 
     const handleInsertAtomicBlockSync = (name: string, data: any) => {
         const block = atomicBlockExists(name, props.customControls)

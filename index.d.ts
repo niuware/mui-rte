@@ -97,6 +97,7 @@ export declare type TAsyncAtomicBlockResponse = {
 export declare type TMUIRichTextEditorRef = {
     focus: () => void;
     save: () => void;
+    insertText: (text: string) => void;
     /**
      * @deprecated Use `insertAtomicBlockSync` instead.
      */
