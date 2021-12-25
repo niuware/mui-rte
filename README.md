@@ -266,6 +266,7 @@ You can style the editor using the `Material-UI` theming feature. First create a
 import { createMuiTheme, MuiThemeProvider } from '@mui/material/styles'
 import MUIRichTextEditor from 'mui-rte'
 
+MUI version 4
 const defaultTheme = createMuiTheme()
 
 Object.assign(defaultTheme, {
@@ -281,6 +282,26 @@ Object.assign(defaultTheme, {
         }
     }
 })
+
+MUI Version 5
+const defaultTheme = createMuiTheme()
+
+Object.assign(defaultTheme, {
+    components: {
+        MUIRichTextEditor: {
+          styleOverrides: {
+            root: {
+                marginTop: 20,
+                width: "80%"
+            },
+            editor: {
+                borderBottom: "1px solid gray" 
+            }
+          }
+        }
+    }
+})
+
 
 <MuiThemeProvider theme={defaultTheme}>
     <MUIRichTextEditor 
