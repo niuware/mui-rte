@@ -37,6 +37,7 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
+    minSearchCharCount?: number;
 }
 
 export type TAsyncAtomicBlockResponse = {
@@ -201,7 +202,6 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
-const autocompleteMinSearchCharCount = 2
 const lineHeight = 26
 const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
@@ -250,7 +250,11 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
 }
 
 const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
-    const { classes, controls, customControls } = props
+    const {
+      classes,
+      controls,
+      customControls,
+    } = props;
 
     const [state, setState] = useState<TMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
@@ -267,6 +271,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const autocompleteMinSearchCharCount =  props?.autocomplete?.minSearchCharCount ?? 2;
     const isFirstFocus = useRef(true)
     const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
     const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)

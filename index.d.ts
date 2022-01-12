@@ -88,6 +88,7 @@ export declare type TAutocompleteStrategy = {
 };
 export declare type TAutocomplete = {
     strategies: TAutocompleteStrategy[];
+    minSearchCharCount?: number;
     suggestLimit?: number;
 };
 export declare type TAsyncAtomicBlockResponse = {
