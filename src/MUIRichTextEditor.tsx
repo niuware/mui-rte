@@ -37,6 +37,7 @@ export type TAutocompleteStrategy = {
 export type TAutocomplete = {
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
+    minSearchCharCount?: number;
 }
 
 export type TAsyncAtomicBlockResponse = {
@@ -88,7 +89,6 @@ export type TMUIRichTextEditorProps = {
     keyCommands?: TKeyCommand[]
     maxLength?: number
     autocomplete?: TAutocomplete
-    autocompleteMinSearchCharCount?: number;
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     onFocus?: () => void
@@ -254,7 +254,6 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
       classes,
       controls,
       customControls,
-      autocompleteMinSearchCharCount = 2
     } = props;
 
     const [state, setState] = useState<TMUIRichTextEditorState>({})
@@ -272,6 +271,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const autocompleteMinSearchCharCount = props?.autocomplete?.minSearchCharCount || 2;
     const isFirstFocus = useRef(true)
     const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
     const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)

@@ -88,6 +88,7 @@ export declare type TAutocompleteStrategy = {
 };
 export declare type TAutocomplete = {
     strategies: TAutocompleteStrategy[];
+    minSearchCharCount?: number;
     suggestLimit?: number;
 };
 export declare type TAsyncAtomicBlockResponse = {
@@ -135,7 +136,6 @@ export declare type TMUIRichTextEditorProps = {
     keyCommands?: TKeyCommand[];
     maxLength?: number;
     autocomplete?: TAutocomplete;
-    autocompleteMinSearchCharCount?: number;
     onSave?: (data: string) => void;
     onChange?: (state: EditorState) => void;
     onFocus?: () => void;
