@@ -88,6 +88,7 @@ export type TMUIRichTextEditorProps = {
     keyCommands?: TKeyCommand[]
     maxLength?: number
     autocomplete?: TAutocomplete
+    autocompleteMinSearchCharCount?: number;
     onSave?: (data: string) => void
     onChange?: (state: EditorState) => void
     onFocus?: () => void
@@ -201,7 +202,6 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
-const autocompleteMinSearchCharCount = 2
 const lineHeight = 26
 const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
@@ -250,7 +250,12 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
 }
 
 const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRichTextEditorProps> = (props, ref) => {
-    const { classes, controls, customControls } = props
+    const {
+      classes,
+      controls,
+      customControls,
+      autocompleteMinSearchCharCount = 2
+    } = props;
 
     const [state, setState] = useState<TMUIRichTextEditorState>({})
     const [focus, setFocus] = useState(false)
