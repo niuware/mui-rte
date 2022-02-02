@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from 'react'
-import { Paper, List, ListItem } from '@mui/material'
-import { createStyles, withStyles, WithStyles } from '@mui/styles'
+import React, {FunctionComponent} from 'react'
+import {List, ListItem, Paper} from '@mui/material'
+import {styled} from '@mui/material/styles';
 
 export type TAutocompleteItem = {
     keys: string[]
@@ -8,7 +8,7 @@ export type TAutocompleteItem = {
     content: string | JSX.Element
 }
 
-interface TAutocompleteProps extends WithStyles<typeof styles> {
+interface TAutocompleteProps {
     items: TAutocompleteItem[]
     top: number
     left: number
@@ -16,25 +16,35 @@ interface TAutocompleteProps extends WithStyles<typeof styles> {
     onClick: (selectedIndex: number) => void
 }
 
-const styles = () => createStyles({
-    container: {
+const PREFIX = 'MUIRichTextEditorAutocomplete';
+
+const classes = {
+    container: `${PREFIX}-container`,
+    item: `${PREFIX}-item`
+};
+
+const Root = styled(Paper, {
+    name: PREFIX,
+    slot: 'Root',
+    overridesResolver: (_, styles) => styles.root
+})(() => ({
+    [`&.${classes.container}`]: {
         minWidth: "200px",
         position: "absolute",
         zIndex: 10
     },
-    item: {
+    [`& .${classes.item}`]: {
         cursor: "pointer"
     }
-})
+}));
 
 const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
     if (!props.items.length) {
         return null
     }
 
-    const { classes } = props
     return (
-        <Paper className={classes.container} style={{
+        <Root className={classes.container} style={{
             top: props.top,
             left: props.left
         }}>
@@ -50,8 +60,8 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
                     </ListItem>
                 ))}
             </List>
-        </Paper>
+        </Root>
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Autocomplete)
+export default Autocomplete

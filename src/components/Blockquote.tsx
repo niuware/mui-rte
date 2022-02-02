@@ -1,25 +1,34 @@
-import React, { FunctionComponent } from 'react'
-import { createStyles, withStyles, WithStyles } from '@mui/styles'
-import { Theme } from '@mui/material/styles'
+import React, {FunctionComponent} from 'react'
+import {styled} from '@mui/material/styles'
 
-const styles = ({ palette }: Theme) => createStyles({
-    root: {
-        fontStyle: "italic",
-        color: palette.grey[800],
-        borderLeft: `4px solid ${palette.grey.A100}`
-    }
-})
-
-interface IBlockquoteProps extends WithStyles<typeof styles> {
+interface IBlockquoteProps {
     children?: React.ReactNode
 }
 
+const PREFIX = 'MUIRichTextEditorBlockquote';
+
+const classes = {
+    root: `${PREFIX}-root`
+};
+
+const Root = styled('div', {
+    name: PREFIX,
+    slot: 'Root',
+    overridesResolver: (_, styles) => styles.root
+})(({theme}) => ({
+    [`&.${classes.root}`]: {
+        fontStyle: "italic",
+        color: theme.palette.grey[800],
+        borderLeft: `4px solid ${theme.palette.grey.A100}`
+    }
+}));
+
 const Blockquote: FunctionComponent<IBlockquoteProps> = (props) => {
     return (
-        <div className={props.classes.root}>
+        <Root className={classes.root}>
             {props.children}
-        </div>
+        </Root>
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Blockquote)
+export default Blockquote

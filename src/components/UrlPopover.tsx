@@ -1,10 +1,9 @@
-import React, { FunctionComponent, useState } from 'react'
+import React, {FunctionComponent, useState} from 'react'
 import Button from '@mui/material/Button'
 import Grid from '@mui/material/Grid'
 import Popover from '@mui/material/Popover'
 import TextField from '@mui/material/TextField'
-import { createStyles, withStyles, WithStyles } from '@mui/styles'
-import { Theme } from '@mui/material/styles'
+import {styled} from '@mui/material/styles'
 import ButtonGroup from '@mui/material/ButtonGroup'
 import InsertPhotoIcon from '@mui/icons-material/InsertPhoto'
 import MovieIcon from '@mui/icons-material/Movie'
@@ -26,22 +25,33 @@ export type TUrlData = {
     type?: TMediaType
 }
 
-interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
+interface IUrlPopoverStateProps {
     anchor?: HTMLElement
     data?: TUrlData
     isMedia?: boolean
     onConfirm: (isMedia?: boolean, ...args: any) => void
 }
 
-const styles = ({ spacing }: Theme) => createStyles({
-    linkPopover: {
-        padding: spacing(2, 2, 2, 2),
+const PREFIX = 'MUIRichTextEditorUrlPopover';
+
+const classes = {
+    linkPopover: `${PREFIX}-linkPopover`,
+    linkTextField: `${PREFIX}-linkTextField`
+};
+
+const Root = styled(Popover, {
+    name: PREFIX,
+    slot: 'Root',
+    overridesResolver: (_, styles) => styles.root
+})(({theme }) => ({
+    [`& .${classes.linkPopover}`]: {
+        padding: theme.spacing(2, 2, 2, 2),
         maxWidth: 250
     },
-    linkTextField: {
+    [`& .${classes.linkTextField}`]: {
         width: "100%"
     }
-})
+}));
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
     const [data, setData] = useState<TUrlData>(props.data || {
@@ -51,8 +61,6 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
         alignment: undefined,
         type: undefined
     })
-
-    const { classes } = props
 
     const onSizeChange = (value: any, prop: "width" | "height") => {
         if (value === "") {
@@ -67,7 +75,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
     }
 
     return (
-        <Popover
+        <Root
             open={props.anchor !== undefined}
             anchorEl={props.anchor}
             anchorOrigin={{
@@ -177,8 +185,8 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
                     </Grid>
                 </Grid>
             </div>
-        </Popover>
+        </Root>
     )
 }
 
-export default withStyles(styles, { withTheme: true })(UrlPopover)
+export default UrlPopover

@@ -1,40 +1,54 @@
-import React, { FunctionComponent } from 'react'
+import React, {FunctionComponent} from 'react'
 import classNames from 'classnames'
-import { ContentState, ContentBlock } from 'draft-js'
-import { createStyles, withStyles, WithStyles } from '@mui/styles'
-import { Theme } from '@mui/material/styles'
+import {ContentBlock, ContentState} from 'draft-js'
+import {styled} from '@mui/material/styles'
 
-interface IMediaProps extends WithStyles<typeof styles> {
+interface IMediaProps {
     block: ContentBlock
     contentState: ContentState
     blockProps: any
     onClick: (block: ContentBlock) => void
 }
 
-const styles = ({ shadows }: Theme) => createStyles({
-    root: {
+const PREFIX = 'MUIRichTextEditorMedia';
+
+const classes = {
+    root: `${PREFIX}-root`,
+    editable: `${PREFIX}-editable`,
+    focused: `${PREFIX}-focused`,
+    centered: `${PREFIX}-centered`,
+    leftAligned: `${PREFIX}-leftAligned`,
+    rightAligned: `${PREFIX}-rightAligned`
+};
+
+const Root = styled('div', {
+    name: PREFIX,
+    slot: 'Root',
+    overridesResolver: (_, styles) => styles.root
+})(({theme }) => ({
+    [`&.${classes.root}`]: {
         margin: "5px 0 1px",
         outline: "none"
     },
-    editable: {
+    [`& .${classes.editable}`]: {
         cursor: "pointer",
         "&:hover": {
-            boxShadow: shadows[3]
+            boxShadow: theme.shadows[3]
         }
     },
-    focused: {
-        boxShadow: shadows[3]
+    [`& .${classes.focused}`]: {
+        boxShadow: theme.shadows[3]
     },
-    centered: {
+    [`&.${classes.centered}`]: {
         textAlign: "center"
     },
-    leftAligned: {
+    [`&.${classes.leftAligned}`]: {
         textAlign: "left"
     },
-    rightAligned: {
+    [`&.${classes.rightAligned}`]: {
         textAlign: "right"
     }
-})
+}));
 
 const Media: FunctionComponent<IMediaProps> = (props) => {
     const { url, width, height, alignment, type } = props.contentState.getEntity(props.block.getEntityAt(0)).getData()
@@ -43,9 +57,9 @@ const Media: FunctionComponent<IMediaProps> = (props) => {
     const htmlTag = () => {
         const componentProps = {
             src: url,
-            className: classNames(props.classes.root, {
-                [props.classes.editable]: !readOnly,
-                [props.classes.focused]: !readOnly && focusKey === props.block.getKey()
+            className: classNames(classes.root, {
+                [classes.editable]: !readOnly,
+                [classes.focused]: !readOnly && focusKey === props.block.getKey()
             }),
             width: width,
             height: type === "video" ? "auto" : height,
@@ -67,14 +81,14 @@ const Media: FunctionComponent<IMediaProps> = (props) => {
     }
 
     return (
-        <div className={classNames({
-            [props.classes.centered]: alignment === "center",
-            [props.classes.leftAligned]: alignment === "left",
-            [props.classes.rightAligned]: alignment === "right"
+        <Root className={classNames({
+            [classes.centered]: alignment === "center",
+            [classes.leftAligned]: alignment === "left",
+            [classes.rightAligned]: alignment === "right"
         })}>
             {htmlTag()}
-        </div>
+        </Root>
     )
 }
 
-export default withStyles(styles, { withTheme: true })(Media)
+export default Media
