@@ -388,12 +388,12 @@ Object.assign(defaultTheme, {
 
 `TAutocompleteStrategy`
 
-|Property|Type||description|
-|---|---|---|---|
-|triggerChar|`string`|required|A single character that triggers the autocomplete strategy.|
-|items|`TAutocompleteItem[]`|required|List of autocomplete suggestion items.| 
-|insertSpaceAfter|`boolean`|optional|If `false` it won't add an space after inserting the content into the editor. Default is `true`.|   
-|atomicBlockName|`string`|optional|Use an *atomic* custom control type to add the content to the editor.|   
+| Property         | Type                           || description |
+|------------------|--------------------------------|-------------|------------------------------------------------------------------------ A single character that triggers the autocomplete strategy.                                                           | required    | A single character that triggers the autocomplete strategy.                                      |
+| items            | `TAutocompleteItem[]`          | optional    | List of autocomplete suggestion items.                                                           |
+| asyncItems       | `Promise<TAutocompleteItem[]>` | optional    | List of autocomplete suggestion items fetched async.                                                          |
+| insertSpaceAfter | `boolean`                      | optional    | If `false` it won't add an space after inserting the content into the editor. Default is `true`. |   
+| atomicBlockName  | `string`                       | optional    | Use an *atomic* custom control type to add the content to the editor.                            |   
 
 <br />
 

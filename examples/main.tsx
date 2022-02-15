@@ -7,6 +7,7 @@ import RefSave from './ref-save'
 import ReadOnly from './read-only'
 import CustomControls from './custom-controls'
 import Decorators from './decorator'
+import Emoji from './emoji'
 import InlineToolbar from './inline-toolbar'
 import CustomInlineToolbar from './custom-inline-toolbar'
 import LoadHTML from './load-html'
@@ -15,6 +16,7 @@ import AtomicCustomBlock from './atomic-custom-block'
 import KeyBindings from './key-bindings'
 import MaxLength from './max-length'
 import Autocomplete from './autocomplete'
+import AutocompleteAsync from './autocomplete-async'
 import AutocompleteAtomic from './autocomplete-atomic'
 import AsyncImageUpload from './async-image-upload'
 import AsyncAtomicCustomBlock from './async-atomic-custom-block'
@@ -39,6 +41,7 @@ const App = () => {
                 <button onClick={() => setSample(<RefSave />)}>Ref Events</button>
                 <button onClick={() => setSample(<CustomControls />)}>Custom Controls</button>
                 <button onClick={() => setSample(<Decorators />)}>Decorators</button>
+                <button onClick={() => setSample(<Emoji />)}>Emoji</button>
                 <button onClick={() => setSample(<InlineToolbar />)}>Inline Toolbar</button>
                 <button onClick={() => setSample(<CustomInlineToolbar />)}>Custom Inline Toolbar</button>
                 <button onClick={() => setSample(<AtomicCustomBlock />)}>Atomic Custom Block</button>
@@ -51,6 +54,7 @@ const App = () => {
                 <button onClick={() => setSample(<KeyBindings />)}>Key Bindings</button>
                 <button onClick={() => setSample(<MaxLength />)}>Max length</button>
                 <button onClick={() => setSample(<Autocomplete />)}>Autocomplete</button>
+                <button onClick={() => setSample(<AutocompleteAsync />)}>AutocompleteAsync</button>
                 <button onClick={() => setSample(<AutocompleteAtomic />)}>Autocomplete Atomic</button>
                 <div style={{
                     margin: "20px 0"

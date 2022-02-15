@@ -82,7 +82,8 @@ export declare type TDecorator = {
 };
 export declare type TAutocompleteStrategy = {
     triggerChar: string;
-    items: TAutocompleteItem[];
+    items?: TAutocompleteItem[];
+    asyncItems?: (search: string) => Promise<TAutocompleteItem[]>
     insertSpaceAfter?: boolean;
     atomicBlockName?: string;
 };
@@ -96,6 +97,7 @@ export declare type TAsyncAtomicBlockResponse = {
 export declare type TMUIRichTextEditorRef = {
     focus: () => void;
     save: () => void;
+    insertText: (text: string) => void;
     /**
      * @deprecated Use `insertAtomicBlockSync` instead.
      */
