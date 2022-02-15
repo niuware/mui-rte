@@ -193,7 +193,6 @@ const Root = styled('div', {
     },
     [`& .${classes.placeHolder}`]: {
         color: theme.palette.grey[600],
-        position: "absolute",
         outline: "none"
     },
     [`& .${classes.linkPopover}`]: {
