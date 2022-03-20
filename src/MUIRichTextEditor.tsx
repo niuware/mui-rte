@@ -227,7 +227,7 @@ const findDecoWithRegex = (regex: RegExp, contentBlock: any, callback: any) => {
     }
 }
 
-const useEditorState = (props: IMUIRichTextEditorProps) => {
+const useEditorState = (props: IMUIRichTextEditorProps, currentEditorState?: EditorState) => {
     const decorators: DraftDecorator[] = [
         {
             strategy: findLinkEntities,
@@ -244,6 +244,14 @@ const useEditorState = (props: IMUIRichTextEditorProps) => {
     }
     const decorator = new CompositeDecorator(decorators)
     const defaultValue = props.defaultValue || props.value
+
+    if (currentEditorState && defaultValue) {
+		const stateWithContent = EditorState.createWithContent(convertFromRaw(JSON.parse(defaultValue)), decorator)
+		const currentSelection = currentEditorState.getSelection()
+		const stateWithContentAndSelection = EditorState.forceSelection(stateWithContent, currentSelection)
+		return stateWithContentAndSelection;
+	}
+
     return (defaultValue)
         ? EditorState.createWithContent(convertFromRaw(JSON.parse(defaultValue)), decorator)
         : EditorState.createEmpty(decorator)
@@ -298,8 +306,8 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     }))
 
     useEffect(() => {
-        const editorState = useEditorState(props)
-        setEditorState(editorState)
+        const newEditorState = useEditorState(props, editorState)
+        setEditorState(newEditorState)
         toggleMouseUpListener(true)
         return () => {
             toggleMouseUpListener()
