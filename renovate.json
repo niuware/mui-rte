@@ -1,0 +1,33 @@
+{
+  "extends": ["config:base"],
+  "separateMajorMinor": true,
+  "stabilityDays": 3,
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 3,
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["dependencies"],
+      "rangeStrategy": "pin"
+    }
+  ],
+  "automergeType": "pr",
+  "automergeStrategy": "squash",
+  "separateMinorPatch": true,
+  "patch": {
+    "automerge": true
+  },
+  "lockFileMaintenance": {
+    "automerge": true
+  },
+  "assignees": [" @tetra-insights/prod-team "],
+  "labels": ["dependencies"],
+  "ignoreTests": false,
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/examples/**",
+    "**/__tests__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/__fixtures__/**"
+  ]
+}
