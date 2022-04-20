@@ -30,9 +30,9 @@
   "devDependencies": {
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
-    "@mui/icons-material": "^5.0.0",
-    "@mui/material": "^5.0.0",
-    "@mui/styles": "^5.0.0",
+    "@mui/icons-material": "5.0.5",
+    "@mui/material": "5.0.6",
+    "@mui/styles": "5.0.2",
     "@types/react": "17.0.44",
     "@types/react-dom": "17.0.15",
     "@webpack-cli/serve": "^1.5.2",
