@@ -9,22 +9,18 @@ const save = (data: string) => {
 }
 
 type TStaff = {
-    job: string
+    avatar: string
     name: string
-    color: string
 }
 
 const Staff: FunctionComponent<TStaff> = (props) => {
     return (
         <>
             <ListItemAvatar>
-                <Avatar style={{
-                    backgroundColor: props.color
-                }}>{props.name.substr(0, 1)}</Avatar>
+                <Avatar src={props.avatar}>{props.name.substr(0, 1)}</Avatar>
             </ListItemAvatar>
             <ListItemText
                 primary={props.name}
-                secondary={props.job}
             />
         </>
     )
@@ -86,23 +82,18 @@ const cities: TAutocompleteItem[] = [
     }
 ]
 
-const staff = [
-    {
-        keys: ["all", "foo", "manager"],
-        value: "Foo Bar",
-        content: <Staff name="Foo Bar" job="Manager" color="tomato" />,
-    },
-    {
-        keys: ["all", "bar", "support"],
-        value: "Bar Foo",
-        content: <Staff name="Bar Foo" job="Technical Support" color="orange" />,
-    },
-    {
-        keys: ["all", "mui", "manager"],
-        value: "Mui Rte",
-        content: <Staff name="Mui Rte" job="Manager" color="dodgerblue" />,
+const searchUsers = async (query: string): Promise<TAutocompleteItem[]> => {
+    let response = await fetch(`https://reqres.in/api/users?page=${query.length - 2}`);
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
-]
+    const json = await response.json();
+    return json.data!.map((u:any) => {return {
+        keys: [u.email, u.first_name, u.last_name],
+        value: `${u.first_name}`,
+        content: <Staff name={`${u.first_name} ${u.last_name}`} avatar={u.avatar} />,
+    }});
+};
 
 const Autocomplete = () => {
     return (
@@ -110,7 +101,6 @@ const Autocomplete = () => {
             label="Try typing ':grin' or '/mexico'..."
             onSave={save}
             autocomplete={{
-                minSearchCharCount: 2,
                 strategies: [
                     {
                         items: emojis,
@@ -121,7 +111,7 @@ const Autocomplete = () => {
                         triggerChar: "/"
                     },
                     {
-                        items: staff,
+                        asyncItems: searchUsers,
                         triggerChar: "@",
                         insertSpaceAfter: false
                     }

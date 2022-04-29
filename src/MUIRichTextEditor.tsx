@@ -28,13 +28,15 @@ export type TDecorator = {
 }
 
 export type TAutocompleteStrategy = {
+    asyncItems?: (search: string) => Promise<TAutocompleteItem[]>
     triggerChar: string
-    items: TAutocompleteItem[]
+    items?: TAutocompleteItem[]
     insertSpaceAfter?: boolean
     atomicBlockName?: string
 }
 
 export type TAutocomplete = {
+    minSearchCharCount?: number;
     strategies: TAutocompleteStrategy[]
     suggestLimit?: number
 }
@@ -130,6 +132,41 @@ interface TMUIRichTextEditorStyles {
     }
 }
 
+// styling for multilevel (tabbed) lists from draft-js
+const listStyles = {
+    '& .public-DraftStyleDefault-ol,.public-DraftStyleDefault-ul': {margin: '16px 0', padding: 0},
+    '& .public-DraftStyleDefault-ltr': {direction: 'ltr', textAlign: 'left'},
+    '& .public-DraftStyleDefault-rtl': {direction :'rtl', textAlign: 'right'},
+    '& .public-DraftStyleDefault-listLTR': {direction: 'ltr'},
+    '& .public-DraftStyleDefault-listRTL': {direction: 'rtl'},
+    '& .public-DraftStyleDefault-depth0.public-DraftStyleDefault-listLTR': {marginLeft: '1.5em'},
+    '& .public-DraftStyleDefault-depth1.public-DraftStyleDefault-listLTR': {marginLeft: '3em'},
+    '& .public-DraftStyleDefault-depth2.public-DraftStyleDefault-listLTR': {marginLeft: '4.5em'},
+    '& .public-DraftStyleDefault-depth3.public-DraftStyleDefault-listLTR': {marginLeft: '6em'},
+    '& .public-DraftStyleDefault-depth4.public-DraftStyleDefault-listLTR': {marginLeft: '7.5em'},
+    '& .public-DraftStyleDefault-depth0.public-DraftStyleDefault-listRTL': {marginRight: '1.5em'},
+    '& .public-DraftStyleDefault-depth1.public-DraftStyleDefault-listRTL': {marginRight: '3em'},
+    '& .public-DraftStyleDefault-depth2.public-DraftStyleDefault-listRTL': {marginRight: '4.5em'},
+    '& .public-DraftStyleDefault-depth3.public-DraftStyleDefault-listRTL': {marginRight: '6em'},
+    '& .public-DraftStyleDefault-depth4.public-DraftStyleDefault-listRTL': {marginRight: '7.5em'},
+    '& .public-DraftStyleDefault-unorderedListItem': {listStyleType: 'square', position: 'relative'},
+    '& .public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth0': {listStyleType: 'disc'},
+    '& .public-DraftStyleDefault-unorderedListItem.public-DraftStyleDefault-depth1': {listStyleType: 'circle'},
+    '& .public-DraftStyleDefault-orderedListItem': {listStyleType: 'none', position: 'relative'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listLTR:before': {left: '-36px', position: 'absolute', textAlign: 'right', width: '30px'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-listRTL:before': {position: 'absolute', right: '-36px', textAlign: 'left', width: '30px'},
+    '& .public-DraftStyleDefault-orderedListItem:before': {content: 'counter(ol0) ". "', counterIncrement: 'ol0'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth1:before': {content: 'counter(ol1,lower-alpha) ". "', counterIncrement: 'ol1'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth2:before': {content: 'counter(ol2,lower-roman) ". "', counterIncrement: 'ol2'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth3:before': {content: 'counter(ol3) ". "', counterIncrement: 'ol3'},
+    '& .public-DraftStyleDefault-orderedListItem.public-DraftStyleDefault-depth4:before': {content: 'counter(ol4,lower-alpha) ". "', counterIncrement: 'ol4'},
+    '& .public-DraftStyleDefault-depth0.public-DraftStyleDefault-reset': {counterReset: 'ol0'},
+    '& .public-DraftStyleDefault-depth1.public-DraftStyleDefault-reset': {counterReset: 'ol1'},
+    '& .public-DraftStyleDefault-depth2.public-DraftStyleDefault-reset': {counterReset: 'ol2'},
+    '& .public-DraftStyleDefault-depth3.public-DraftStyleDefault-reset': {counterReset: 'ol3'},
+    '& .public-DraftStyleDefault-depth4.public-DraftStyleDefault-reset': {counterReset: 'ol4'},
+}
+
 const styles = (theme: Theme & TMUIRichTextEditorStyles) => createStyles({
     root: theme?.overrides?.MUIRichTextEditor?.root || {},
     container: theme?.overrides?.MUIRichTextEditor?.container || {
@@ -144,7 +181,9 @@ const styles = (theme: Theme & TMUIRichTextEditorStyles) => createStyles({
     inheritFontSize: theme?.overrides?.MUIRichTextEditor?.inheritFontSize || {
         fontSize: "inherit"
     },
-    editor: theme?.overrides?.MUIRichTextEditor?.editor || {},
+    editor: theme?.overrides?.MUIRichTextEditor?.editor || {
+        ...listStyles
+    },
     editorContainer: theme?.overrides?.MUIRichTextEditor?.editorContainer || {
         margin: theme.spacing(1, 0, 0, 0),
         cursor: "text",
@@ -201,7 +240,6 @@ const styleRenderMap: DraftStyleMap = {
 }
 
 const { hasCommandModifier } = KeyBindingUtil
-const autocompleteMinSearchCharCount = 2
 const lineHeight = 26
 const defaultInlineToolbarControls = ["bold", "italic", "underline", "clear"]
 
@@ -263,10 +301,12 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     const editorId = props.id || "mui-rte"
     const toolbarPositionRef = useRef<TPosition | undefined>(undefined)
     const editorStateRef = useRef<EditorState | null>(editorState)
+    const [autocompleteItems, setAutocompleteItems] = useState<TAutocompleteItem[]>([])
     const autocompleteRef = useRef<TAutocompleteStrategy | undefined>(undefined)
     const autocompleteSelectionStateRef = useRef<SelectionState | undefined>(undefined)
     const autocompletePositionRef = useRef<TPosition | undefined>(undefined)
     const autocompleteLimit = props.autocomplete ? props.autocomplete.suggestLimit || 5 : 5
+    const autocompleteMinSearchCharCount =  props?.autocomplete?.minSearchCharCount ?? 2;
     const isFirstFocus = useRef(true)
     const customBlockMapRef = useRef<DraftBlockRenderMap | undefined>(undefined)
     const customStyleMapRef = useRef<DraftStyleMap | undefined>(undefined)
@@ -294,7 +334,10 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         },
         insertAtomicBlockAsync: (name: string, promise: Promise<TAsyncAtomicBlockResponse>, placeholder?: string) => {
             handleInsertAtomicBlockAsync(name, promise, placeholder)
-        }
+        },
+        insertText: (text: string) => {
+            handleInsertText(text)
+        },
     }))
 
     useEffect(() => {
@@ -320,6 +363,8 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
     useEffect(() => {
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             setSelectedIndex(0)
+        } else if (autocompleteRef.current?.asyncItems !== undefined) {
+            autocompleteRef.current?.asyncItems(searchTerm).then((items: TAutocompleteItem[]) => setAutocompleteItems(items));
         }
     }, [searchTerm])
 
@@ -472,9 +517,13 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         if (searchTerm.length < autocompleteMinSearchCharCount) {
             return []
         }
-        return autocompleteRef.current!.items
-            .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
-            .splice(0, autocompleteLimit)
+        if (autocompleteRef.current?.items !== undefined) {
+            return autocompleteRef.current!.items
+                .filter(item => (item.keys.filter(key => key.includes(searchTerm)).length > 0))
+                .splice(0, autocompleteLimit)
+        } else {
+            return autocompleteItems;
+        }
     }
 
     const handleChange = (state: EditorState) => {
@@ -562,6 +611,20 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         }
     }
 
+    const handleInsertText = (text: string) => {
+        const currentContent = editorStateRef.current!.getCurrentContent()
+        const currentSelection = editorStateRef.current!.getSelection();
+
+        const newContent = Modifier.replaceText(
+            currentContent,
+            currentSelection,
+            text
+        );
+
+        const newEditorState = EditorState.push(editorState, newContent, 'insert-characters');
+        handleChange(EditorState.forceSelection(newEditorState, newContent.getSelectionAfter()));
+    };
+
     const handleInsertAtomicBlockSync = (name: string, data: any) => {
         const block = atomicBlockExists(name, props.customControls)
         if (!block) {
@@ -638,6 +701,11 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
         }
         return "not-handled"
     }
+
+    const onTab = (event: any) => {
+        const maxDepth = 4;
+        handleChange(RichUtils.onTab(event, editorState, maxDepth));
+    };
 
     const handleCustomClick = (style: any, id: string) => {
         if (!props.customControls) {
@@ -1126,6 +1194,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
                             editorState={editorState}
                             onChange={handleChange}
                             onFocus={handleEditorFocus}
+                            onTab={onTab}
                             readOnly={props.readOnly}
                             handleKeyCommand={handleKeyCommand}
                             handleBeforeInput={handleBeforeInput}
@@ -1142,6 +1211,7 @@ const MUIRichTextEditor: ForwardRefRenderFunction<TMUIRichTextEditorRef, IMUIRic
                         data={state.urlData}
                         anchor={state.anchorUrlPopover}
                         onConfirm={handleConfirmPrompt}
+                        onCancel={dismissPopover}
                         isMedia={state.urlIsMedia}
                     />
                     : null}

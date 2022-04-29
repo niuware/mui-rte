@@ -31,6 +31,7 @@ interface IUrlPopoverStateProps extends WithStyles<typeof styles> {
     data?: TUrlData
     isMedia?: boolean
     onConfirm: (isMedia?: boolean, ...args: any) => void
+    onCancel: () => void
 }
 
 const styles = ({ spacing }: Theme) => createStyles({
@@ -69,6 +70,7 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
     return (
         <Popover
             open={props.anchor !== undefined}
+            onClose={props.onCancel}
             anchorEl={props.anchor}
             anchorOrigin={{
                 vertical: "bottom",

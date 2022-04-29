@@ -1,1 +1,1 @@
-export {default} from './dist/MUIRichTextEditor'
+module.exports = require('./dist/MUIRichTextEditor')
