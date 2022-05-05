@@ -1,6 +1,6 @@
 {
   "name": "mui-rte",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Material-UI Rich Text Editor and Viewer",
   "keywords": [
     "material-ui",
@@ -11,14 +11,6 @@
     "text editor",
     "draft-js"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/niuware/mui-rte.git"
-  },
-  "bugs": {
-    "url": "https://github.com/niuware/mui-rte/issues"
-  },
-  "homepage": "https://github.com/niuware/mui-rte#readme",
   "main": "index.js",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
@@ -68,5 +60,17 @@
     "index.js",
     "index.d.ts"
   ],
-  "types": "index.d.ts"
+  "types": "index.d.ts",
+  "homepage": "https://github.com/tetra-insights/mui-rte#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tetra-insights/mui-rte.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tetra-insights/mui-rte/issues"
+  },
+  "author": {
+    "name": "Tetra Insights",
+    "url": "https://www.tetrainsights.com"
+  }
 }
