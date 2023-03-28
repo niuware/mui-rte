@@ -1,7 +1,7 @@
 {
-  "name": "mui-rte",
+  "name": "mui-rte-fixed",
   "version": "2.0.1",
-  "description": "Material-UI Rich Text Editor and Viewer",
+  "description": "Material-UI Rich Text Editor and Viewer Fixed Version",
   "keywords": [
     "material-ui",
     "mui",
