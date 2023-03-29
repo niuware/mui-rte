@@ -1,6 +1,6 @@
 # mui-rte  
 
-The Material-UI Rich Text Editor and Viewer
+The Material-UI Rich Text Editor and Viewer Fixed Version
 
 <img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
