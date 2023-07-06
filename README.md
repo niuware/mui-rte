@@ -1,6 +1,11 @@
-# mui-rte  
+# mui-rte-fixed
 
-The Material-UI Rich Text Editor and Viewer
+The Material-UI Rich Text Editor and Viewer Fixed Version
+
+#### Fixs the annoying error
+```ts
+export {default} from './dist/MUIRichTextEditor'
+```
 
 <img src="https://raw.githubusercontent.com/niuware/niuware.github.io/master/public/assets/mui-rte/editor-1-9-0.png" width="600" />
 
