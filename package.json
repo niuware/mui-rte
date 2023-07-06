@@ -1,6 +1,6 @@
 {
   "name": "mui-rte-fixed",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "Material-UI Rich Text Editor and Viewer Fixed Version",
   "keywords": [
     "material-ui",
@@ -13,12 +13,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/niuware/mui-rte.git"
+    "url": "git@github.com:abdelrahman-essawy/mui-rte-fixed.git"
   },
   "bugs": {
     "url": "https://github.com/niuware/mui-rte/issues"
   },
-  "homepage": "https://github.com/niuware/mui-rte#readme",
+  "homepage": "https://github.com/abdelrahman-essawy/mui-rte-fixed#readme",
   "main": "index.js",
   "scripts": {
     "serve": "cross-env webpack-dev-server --mode development",
