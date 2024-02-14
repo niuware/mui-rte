@@ -1,7 +1,7 @@
-const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const { pathsToModuleNameMapper } = require('ts-jest');
 const { compilerOptions } = require('./tsconfig.json');
 
-const esModules = ['lodash-es'].join('|');
+const esModules = ['lodash-es', '@mui', '@emotion', '@swipejobs'].join('|');
 
 module.exports = {
   verbose: true,
