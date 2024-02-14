@@ -1,3 +1,7 @@
+# important
+
+Any additional features added to this module should be unit tested
+
 # mui-rte
 
 The Material-UI Rich Text Editor and Viewer
