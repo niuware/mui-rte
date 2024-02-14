@@ -1,29 +1,41 @@
 {
-    "compilerOptions": {
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "target": "ES5",
-        "strict": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "noImplicitReturns": true,
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
-        "outDir": "dist",
-        "baseUrl": ".",
-        "jsx": "react",
-        "lib": [
-            "es5",
-            "es6",
-            "dom"
-        ],
-        "paths": {
-            "*": [
-                "node_modules/*"
-            ]
-        }
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "lib": ["dom", "es6"],
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+    "outDir": "dist",
+    "typeRoots": ["node_modules/@types"],
+    "types": ["jest"],
+    "paths": {
+      "@components/*": ["components/*"]
     },
-    "include": [
-        "src/**/*"
+    "plugins": [
+      {
+        "transform": "@zerollup/ts-transform-paths",
+        "exclude": ["*"]
+      }
     ]
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.stories.tsx",
+    "jest",
+    "src/**/__tests__/*"
+  ]
 }

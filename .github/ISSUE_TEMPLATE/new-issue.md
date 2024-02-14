@@ -4,7 +4,6 @@ about: All new issues must use this template
 title: ''
 labels: ''
 assignees: ''
-
 ---
 
 ## Checklist
