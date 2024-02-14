@@ -1,29 +1,21 @@
 {
-    "compilerOptions": {
-        "module": "CommonJS",
-        "moduleResolution": "node",
-        "target": "ES5",
-        "strict": true,
-        "sourceMap": true,
-        "esModuleInterop": true,
-        "noImplicitReturns": true,
-        "noUnusedParameters": true,
-        "noUnusedLocals": true,
-        "outDir": "dist",
-        "baseUrl": ".",
-        "jsx": "react",
-        "lib": [
-            "es5",
-            "es6",
-            "dom"
-        ],
-        "paths": {
-            "*": [
-                "node_modules/*"
-            ]
-        }
-    },
-    "include": [
-        "src/**/*"
-    ]
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES5",
+    "strict": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "jsx": "react",
+    "lib": ["es5", "es6", "dom"],
+    "paths": {
+      "*": ["node_modules/*"]
+    }
+  },
+  "include": ["src/**/*"]
 }

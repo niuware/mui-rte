@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { Paper, List, ListItem, styled, createStyles } from "@mui/material";
-import { MaterialStyle } from "../types";
+import { Paper, List, ListItem } from "@mui/material";
 
 export type TAutocompleteItem = {
   keys: string[];
@@ -14,41 +13,30 @@ type TAutocompleteProps = {
   left: number;
   selectedIndex: number;
   onClick: (selectedIndex: number) => void;
-} & MaterialStyle<ReturnType<typeof styles>>;
-
-const styles = () =>
-  createStyles({
-    container: {
-      minWidth: "200px",
-      position: "absolute",
-      zIndex: 10,
-    },
-    item: {
-      cursor: "pointer",
-    },
-  });
+};
 
 const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
   if (!props.items.length) {
     return null;
   }
 
-  const { classes } = props;
   return (
     <Paper
-      className={classes.container}
       style={{
         top: props.top,
         left: props.left,
+        minWidth: "200px",
+        position: "absolute",
+        zIndex: 10,
       }}
     >
       <List dense={true}>
         {props.items.map((item, index) => (
           <ListItem
             key={index}
-            className={classes.item}
             selected={index === props.selectedIndex}
             onClick={() => props.onClick(index)}
+            style={{ cursor: "pointer" }}
           >
             {item.content}
           </ListItem>
@@ -58,4 +46,4 @@ const Autocomplete: FunctionComponent<TAutocompleteProps> = (props) => {
   );
 };
 
-export default styled(Autocomplete)(({}) => styles);
+export default Autocomplete;

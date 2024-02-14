@@ -3,8 +3,6 @@ import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import Popover from "@mui/material/Popover";
 import TextField from "@mui/material/TextField";
-import { createStyles, styled } from "@mui/material";
-import { Theme } from "@mui/material/styles";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto";
 import MovieIcon from "@mui/icons-material/Movie";
@@ -13,7 +11,6 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import FormatAlignCenter from "@mui/icons-material/FormatAlignCenter";
 import FormatAlignLeft from "@mui/icons-material/FormatAlignLeft";
 import FormatAlignRight from "@mui/icons-material/FormatAlignRight";
-import { MaterialStyle } from "../types";
 
 export type TAlignment = "left" | "center" | "right";
 
@@ -32,18 +29,7 @@ type IUrlPopoverStateProps = {
   data?: TUrlData;
   isMedia?: boolean;
   onConfirm: (isMedia?: boolean, ...args: any) => void;
-} & MaterialStyle<ReturnType<typeof styles>>;
-
-const styles = ({ spacing }: Theme) =>
-  createStyles({
-    linkPopover: {
-      padding: spacing(2, 2, 2, 2),
-      maxWidth: 250,
-    },
-    linkTextField: {
-      width: "100%",
-    },
-  });
+};
 
 const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
   const [data, setData] = useState<TUrlData>(
@@ -55,8 +41,6 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
       type: undefined,
     }
   );
-
-  const { classes } = props;
 
   const onSizeChange = (value: any, prop: "width" | "height") => {
     if (value === "") {
@@ -83,12 +67,12 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
         horizontal: "left",
       }}
     >
-      <div className={classes.linkPopover}>
+      <div style={{ padding: "spacing(2, 2, 2, 2)", maxWidth: 250 }}>
         <Grid container spacing={1}>
           <Grid container item xs spacing={1}>
             <Grid item xs={12}>
               <TextField
-                className={classes.linkTextField}
+                sx={{ width: "100%" }}
                 onChange={(event) =>
                   setData({ ...data, url: event.target.value })
                 }
@@ -211,4 +195,4 @@ const UrlPopover: FunctionComponent<IUrlPopoverStateProps> = (props) => {
   );
 };
 
-export default styled(UrlPopover)(({}) => styles);
+export default UrlPopover;
